@@ -6,6 +6,7 @@ import * as cookieParser from 'cookie-parser';
 import { HttpException, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AllConfigType } from './config/config.type';
+import { CustomExceptionFilter } from './filters/custom-exception-filter.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -57,6 +58,9 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
+
+  //global exception filter
+  app.useGlobalFilters(new CustomExceptionFilter());
 
   await app.listen(3000);
 }
