@@ -1,14 +1,20 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './config/database.config';
 import appConfig from './config/app.config';
 import config from './config/config';
 import { TypeOrmConfigService } from './database/typeorm-config.service';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
 import * as path from 'path';
+import { LoggerMiddleware } from './middlewares/logger.middleware';
+import { JwtService } from '@nestjs/jwt';
+import { ScheduleModule } from '@nestjs/schedule';
+import { RedisModule } from './modules/redis/redis.module';
 
 @Module({
   imports: [
@@ -37,8 +43,19 @@ import * as path from 'path';
         AcceptLanguageResolver,
       ],
     }),
+    ScheduleModule.forRoot(),
+    RedisModule,
+    AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, JwtService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly configService: ConfigService) {}
+  configure(consumer: MiddlewareConsumer): void {
+    if (this.configService.get('app.nodeEnv') == 'development') {
+      consumer.apply(LoggerMiddleware).forRoutes('*');
+    }
+  }
+}

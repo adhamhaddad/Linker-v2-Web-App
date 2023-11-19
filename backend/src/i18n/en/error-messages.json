@@ -1,0 +1,16 @@
+{
+  "userNotFound": "User not found",
+  "usernameTaken": "Username already exist",
+  "emailTaken": "Email already exist",
+  "otpForVerification": "We have sent you an OTP for verification",
+  "accountVerified": "Account has already been verified",
+  "invalidOtp": "Invalid otp",
+  "verificationSuccessful": "Verification has been successful",
+  "verificationFailed": "Verification has not been successful",
+  "loginSuccessfully": "Login successfully!",
+  "resendAfter60Seconds": "Resend request after 60 seconds",
+  "invalidUsernameOrPassword": "Invalid username or password",
+  "passwordMismatch": "Password and confirm password do not match",
+  "requestSuccessful": "Request successful",
+  "requestFailed": "Failed to reset your password"
+}
