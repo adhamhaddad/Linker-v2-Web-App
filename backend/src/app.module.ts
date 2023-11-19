@@ -16,6 +16,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
 import { RedisModule } from './modules/redis/redis.module';
 import { AddressModule } from './modules/address/address.module';
+import { AboutModule } from './modules/about/about.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { AddressModule } from './modules/address/address.module';
     AuthModule,
     UserModule,
     AddressModule,
+    AboutModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],

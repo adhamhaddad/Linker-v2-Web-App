@@ -14,9 +14,15 @@ export interface ErrorMessages {
   requestSuccessful: string;
   requestFailed: string;
   addressExist: string;
+  addressNotFound: string;
   addressCreatedSuccessfully: string;
   failedToCreateAddress: string;
   addressUpdatedSuccessfully: string;
   failedToUpdateAddress: string;
-  addressNotFound: string;
+  aboutExist: string;
+  aboutNotFound: string;
+  aboutCreatedSuccessfully: string;
+  failedToCreateAbout: string;
+  aboutUpdatedSuccessfully: string;
+  failedToUpdateAbout: string;
 }

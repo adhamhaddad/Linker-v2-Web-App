@@ -14,9 +14,15 @@
   "requestSuccessful": "Request successful",
   "requestFailed": "Failed to reset your password",
   "addressExist": "Address already exist",
+  "addressNotFound": "Address not found",
   "addressCreatedSuccessfully": "Address created successfully",
   "failedToCreateAddress": "Failed to create address",
   "addressUpdatedSuccessfully": "Address updated successfully",
   "failedToUpdateAddress": "Failed to update address",
-  "addressNotFound": "Address not found"
+  "aboutExist": "About already exist",
+  "aboutNotFound": "About not found",
+  "aboutCreatedSuccessfully": "About created successfully",
+  "failedToCreateAbout": "Failed to create about",
+  "aboutUpdatedSuccessfully": "About updated successfully",
+  "failedToUpdateAbout": "Failed to update about"
 }
