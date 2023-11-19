@@ -12,5 +12,11 @@
   "invalidUsernameOrPassword": "خطأ في اسم المستخدم أو كلمة مرور",
   "passwordMismatch": "كلمة المرور وتأكيد كلمة المرور غير متطابقين",
   "requestSuccessful": "تم الطلب بنجاح",
-  "requestFailed": "فشلت في إعادة تعيين كلمة المرور الخاصة بك"
+  "requestFailed": "فشلت في إعادة تعيين كلمة المرور الخاصة بك",
+  "addressExist": "العنوان موجود بالفعل",
+  "addressCreatedSuccessfully": "تم إنشاء العنوان بنجاح",
+  "failedToCreateAddress": "فشل إنشاء العنوان",
+  "addressUpdatedSuccessfully": "تم تحديث العنوان بنجاح",
+  "failedToUpdateAddress": "فشل تحديث العنوان",
+  "addressNotFound": "العنوان غير موجود"
 }

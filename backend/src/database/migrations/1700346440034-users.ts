@@ -58,7 +58,6 @@ export class Users1700346440034 implements MigrationInterface {
             enum: ['male', 'female'],
             isNullable: false,
           },
-
           {
             name: 'email_verified_at',
             type: 'timestamp',

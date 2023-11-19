@@ -6,9 +6,11 @@ import {
   UpdateDateColumn,
   Generated,
   DeleteDateColumn,
+  OneToOne,
 } from 'typeorm';
 import { IUser } from '../interfaces/user.interface';
 import { Gender } from 'src/constants';
+import { Address } from 'src/modules/address/entities/address.entity';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -54,4 +56,7 @@ export class User implements IUser {
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
   deleted_at: Date;
+
+  @OneToOne(() => Address, (address) => address.user)
+  address: Address;
 }
