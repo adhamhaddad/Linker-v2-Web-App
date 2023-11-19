@@ -9,6 +9,6 @@ export const Lang = createParamDecorator(
     if (!(lang && ['en', 'ar'].includes(lang))) {
       lang = 'en';
     }
-    return lang;
+    return lang.toLowerCase();
   },
 );

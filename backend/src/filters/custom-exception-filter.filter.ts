@@ -24,6 +24,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
       const response: any = exception.getResponse();
       switch (status) {
         case 400:
+          console.log('response', response);
           errors = response.message;
           message = errors ? 'Bad Request Errors' : response;
           break;

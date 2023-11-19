@@ -1,0 +1,16 @@
+{
+  "userNotFound": "لم يتم العثور على المستخدم",
+  "usernameTaken": "هذاالاسم مستخدم من قبل",
+  "emailTaken": "هذا البريد مستخدم من قبل",
+  "otpForVerification": "لقد أرسلنا لك OTP للتحقق",
+  "accountVerified": "لقد تم بالفعل التحقق من الحساب",
+  "invalidOtp": "كلمة مرور لمرة واحدة غير صالحة",
+  "verificationSuccessful": "تم التحقق بنجاح",
+  "verificationFailed": "لم يتم التحقق بنجاح",
+  "loginSuccessfully": "تسجيل الدخول بنجاح!",
+  "resendAfter60Seconds": "إعادة إرسال الطلب بعد 60 ثانية",
+  "invalidUsernameOrPassword": "خطأ في اسم المستخدم أو كلمة مرور",
+  "passwordMismatch": "كلمة المرور وتأكيد كلمة المرور غير متطابقين",
+  "requestSuccessful": "تم الطلب بنجاح",
+  "requestFailed": "فشلت في إعادة تعيين كلمة المرور الخاصة بك"
+}

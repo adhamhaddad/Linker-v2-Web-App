@@ -12,4 +12,8 @@ export default registerAs<AppConfig>('app', () => ({
     ? parseInt(process.env.NODE_SERVICE_PORT, 10)
     : 3000,
   apiPrefix: process.env.API_PREFIX || 'api/v1',
+  throttle: {
+    ttl: process.env.THROTTLE_TTL,
+    limit: process.env.THROTTLE_LIMIT,
+  },
 }));
