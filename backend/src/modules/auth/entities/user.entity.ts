@@ -11,6 +11,7 @@ import {
 import { IUser } from '../interfaces/user.interface';
 import { Gender } from 'src/constants';
 import { Address } from 'src/modules/address/entities/address.entity';
+import { About } from 'src/modules/about/entities/about.entity';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -59,4 +60,7 @@ export class User implements IUser {
 
   @OneToOne(() => Address, (address) => address.user)
   address: Address;
+
+  @OneToOne(() => About, (about) => about.user)
+  about: About;
 }

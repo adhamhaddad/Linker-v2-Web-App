@@ -18,5 +18,11 @@
   "failedToCreateAddress": "فشل إنشاء العنوان",
   "addressUpdatedSuccessfully": "تم تحديث العنوان بنجاح",
   "failedToUpdateAddress": "فشل تحديث العنوان",
-  "addressNotFound": "العنوان غير موجود"
+  "addressNotFound": "العنوان غير موجود",
+  "aboutExist": "الوصف موجود بالفعل",
+  "aboutNotFound": "الوصف غير موجود",
+  "aboutCreatedSuccessfully": "تم إنشاء الوصف بنجاح",
+  "failedToCreateAbout": "فشل إنشاء الوصف",
+  "aboutUpdatedSuccessfully": "تم تحديث الوصف بنجاح",
+  "failedToUpdateAbout": "فشل تحديث الوصف"
 }

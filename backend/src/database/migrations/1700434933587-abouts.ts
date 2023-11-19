@@ -5,11 +5,11 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export class Addresses1700377299278 implements MigrationInterface {
+export class Abouts1700434933587 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'users',
+        name: 'abouts',
         columns: [
           {
             name: 'id',
@@ -29,13 +29,7 @@ export class Addresses1700377299278 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'country',
-            type: 'varchar',
-            isNullable: false,
-            length: '145',
-          },
-          {
-            name: 'city',
+            name: 'about',
             type: 'varchar',
             isNullable: false,
             length: '145',
@@ -55,7 +49,7 @@ export class Addresses1700377299278 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'addresses',
+      'abouts',
       new TableForeignKey({
         columnNames: ['user_id'],
         referencedColumnNames: ['id'],
@@ -67,6 +61,6 @@ export class Addresses1700377299278 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('addresses');
+    await queryRunner.dropTable('abouts');
   }
 }
