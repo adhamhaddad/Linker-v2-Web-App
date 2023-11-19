@@ -13,4 +13,10 @@ export interface ErrorMessages {
   passwordMismatch: string;
   requestSuccessful: string;
   requestFailed: string;
+  addressExist: string;
+  addressCreatedSuccessfully: string;
+  failedToCreateAddress: string;
+  addressUpdatedSuccessfully: string;
+  failedToUpdateAddress: string;
+  addressNotFound: string;
 }

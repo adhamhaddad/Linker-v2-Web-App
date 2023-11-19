@@ -12,5 +12,11 @@
   "invalidUsernameOrPassword": "Invalid username or password",
   "passwordMismatch": "Password and confirm password do not match",
   "requestSuccessful": "Request successful",
-  "requestFailed": "Failed to reset your password"
+  "requestFailed": "Failed to reset your password",
+  "addressExist": "Address already exist",
+  "addressCreatedSuccessfully": "Address created successfully",
+  "failedToCreateAddress": "Failed to create address",
+  "addressUpdatedSuccessfully": "Address updated successfully",
+  "failedToUpdateAddress": "Failed to update address",
+  "addressNotFound": "Address not found"
 }

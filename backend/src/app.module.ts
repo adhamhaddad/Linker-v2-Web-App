@@ -15,6 +15,7 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { JwtService } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
 import { RedisModule } from './modules/redis/redis.module';
+import { AddressModule } from './modules/address/address.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { RedisModule } from './modules/redis/redis.module';
     RedisModule,
     AuthModule,
     UserModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],
