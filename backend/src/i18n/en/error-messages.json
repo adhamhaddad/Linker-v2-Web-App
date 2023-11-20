@@ -24,5 +24,12 @@
   "aboutCreatedSuccessfully": "About created successfully",
   "failedToCreateAbout": "Failed to create about",
   "aboutUpdatedSuccessfully": "About updated successfully",
-  "failedToUpdateAbout": "Failed to update about"
+  "failedToUpdateAbout": "Failed to update about",
+  "phoneExist": "Phone already exist",
+  "phoneNotFound": "Phone not found",
+  "phoneCreatedSuccessfully": "Phone created successfully",
+  "failedToDeletePhone": "Failed to delete phone",
+  "phoneDeletedSuccessfully": "Phone deleted successfully",
+  "phoneMaxLength": "You cant add more than 2 phone numbers",
+  "phoneVerified": "Phone has already been verified"
 }

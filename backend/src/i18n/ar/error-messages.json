@@ -24,5 +24,12 @@
   "aboutCreatedSuccessfully": "تم إنشاء الوصف بنجاح",
   "failedToCreateAbout": "فشل إنشاء الوصف",
   "aboutUpdatedSuccessfully": "تم تحديث الوصف بنجاح",
-  "failedToUpdateAbout": "فشل تحديث الوصف"
+  "failedToUpdateAbout": "فشل تحديث الوصف",
+  "phoneExist": "الهاتف موجود بالفعل",
+  "phoneNotFound": "الهاتف غير موجود",
+  "phoneCreatedSuccessfully": "تم إنشاء الهاتف بنجاح",
+  "failedToDeletePhone": "فشل حذف الهاتف",
+  "phoneDeletedSuccessfully": "تم حذف الهاتف بنجاح",
+  "phoneMaxLength": "لا يمكنك إضافة أكثر من رقمي هاتف",
+  "phoneVerified": "تم التحقق من الهاتف بالفعل"
 }

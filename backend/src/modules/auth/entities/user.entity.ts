@@ -7,11 +7,13 @@ import {
   Generated,
   DeleteDateColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { IUser } from '../interfaces/user.interface';
 import { Gender } from 'src/constants';
 import { Address } from 'src/modules/address/entities/address.entity';
 import { About } from 'src/modules/about/entities/about.entity';
+import { Phone } from 'src/modules/phone/entities/phone.entity';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -63,4 +65,7 @@ export class User implements IUser {
 
   @OneToOne(() => About, (about) => about.user)
   about: About;
+
+  @OneToMany(() => Phone, (phone) => phone.user)
+  phone: Phone;
 }
