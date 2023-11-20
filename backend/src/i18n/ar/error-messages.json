@@ -43,5 +43,12 @@
   "eductionUpdatedSuccessfully": "تم تحديث التعليم بنجاح",
   "failedToUpdateEducation": "فشل تحديث التعليم",
   "educationDeletedSuccessfully": "تم حذف التعليم بنجاح",
-  "failedToDeleteEducation": "فشل حذف التعليم"
+  "failedToDeleteEducation": "فشل حذف التعليم",
+  "jobNotFound": "الوظيفة غير موجودة",
+  "jobCreatedSuccessfully": "تم إنشاء الوظيفة بنجاح",
+  "failedToCreateJob": "فشل في إنشاء الوظيفة",
+  "jobUpdatedSuccessfully": "تم تحديث الوظيفة بنجاح",
+  "failedToUpdateJob": "فشل في تحديث الوظيفة",
+  "jobDeletedSuccessfully": "تم حذف الوظيفة بنجاح",
+  "failedToDeleteJob": "فشل في حذف الوظيفة"
 }

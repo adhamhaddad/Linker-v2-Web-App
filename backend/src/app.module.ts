@@ -19,6 +19,7 @@ import { AddressModule } from './modules/address/address.module';
 import { AboutModule } from './modules/about/about.module';
 import { PhoneModule } from './modules/phone/phone.module';
 import { EducationModule } from './modules/education/education.module';
+import { JobModule } from './modules/job/job.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { EducationModule } from './modules/education/education.module';
     AboutModule,
     PhoneModule,
     EducationModule,
+    JobModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],

@@ -43,5 +43,12 @@
   "eductionUpdatedSuccessfully": "Education updated successfully",
   "failedToUpdateEducation": "Failed to update education",
   "educationDeletedSuccessfully": "Education deleted successfully",
-  "failedToDeleteEducation": "Failed to delete education"
+  "failedToDeleteEducation": "Failed to delete education",
+  "jobNotFound": "Job not found",
+  "jobCreatedSuccessfully": "Job created successfully",
+  "failedToCreateJob": "Failed to create job",
+  "jobUpdatedSuccessfully": "Job updated successfully",
+  "failedToUpdateJob": "Failed to update job",
+  "jobDeletedSuccessfully": "Job deleted successfully",
+  "failedToDeleteJob": "Failed to delete job"
 }
