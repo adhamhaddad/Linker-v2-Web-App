@@ -18,6 +18,7 @@ import { RedisModule } from './modules/redis/redis.module';
 import { AddressModule } from './modules/address/address.module';
 import { AboutModule } from './modules/about/about.module';
 import { PhoneModule } from './modules/phone/phone.module';
+import { DateModule } from './modules/date/date.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { PhoneModule } from './modules/phone/phone.module';
     AddressModule,
     AboutModule,
     PhoneModule,
+    DateModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],

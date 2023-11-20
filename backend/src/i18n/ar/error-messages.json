@@ -31,5 +31,10 @@
   "failedToDeletePhone": "فشل حذف الهاتف",
   "phoneDeletedSuccessfully": "تم حذف الهاتف بنجاح",
   "phoneMaxLength": "لا يمكنك إضافة أكثر من رقمي هاتف",
-  "phoneVerified": "تم التحقق من الهاتف بالفعل"
+  "phoneVerified": "تم التحقق من الهاتف بالفعل",
+  "dateNotFound": "التاريخ غير موجود",
+  "dateCreatedSuccessfully": "تم إنشاء التاريخ بنجاح",
+  "failedToCreateDate": "فشل إنشاء التاريخ",
+  "dateUpdatedSuccessfully": "تم تحديث التاريخ بنجاح",
+  "failedToUpdateDate": "فشل تحديث التاريخ"
 }

@@ -31,5 +31,10 @@
   "failedToDeletePhone": "Failed to delete phone",
   "phoneDeletedSuccessfully": "Phone deleted successfully",
   "phoneMaxLength": "You cant add more than 2 phone numbers",
-  "phoneVerified": "Phone has already been verified"
+  "phoneVerified": "Phone has already been verified",
+  "dateNotFound": "Date not found",
+  "dateCreatedSuccessfully": "Date created successfully",
+  "failedToCreateDate": "Failed to create date",
+  "dateUpdatedSuccessfully": "Date updated successfully",
+  "failedToUpdateDate": "Failed to update date"
 }
