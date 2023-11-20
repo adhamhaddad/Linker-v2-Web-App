@@ -25,4 +25,11 @@ export interface ErrorMessages {
   failedToCreateAbout: string;
   aboutUpdatedSuccessfully: string;
   failedToUpdateAbout: string;
+  phoneExist: string;
+  phoneNotFound: string;
+  phoneCreatedSuccessfully: string;
+  failedToDeletePhone: string;
+  phoneDeletedSuccessfully: string;
+  phoneMaxLength: string;
+  phoneVerified: string;
 }
