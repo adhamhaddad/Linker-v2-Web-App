@@ -36,5 +36,12 @@
   "dateCreatedSuccessfully": "تم إنشاء التاريخ بنجاح",
   "failedToCreateDate": "فشل إنشاء التاريخ",
   "dateUpdatedSuccessfully": "تم تحديث التاريخ بنجاح",
-  "failedToUpdateDate": "فشل تحديث التاريخ"
+  "failedToUpdateDate": "فشل تحديث التاريخ",
+  "educationNotFound": "التعليم غير موجود",
+  "educationCreatedSuccessfully": "تم إنشاء التعليم بنجاح",
+  "failedToCreateEducation": "فشل إنشاء التعليم",
+  "eductionUpdatedSuccessfully": "تم تحديث التعليم بنجاح",
+  "failedToUpdateEducation": "فشل تحديث التعليم",
+  "educationDeletedSuccessfully": "تم حذف التعليم بنجاح",
+  "failedToDeleteEducation": "فشل حذف التعليم"
 }

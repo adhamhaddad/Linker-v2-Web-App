@@ -37,4 +37,11 @@ export interface ErrorMessages {
   failedToCreateDate: string;
   dateUpdatedSuccessfully: string;
   failedToUpdateDate: string;
+  educationNotFound: string;
+  educationCreatedSuccessfully: string;
+  failedToCreateEducation: string;
+  educationUpdatedSuccessfully: string;
+  failedToUpdateEducation: string;
+  educationDeletedSuccessfully: string;
+  failedToDeleteEducation: string;
 }
