@@ -14,6 +14,7 @@ import { Gender } from 'src/constants';
 import { Address } from 'src/modules/address/entities/address.entity';
 import { About } from 'src/modules/about/entities/about.entity';
 import { Phone } from 'src/modules/phone/entities/phone.entity';
+import { Education } from 'src/modules/education/entities/education.entity';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -68,4 +69,7 @@ export class User implements IUser {
 
   @OneToMany(() => Phone, (phone) => phone.user)
   phone: Phone;
+
+  @OneToMany(() => Education, (education) => education.user)
+  education: Education;
 }

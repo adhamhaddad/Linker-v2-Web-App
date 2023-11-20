@@ -36,5 +36,12 @@
   "dateCreatedSuccessfully": "Date created successfully",
   "failedToCreateDate": "Failed to create date",
   "dateUpdatedSuccessfully": "Date updated successfully",
-  "failedToUpdateDate": "Failed to update date"
+  "failedToUpdateDate": "Failed to update date",
+  "educationNotFound": "Education not found",
+  "educationCreatedSuccessfully": "Education created successfully",
+  "failedToCreateEducation": "Failed to create education",
+  "eductionUpdatedSuccessfully": "Education updated successfully",
+  "failedToUpdateEducation": "Failed to update education",
+  "educationDeletedSuccessfully": "Education deleted successfully",
+  "failedToDeleteEducation": "Failed to delete education"
 }

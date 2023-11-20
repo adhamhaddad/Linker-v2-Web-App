@@ -5,7 +5,6 @@ import { UserActivity } from '../entities/user-activity.entity';
 import { UserActivityDTO } from '../dto/activity.dto';
 import { ActivityListSerialization } from '../serializers/activity.serialization';
 import { plainToClass } from 'class-transformer';
-import { User } from 'src/decorators/user.decorator';
 import {
   ActivityLogsSortOptions,
   FilterActivityLogsDTO,
@@ -61,10 +60,7 @@ export class ActivityService {
     });
   }
 
-  async findAll(
-    filterActivityLogsDTO: FilterActivityLogsDTO,
-    @User() user: any,
-  ) {
+  async findAll(filterActivityLogsDTO: FilterActivityLogsDTO) {
     const selector: FindOptionsWhere<UserActivity> = {};
     filterActivityLogsDTO.paginate = filterActivityLogsDTO?.paginate
       ? filterActivityLogsDTO?.paginate
