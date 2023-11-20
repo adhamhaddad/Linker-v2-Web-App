@@ -44,4 +44,11 @@ export interface ErrorMessages {
   failedToUpdateEducation: string;
   educationDeletedSuccessfully: string;
   failedToDeleteEducation: string;
+  jobNotFound: string;
+  jobCreatedSuccessfully: string;
+  failedToCreateJob: string;
+  jobUpdatedSuccessfully: string;
+  failedToUpdateJob: string;
+  jobDeletedSuccessfully: string;
+  failedToDeleteJob: string;
 }

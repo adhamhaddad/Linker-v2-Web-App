@@ -154,7 +154,6 @@ export class EducationService {
 
     const education = await this.educationRepository.findOne({
       where: { uuid, user_id: user.id },
-      relations: ['date'],
     });
     if (!education)
       throw new HttpException(

@@ -15,6 +15,7 @@ import { Address } from 'src/modules/address/entities/address.entity';
 import { About } from 'src/modules/about/entities/about.entity';
 import { Phone } from 'src/modules/phone/entities/phone.entity';
 import { Education } from 'src/modules/education/entities/education.entity';
+import { Job } from 'src/modules/job/entities/job.entity';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -72,4 +73,7 @@ export class User implements IUser {
 
   @OneToMany(() => Education, (education) => education.user)
   education: Education;
+
+  @OneToMany(() => Job, (job) => job.user)
+  job: Job;
 }
