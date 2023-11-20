@@ -32,4 +32,9 @@ export interface ErrorMessages {
   phoneDeletedSuccessfully: string;
   phoneMaxLength: string;
   phoneVerified: string;
+  dateNotFound: string;
+  dateCreatedSuccessfully: string;
+  failedToCreateDate: string;
+  dateUpdatedSuccessfully: string;
+  failedToUpdateDate: string;
 }
