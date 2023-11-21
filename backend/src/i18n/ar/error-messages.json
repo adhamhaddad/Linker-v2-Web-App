@@ -50,5 +50,10 @@
   "jobUpdatedSuccessfully": "تم تحديث الوظيفة بنجاح",
   "failedToUpdateJob": "فشل في تحديث الوظيفة",
   "jobDeletedSuccessfully": "تم حذف الوظيفة بنجاح",
-  "failedToDeleteJob": "فشل في حذف الوظيفة"
+  "failedToDeleteJob": "فشل في حذف الوظيفة",
+  "profilePictureNotFound": "لم يتم العثور على صورة الملف الشخصي",
+  "profilePictureCreatedSuccessfully": "تم إنشاء صورة الملف الشخصي بنجاح",
+  "failedToCreateProfilePicture": "فشل في إنشاء صورة الملف الشخصي",
+  "profilePictureDeletedSuccessfully": "تم حذف صورة الملف الشخصي بنجاح",
+  "failedToDeleteProfilePicture": "فشل في حذف صورة الملف الشخصي"
 }

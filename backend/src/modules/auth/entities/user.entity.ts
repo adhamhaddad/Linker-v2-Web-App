@@ -16,6 +16,7 @@ import { About } from 'src/modules/about/entities/about.entity';
 import { Phone } from 'src/modules/phone/entities/phone.entity';
 import { Education } from 'src/modules/education/entities/education.entity';
 import { Job } from 'src/modules/job/entities/job.entity';
+import { ProfilePicture } from 'src/modules/profile-picture/entities/profile-picture.entity';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -76,4 +77,7 @@ export class User implements IUser {
 
   @OneToMany(() => Job, (job) => job.user)
   job: Job;
+
+  @OneToMany(() => ProfilePicture, (profilePicture) => profilePicture.user)
+  profilePicture: ProfilePicture;
 }

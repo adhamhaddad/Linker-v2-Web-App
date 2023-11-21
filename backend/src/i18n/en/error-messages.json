@@ -50,5 +50,10 @@
   "jobUpdatedSuccessfully": "Job updated successfully",
   "failedToUpdateJob": "Failed to update job",
   "jobDeletedSuccessfully": "Job deleted successfully",
-  "failedToDeleteJob": "Failed to delete job"
+  "failedToDeleteJob": "Failed to delete job",
+  "profilePictureNotFound": "Profile picture not found",
+  "profilePictureCreatedSuccessfully": "Profile picture created successfully",
+  "failedToCreateProfilePicture": "Failed to create profile picture",
+  "profilePictureDeletedSuccessfully": "Profile picture deleted successfully",
+  "failedToDeleteProfilePicture": "Failed to delete profile picture"
 }

@@ -51,4 +51,9 @@ export interface ErrorMessages {
   failedToUpdateJob: string;
   jobDeletedSuccessfully: string;
   failedToDeleteJob: string;
+  profilePictureNotFound: string;
+  profilePictureCreatedSuccessfully: string;
+  failedToCreateProfilePicture: string;
+  profilePictureDeletedSuccessfully: string;
+  failedToDeleteProfilePicture: string;
 }
