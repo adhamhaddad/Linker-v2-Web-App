@@ -55,5 +55,18 @@
   "profilePictureCreatedSuccessfully": "تم إنشاء صورة الملف الشخصي بنجاح",
   "failedToCreateProfilePicture": "فشل في إنشاء صورة الملف الشخصي",
   "profilePictureDeletedSuccessfully": "تم حذف صورة الملف الشخصي بنجاح",
-  "failedToDeleteProfilePicture": "فشل في حذف صورة الملف الشخصي"
+  "failedToDeleteProfilePicture": "فشل في حذف صورة الملف الشخصي",
+  "friendRequestNotFound": "لم يتم العثور على طلب الصداقة",
+  "friendRequestSent": "تم إرسال طلب الصداقة",
+  "failedToSendFriendRequest": "فشل في إرسال طلب الصداقة",
+  "friendAlreadyRequested": "تم إرسال طلب الصداقة بالفعل",
+  "friendRequestAcceptedSuccessfully": "تم قبول طلب الصداقة بنجاح",
+  "friendRequestUpdatedSuccessfully": "تم تحديث طلب الصداقة بنجاح",
+  "friendRequestAlreadyUpdated": "تم تحديث طلب الصداقة بالفعل",
+  "noFriendRequestsFound": "لا توجد طلبات صداقة تم إرسالها أو استلامها",
+  "friendNotFound": "لم يتم العثور على الصديق",
+  "friendExist": "الصديق موجود بالفعل",
+  "noFriendsFound": "لم يتم العثور على اصدقاء",
+  "friendDeletedSuccessfully": "تم حذف الصديق بنجاح",
+  "failedToDeleteFriend": "فشل في حذف الصديق"
 }

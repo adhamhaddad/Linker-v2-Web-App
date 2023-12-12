@@ -8,6 +8,7 @@ import {
   DeleteDateColumn,
   OneToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { IUser } from '../interfaces/user.interface';
 import { Gender } from 'src/constants';
@@ -17,6 +18,8 @@ import { Phone } from 'src/modules/phone/entities/phone.entity';
 import { Education } from 'src/modules/education/entities/education.entity';
 import { Job } from 'src/modules/job/entities/job.entity';
 import { ProfilePicture } from 'src/modules/profile-picture/entities/profile-picture.entity';
+import { FriendRequest } from 'src/modules/friends/entities/friend-request.entity';
+import { Friend } from 'src/modules/friends/entities/friend.entity';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -80,4 +83,18 @@ export class User implements IUser {
 
   @OneToMany(() => ProfilePicture, (profilePicture) => profilePicture.user)
   profilePicture: ProfilePicture;
+
+  @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.requester)
+  @JoinColumn({ name: 'requester_id' })
+  sentFriendRequests: FriendRequest[];
+
+  @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.recipient)
+  @JoinColumn({ name: 'recipient_id' })
+  receivedFriendRequests: FriendRequest[];
+
+  @OneToMany(() => Friend, (friend) => friend.user1)
+  user1Friends: Friend[];
+
+  @OneToMany(() => Friend, (friend) => friend.user2)
+  user2Friends: Friend[];
 }

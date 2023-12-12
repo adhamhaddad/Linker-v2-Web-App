@@ -56,4 +56,18 @@ export interface ErrorMessages {
   failedToCreateProfilePicture: string;
   profilePictureDeletedSuccessfully: string;
   failedToDeleteProfilePicture: string;
+  friendRequestNotFound: string;
+  friendRequestSent: string;
+  failedToSendFriendRequest: string;
+  friendAlreadyRequested: string;
+  friendRequestAlreadyUpdated: string;
+  friendRequestAcceptedSuccessfully: string;
+  friendRequestUpdatedSuccessfully: string;
+  cannotSendRequestToYourself: string;
+  noFriendRequestsFound: string;
+  friendNotFound: string;
+  friendExist: string;
+  noFriendsFound: string;
+  friendDeletedSuccessfully: string;
+  failedToDeleteFriend: string;
 }
