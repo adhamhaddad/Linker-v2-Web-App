@@ -55,5 +55,19 @@
   "profilePictureCreatedSuccessfully": "Profile picture created successfully",
   "failedToCreateProfilePicture": "Failed to create profile picture",
   "profilePictureDeletedSuccessfully": "Profile picture deleted successfully",
-  "failedToDeleteProfilePicture": "Failed to delete profile picture"
+  "failedToDeleteProfilePicture": "Failed to delete profile picture",
+  "friendRequestNotFound": "Friend request not found",
+  "friendRequestSent": "Friend request sent",
+  "failedToSendFriendRequest": "Failed to send friend request",
+  "friendAlreadyRequested": "Friend request is already sent",
+  "friendRequestAcceptedSuccessfully": "Friend request has been accepted successfully",
+  "friendRequestUpdatedSuccessfully": "Friend request updated successfully",
+  "friendRequestAlreadyUpdated": "Friend request has been already updated",
+  "cannotSendRequestToYourself": "You cannot send friend request to yourself",
+  "noFriendRequestsFound": "There is no friend requests was sent or received",
+  "friendNotFound": "Friend not found",
+  "friendExist": "Friend already exist",
+  "noFriendsFound": "No friends found",
+  "friendDeletedSuccessfully": "Friend deleted successfully",
+  "failedToDeleteFriend": "Failed to delete friend"
 }
