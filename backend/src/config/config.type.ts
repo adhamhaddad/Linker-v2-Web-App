@@ -11,6 +11,10 @@ export interface AuthConfig {
   expires?: string;
 }
 
+export interface MongoConfig {
+  uri?: string;
+}
+
 export interface DatabaseConfig {
   url?: string;
   type?: string;

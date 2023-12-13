@@ -14,7 +14,6 @@ import { ConfigService } from '@nestjs/config';
 import { AllConfigType } from './config/config.type';
 import { CustomExceptionFilter } from './filters/custom-exception-filter.filter';
 import { ResponseInterceptor } from './utils/interceptor/response.interceptor';
-// import { ValidationError } from 'class-validator';
 import { ValidationError } from 'class-validator/types/validation/ValidationError';
 
 async function bootstrap() {
