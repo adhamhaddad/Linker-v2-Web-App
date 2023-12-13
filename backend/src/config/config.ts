@@ -3,8 +3,8 @@ export default () => ({
   encryptionSalt: process.env.NODE_SERVICE_ENCRYPTION_SALT,
   database: {
     dialect: process.env.DATABASE_DIALECT,
-    port: process.env.DATABASE_PORT,
     host: process.env.DATABASE_HOST,
+    port: process.env.DATABASE_PORT,
     username: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
     name: process.env.DATABASE_NAME,
@@ -12,6 +12,9 @@ export default () => ({
     max: process.env.DATABASE_POOL_MAX,
     min: process.env.DATABASE_POOL_MIN,
     synchronize: process.env.DATABASE_SYNCHRONIZE,
+  },
+  mongo: {
+    uri: process.env.MONGO_URI,
   },
   redis: {
     host: process.env.REDIS_HOST,

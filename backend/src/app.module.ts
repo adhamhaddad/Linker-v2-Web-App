@@ -4,9 +4,11 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './config/database.config';
+import mongoConfig from './config/mongo.config';
 import appConfig from './config/app.config';
 import config from './config/config';
-import { TypeOrmConfigService } from './database/typeorm-config.service';
+import { TypeOrmConfigService } from './database/sql/typeorm-config.service';
+import { MongoConfigService } from './database/mongo/mongo-config.service';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
@@ -23,16 +25,20 @@ import { JobModule } from './modules/job/job.module';
 import { MulterConfig } from './config/multer.config';
 import { ProfilePictureModule } from './modules/profile-picture/profile-picture.module';
 import { FriendsModule } from './modules/friends/friends.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, appConfig, config],
+      load: [databaseConfig, mongoConfig, appConfig, config],
       envFilePath: ['.env'],
     }),
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
+    }),
+    MongooseModule.forRootAsync({
+      useClass: MongoConfigService,
     }),
     //Localization
     I18nModule.forRoot({
