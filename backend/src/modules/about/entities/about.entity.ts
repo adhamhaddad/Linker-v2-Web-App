@@ -20,7 +20,7 @@ export class About implements IAbout {
   @Generated('uuid')
   uuid: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: false })
+  @Column({ type: 'text', nullable: false })
   about: string;
 
   @Column({ type: 'int', nullable: false })
