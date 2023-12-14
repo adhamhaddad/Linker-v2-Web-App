@@ -1,4 +1,3 @@
-// multer.config.ts
 import { MulterModule } from '@nestjs/platform-express';
 
 export const MulterConfig = MulterModule.register({

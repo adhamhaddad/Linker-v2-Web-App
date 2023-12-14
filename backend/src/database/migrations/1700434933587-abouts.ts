@@ -30,9 +30,8 @@ export class Abouts1700434933587 implements MigrationInterface {
           },
           {
             name: 'about',
-            type: 'varchar',
+            type: 'text',
             isNullable: false,
-            length: '145',
           },
           {
             name: 'created_at',
