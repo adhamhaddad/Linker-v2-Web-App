@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { FriendsService } from './services/friend.service';
-import { FriendsController } from './controllers/friend.controller';
+import { FriendService } from './services/friend.service';
+import { FriendController } from './controllers/friend.controller';
 import { FriendRequestController } from './controllers/friend-request.controller';
 import { FriendRequestService } from './services/friend-request.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,12 +14,12 @@ import { User } from '../auth/entities/user.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Friend, FriendRequest, User])],
   providers: [
-    FriendsService,
+    FriendService,
     FriendRequestService,
     JwtStrategy,
     Utils,
     RedisService,
   ],
-  controllers: [FriendsController, FriendRequestController],
+  controllers: [FriendController, FriendRequestController],
 })
 export class FriendsModule {}

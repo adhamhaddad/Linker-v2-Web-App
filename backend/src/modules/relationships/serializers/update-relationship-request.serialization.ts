@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
 import { RequestStatus } from 'src/constants/request-status';
 
-export class UpdateFriendRequestSerialization {
+export class UpdateRelationshipRequestSerialization {
   @Expose({ name: 'uuid' })
   id: string;
 

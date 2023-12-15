@@ -68,5 +68,21 @@
   "friendExist": "الصديق موجود بالفعل",
   "noFriendsFound": "لم يتم العثور على اصدقاء",
   "friendDeletedSuccessfully": "تم حذف الصديق بنجاح",
-  "failedToDeleteFriend": "فشل في حذف الصديق"
+  "failedToDeleteFriend": "فشل في حذف الصديق",
+  "relationshipRequestNotFound": "لم يتم العثور على طلب العلاقة",
+  "relationshipRequestSent": "تم إرسال طلب العلاقة",
+  "failedToSendRelationshipRequest": "فشل في إرسال طلب العلاقة",
+  "relationshipAlreadyRequested": "تم إرسال طلب العلاقة بالفعل",
+  "relationshipRequestAcceptedSuccessfully": "تم قبول طلب العلاقة بنجاح",
+  "relationshipRequestUpdatedSuccessfully": "تم تحديث طلب العلاقة بنجاح",
+  "relationshipRequestAlreadyUpdated": "تم تحديث طلب العلاقة بالفعل",
+  "noRelationshipRequestsFound": "لا توجد طلبات علاقة تم إرسالها أو استلامها",
+  "cannotSendRelationRequestToYourself": "لا يمكنك إرسال طلب علاقة لنفسك",
+  "relationshipNotFound": "لم يتم العثور على العلاقة",
+  "noRelationshipsFound": "لا توجد علاقات متاحة",
+  "relationshipCreatedSuccessfully": "تم إنشاء العلاقة بنجاح",
+  "relationshipDeletedSuccessfully": "تم حذف العلاقة بنجاح",
+  "relationshipUpdatedSuccessfully": "تم تحديث العلاقة بنجاح",
+  "failedToUpdateRelationship": "فشل في تحديث العلاقة",
+  "failedToDeleteRelationship": "فشل في حذف العلاقة"
 }

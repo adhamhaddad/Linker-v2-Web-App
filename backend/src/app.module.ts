@@ -23,6 +23,7 @@ import { JobModule } from './modules/job/job.module';
 import { MulterConfig } from './config/multer.config';
 import { ProfilePictureModule } from './modules/profile-picture/profile-picture.module';
 import { FriendsModule } from './modules/friends/friends.module';
+import { RelationshipsModule } from './modules/relationships/relationships.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { FriendsModule } from './modules/friends/friends.module';
     JobModule,
     ProfilePictureModule,
     FriendsModule,
+    RelationshipsModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],

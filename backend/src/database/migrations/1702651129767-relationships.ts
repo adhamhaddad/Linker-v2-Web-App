@@ -5,11 +5,11 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export class Friends1702363956996 implements MigrationInterface {
+export class Relationships1702651129767 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'friends',
+        name: 'relationships',
         columns: [
           {
             name: 'id',
@@ -32,6 +32,36 @@ export class Friends1702363956996 implements MigrationInterface {
             name: 'user2_id',
             type: 'integer',
             isNullable: false,
+          },
+          {
+            name: 'relation',
+            type: 'enum',
+            enum: [
+              'single',
+              'in_relation',
+              'engaged',
+              'married',
+              'family',
+              'friend',
+              'colleague',
+            ],
+            isNullable: false,
+          },
+          {
+            name: 'is_verified',
+            type: 'boolean',
+            default: false,
+            isNullable: false,
+          },
+          {
+            name: 'start_date',
+            type: 'date',
+            isNullable: true,
+          },
+          {
+            name: 'end_date',
+            type: 'date',
+            isNullable: true,
           },
           {
             name: 'created_at',
@@ -71,6 +101,6 @@ export class Friends1702363956996 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('friends');
+    await queryRunner.dropTable('relationships');
   }
 }
