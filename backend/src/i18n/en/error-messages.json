@@ -85,5 +85,10 @@
   "relationshipDeletedSuccessfully": "Relationship deleted successfully",
   "relationshipUpdatedSuccessfully": "Relationship updated successfully",
   "failedToUpdateRelationship": "Failed to update relationship",
-  "failedToDeleteRelationship": "Failed to delete relationship"
+  "failedToDeleteRelationship": "Failed to delete relationship",
+  "cannotVisitYourself": "You cannot visit yourself",
+  "visitCreatedSuccessfully": "Visit log created successfully",
+  "visitUpdatedSuccessfully": "Visit log updated successfully",
+  "failedToCreateVisit": "Failed to log visit",
+  "failedToUpdateVisit": "Failed to update visitation log"
 }
