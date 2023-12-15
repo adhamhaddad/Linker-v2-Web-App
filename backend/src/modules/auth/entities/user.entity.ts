@@ -20,6 +20,8 @@ import { Job } from 'src/modules/job/entities/job.entity';
 import { ProfilePicture } from 'src/modules/profile-picture/entities/profile-picture.entity';
 import { FriendRequest } from 'src/modules/friends/entities/friend-request.entity';
 import { Friend } from 'src/modules/friends/entities/friend.entity';
+import { Relationship } from 'src/modules/relationships/entities/relationship.entity';
+import { RelationshipRequest } from 'src/modules/relationships/entities/relationship-request.entity';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -97,4 +99,24 @@ export class User implements IUser {
 
   @OneToMany(() => Friend, (friend) => friend.user2)
   user2Friends: Friend[];
+
+  @OneToMany(
+    () => RelationshipRequest,
+    (relationRequest) => relationRequest.requester,
+  )
+  @JoinColumn({ name: 'requester_id' })
+  sentRelationshipRequests: RelationshipRequest[];
+
+  @OneToMany(
+    () => RelationshipRequest,
+    (relationRequest) => relationRequest.recipient,
+  )
+  @JoinColumn({ name: 'recipient_id' })
+  receivedRelationshipRequests: RelationshipRequest[];
+
+  @OneToMany(() => Relationship, (relationship) => relationship.user1)
+  user1Relations: Relationship[];
+
+  @OneToMany(() => Relationship, (relationship) => relationship.user2)
+  user2Relations: Relationship[];
 }

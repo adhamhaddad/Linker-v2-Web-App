@@ -6,7 +6,7 @@ import { Friend } from '../entities/friend.entity';
 import { User } from 'src/modules/auth/entities/user.entity';
 import { I18nService } from 'nestjs-i18n';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
-import { RequestStatus } from '../interfaces/friend-request.interface';
+import { RequestStatus } from 'src/constants/request-status';
 import { plainToClass } from 'class-transformer';
 import { FriendRequestSerialization } from '../serializers/friend-request.serialization';
 import { FriendSerialization } from '../serializers/friend.serialization';
@@ -77,6 +77,7 @@ export class FriendRequestService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
     const receiverUser = await this.userRepository.findOne({
       where: { uuid: recipientUuid },
     });

@@ -10,7 +10,7 @@ import { User } from 'src/modules/auth/entities/user.entity';
 import { UserSerialization } from 'src/modules/auth/serializers/user.serialization';
 
 @Injectable()
-export class FriendsService {
+export class FriendService {
   constructor(
     @InjectRepository(Friend)
     private readonly friendsRepository: Repository<Friend>,

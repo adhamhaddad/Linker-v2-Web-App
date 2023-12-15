@@ -5,11 +5,11 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export class Friends1702363956996 implements MigrationInterface {
+export class RelationshipRequests1702651144836 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'friends',
+        name: 'relation_requests',
         columns: [
           {
             name: 'id',
@@ -24,13 +24,24 @@ export class Friends1702363956996 implements MigrationInterface {
             length: '145',
           },
           {
-            name: 'user1_id',
+            name: 'relation_id',
             type: 'integer',
             isNullable: false,
           },
           {
-            name: 'user2_id',
+            name: 'requester_id',
             type: 'integer',
+            isNullable: false,
+          },
+          {
+            name: 'recipient_id',
+            type: 'integer',
+            isNullable: false,
+          },
+          {
+            name: 'status',
+            type: 'enum',
+            enum: ['pending', 'accepted', 'rejected', 'canceled'],
             isNullable: false,
           },
           {
@@ -48,9 +59,20 @@ export class Friends1702363956996 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'friends',
+      'relation_requests',
       new TableForeignKey({
-        columnNames: ['user1_id'],
+        columnNames: ['relation_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'relationships',
+        onDelete: 'CASCADE',
+        onUpdate: 'NO ACTION',
+      }),
+    );
+
+    await queryRunner.createForeignKey(
+      'relation_requests',
+      new TableForeignKey({
+        columnNames: ['requester_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
@@ -59,9 +81,9 @@ export class Friends1702363956996 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'friends',
+      'relation_requests',
       new TableForeignKey({
-        columnNames: ['user2_id'],
+        columnNames: ['recipient_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE',
@@ -71,6 +93,6 @@ export class Friends1702363956996 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('friends');
+    await queryRunner.dropTable('relation_requests');
   }
 }

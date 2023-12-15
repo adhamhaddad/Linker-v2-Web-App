@@ -1,13 +1,13 @@
 import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
-import { FriendsService } from '../services/friend.service';
+import { FriendService } from '../services/friend.service';
 import { User } from 'src/decorators/user.decorator';
 import { Lang } from 'src/decorators/lang.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('user')
-export class FriendsController {
-  constructor(private readonly friendsService: FriendsService) {}
+export class FriendController {
+  constructor(private readonly friendsService: FriendService) {}
 
   @Get(':id/friends')
   async getFriends(@Param('id') uuid: string, @Lang() lang: string) {

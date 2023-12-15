@@ -1,24 +1,32 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  Generated,
+  PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Generated,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { RequestStatus } from 'src/constants/request-status';
-import { IFriendRequest } from '../interfaces/friend-request.interface';
+import { IRelationshipRequest } from '../interfaces/relationship-request.interface';
 import { User } from 'src/modules/auth/entities/user.entity';
+import { Relationship } from './relationship.entity';
 
-@Entity({ name: 'friend_requests' })
-export class FriendRequest implements IFriendRequest {
+@Entity({ name: 'relationship_requests' })
+export class RelationshipRequest implements IRelationshipRequest {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'uuid', unique: true, nullable: false })
   @Generated('uuid')
   uuid: string;
+
+  @ManyToOne(() => Relationship, (relation) => relation.relationshipRequest, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'relation_id' })
+  relation: Relationship;
 
   @ManyToOne(() => User)
   requester: User;
