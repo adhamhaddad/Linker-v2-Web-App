@@ -24,6 +24,7 @@ import { MulterConfig } from './config/multer.config';
 import { ProfilePictureModule } from './modules/profile-picture/profile-picture.module';
 import { FriendsModule } from './modules/friends/friends.module';
 import { RelationshipsModule } from './modules/relationships/relationships.module';
+import { VisitorModule } from './modules/visitor/visitor.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { RelationshipsModule } from './modules/relationships/relationships.modul
     ProfilePictureModule,
     FriendsModule,
     RelationshipsModule,
+    VisitorModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],

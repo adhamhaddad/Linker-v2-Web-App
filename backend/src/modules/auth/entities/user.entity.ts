@@ -22,6 +22,7 @@ import { FriendRequest } from 'src/modules/friends/entities/friend-request.entit
 import { Friend } from 'src/modules/friends/entities/friend.entity';
 import { Relationship } from 'src/modules/relationships/entities/relationship.entity';
 import { RelationshipRequest } from 'src/modules/relationships/entities/relationship-request.entity';
+import { Visitor } from 'src/modules/visitor/entities/visitor.entity';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -119,4 +120,10 @@ export class User implements IUser {
 
   @OneToMany(() => Relationship, (relationship) => relationship.user2)
   user2Relations: Relationship[];
+
+  @OneToMany(() => Visitor, (visitor) => visitor.visitor)
+  visitors: Visitor[];
+
+  @OneToMany(() => Visitor, (visitor) => visitor.recipient)
+  recipients: Visitor[];
 }

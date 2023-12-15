@@ -86,4 +86,9 @@ export interface ErrorMessages {
   relationshipUpdatedSuccessfully: string;
   failedToUpdateRelationship: string;
   failedToDeleteRelationship: string;
+  cannotVisitYourself: string;
+  visitCreatedSuccessfully: string;
+  failedToCreateVisit: string;
+  visitUpdatedSuccessfully: string;
+  failedToUpdateVisit: string;
 }

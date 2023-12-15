@@ -84,5 +84,10 @@
   "relationshipDeletedSuccessfully": "تم حذف العلاقة بنجاح",
   "relationshipUpdatedSuccessfully": "تم تحديث العلاقة بنجاح",
   "failedToUpdateRelationship": "فشل في تحديث العلاقة",
-  "failedToDeleteRelationship": "فشل في حذف العلاقة"
+  "failedToDeleteRelationship": "فشل في حذف العلاقة",
+  "cannotVisitYourself": "لا يمكنك زيارة نفسك",
+  "visitCreatedSuccessfully": "تم إنشاء سجل الزيارة بنجاح",
+  "visitUpdatedSuccessfully": "تم تحديث سجل الزيارة بنجاح",
+  "failedToCreateVisit": "فشل في تسجيل الزيارة",
+  "failedToUpdateVisit": "فشل في تحديث سجل الزيارة"
 }
