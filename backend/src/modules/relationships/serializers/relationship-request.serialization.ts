@@ -1,6 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import { RequestStatus } from 'src/constants/request-status';
-import { UserSerialization } from 'src/modules/auth/serializers/user.serialization';
+import { GetUserSerialization } from 'src/modules/user/serializers/get-user.serialization';
 import { RelationshipSerialization } from './relationship.serialization';
 
 export class RelationshipRequestSerialization {
@@ -10,13 +10,13 @@ export class RelationshipRequestSerialization {
   @Expose({ name: 'status' })
   status: RequestStatus;
 
-  @Type(() => UserSerialization)
+  @Type(() => GetUserSerialization)
   @Expose({ name: 'requester' })
-  requester: UserSerialization;
+  requester: GetUserSerialization;
 
-  @Type(() => UserSerialization)
+  @Type(() => GetUserSerialization)
   @Expose({ name: 'recipient' })
-  recipient: UserSerialization;
+  recipient: GetUserSerialization;
 
   @Type(() => RelationshipSerialization)
   @Expose({ name: 'relation' })

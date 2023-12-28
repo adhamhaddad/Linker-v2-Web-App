@@ -1,5 +1,5 @@
 import { Expose, plainToClass } from 'class-transformer';
-import { UserSerialization } from 'src/modules/auth/serializers/user.serialization';
+import { GetUserSerialization } from 'src/modules/user/serializers/get-user.serialization';
 import { MultiRelationType } from '../interfaces/relationship.interface';
 
 export class RelationshipSerialization {
@@ -7,7 +7,7 @@ export class RelationshipSerialization {
   id: string;
 
   @Expose({ name: 'user' })
-  user: UserSerialization;
+  user: GetUserSerialization;
 
   @Expose({ name: 'relation' })
   relation: MultiRelationType;
@@ -28,7 +28,7 @@ export class RelationshipSerialization {
   updatedAt: Date;
 
   static serializeUser(user) {
-    return plainToClass(UserSerialization, user, {
+    return plainToClass(GetUserSerialization, user, {
       excludeExtraneousValues: true,
       enableCircularCheck: true,
       strategy: 'excludeAll',

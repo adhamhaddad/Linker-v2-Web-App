@@ -1,6 +1,4 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -25,6 +23,7 @@ import { ProfilePictureModule } from './modules/profile-picture/profile-picture.
 import { FriendsModule } from './modules/friends/friends.module';
 import { RelationshipsModule } from './modules/relationships/relationships.module';
 import { VisitorModule } from './modules/visitor/visitor.module';
+import { GroupModule } from './modules/group/group.module';
 
 @Module({
   imports: [
@@ -70,9 +69,10 @@ import { VisitorModule } from './modules/visitor/visitor.module';
     FriendsModule,
     RelationshipsModule,
     VisitorModule,
+    GroupModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, JwtService],
+  controllers: [],
+  providers: [JwtService],
 })
 export class AppModule {
   constructor(private readonly configService: ConfigService) {}

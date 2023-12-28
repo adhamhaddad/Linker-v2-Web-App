@@ -23,6 +23,9 @@ import { Friend } from 'src/modules/friends/entities/friend.entity';
 import { Relationship } from 'src/modules/relationships/entities/relationship.entity';
 import { RelationshipRequest } from 'src/modules/relationships/entities/relationship-request.entity';
 import { Visitor } from 'src/modules/visitor/entities/visitor.entity';
+import { Group } from 'src/modules/group/entities/group.entity';
+import { GroupMember } from 'src/modules/group/entities/group-member.entity';
+import { GroupRequest } from 'src/modules/group/entities/group-request.entity';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -126,4 +129,13 @@ export class User implements IUser {
 
   @OneToMany(() => Visitor, (visitor) => visitor.recipient)
   recipients: Visitor[];
+
+  @OneToMany(() => Group, (group) => group.creator)
+  groups: Group[];
+
+  @OneToMany(() => GroupMember, (groupMember) => groupMember.member)
+  groupMembers: GroupMember[];
+
+  @OneToMany(() => GroupRequest, (groupRequest) => groupRequest.requester)
+  groupRequests: GroupRequest[];
 }

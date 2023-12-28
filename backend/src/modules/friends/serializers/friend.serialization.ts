@@ -1,12 +1,12 @@
 import { Expose, plainToClass } from 'class-transformer';
-import { UserSerialization } from 'src/modules/auth/serializers/user.serialization';
+import { GetUserSerialization } from 'src/modules/user/serializers/get-user.serialization';
 
 export class FriendSerialization {
   @Expose({ name: 'uuid' })
   id: string;
 
   @Expose({ name: 'user' })
-  user: UserSerialization;
+  user: GetUserSerialization;
 
   @Expose({ name: 'created_at' })
   createdAt: Date;
@@ -15,7 +15,7 @@ export class FriendSerialization {
   updatedAt: Date;
 
   static serializeUser(user) {
-    return plainToClass(UserSerialization, user, {
+    return plainToClass(GetUserSerialization, user, {
       excludeExtraneousValues: true,
       enableCircularCheck: true,
       strategy: 'excludeAll',

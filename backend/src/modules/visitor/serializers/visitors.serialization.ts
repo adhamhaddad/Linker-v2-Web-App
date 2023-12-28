@@ -1,13 +1,13 @@
 import { Expose, Type } from 'class-transformer';
-import { UserSerialization } from 'src/modules/auth/serializers/user.serialization';
+import { GetUserSerialization } from 'src/modules/user/serializers/get-user.serialization';
 
 export class VisitorSerialization {
   @Expose({ name: 'uuid' })
   id: string;
 
-  @Type(() => UserSerialization)
+  @Type(() => GetUserSerialization)
   @Expose({ name: 'visitor' })
-  visitor: UserSerialization;
+  visitor: GetUserSerialization;
 
   @Expose({ name: 'created_at' })
   createdAt: Date;
