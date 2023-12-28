@@ -1,5 +1,4 @@
 import { Expose } from 'class-transformer';
-import { Gender } from 'src/constants';
 
 export class GetUserSerialization {
   @Expose({ name: 'uuid' })
@@ -16,16 +15,4 @@ export class GetUserSerialization {
 
   @Expose({ name: 'username' })
   username: string;
-
-  @Expose({ name: 'gender' })
-  gender: Gender;
-
-  @Expose({ name: 'email' })
-  email: string;
-
-  @Expose({ name: 'created_at' })
-  createdAt: Date;
-
-  @Expose({ name: 'updated_at' })
-  updateAt: Date | null;
 }

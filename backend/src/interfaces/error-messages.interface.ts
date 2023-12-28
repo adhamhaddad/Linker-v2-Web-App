@@ -1,4 +1,5 @@
 export interface ErrorMessages {
+  /* -- Auth -- */
   userNotFound: string;
   emailTaken: string;
   usernameTaken: string;
@@ -13,37 +14,43 @@ export interface ErrorMessages {
   passwordMismatch: string;
   requestSuccessful: string;
   requestFailed: string;
-  addressExist: string;
+  /* -- Address -- */
   addressNotFound: string;
+  addressExist: string;
   addressCreatedSuccessfully: string;
-  failedToCreateAddress: string;
   addressUpdatedSuccessfully: string;
+  failedToCreateAddress: string;
   failedToUpdateAddress: string;
-  aboutExist: string;
+  /* -- About -- */
   aboutNotFound: string;
+  aboutExist: string;
   aboutCreatedSuccessfully: string;
-  failedToCreateAbout: string;
   aboutUpdatedSuccessfully: string;
+  failedToCreateAbout: string;
   failedToUpdateAbout: string;
-  phoneExist: string;
+  /* -- Phone -- */
   phoneNotFound: string;
+  phoneExist: string;
   phoneCreatedSuccessfully: string;
-  failedToDeletePhone: string;
   phoneDeletedSuccessfully: string;
+  failedToDeletePhone: string;
   phoneMaxLength: string;
   phoneVerified: string;
+  /* -- Date -- */
   dateNotFound: string;
   dateCreatedSuccessfully: string;
   failedToCreateDate: string;
   dateUpdatedSuccessfully: string;
   failedToUpdateDate: string;
+  /* -- Education -- */
   educationNotFound: string;
   educationCreatedSuccessfully: string;
-  failedToCreateEducation: string;
   educationUpdatedSuccessfully: string;
-  failedToUpdateEducation: string;
   educationDeletedSuccessfully: string;
+  failedToCreateEducation: string;
+  failedToUpdateEducation: string;
   failedToDeleteEducation: string;
+  /* -- Job -- */
   jobNotFound: string;
   jobCreatedSuccessfully: string;
   failedToCreateJob: string;
@@ -51,34 +58,39 @@ export interface ErrorMessages {
   failedToUpdateJob: string;
   jobDeletedSuccessfully: string;
   failedToDeleteJob: string;
+  /* -- Profile Picture -- */
   profilePictureNotFound: string;
   profilePictureCreatedSuccessfully: string;
   failedToCreateProfilePicture: string;
   profilePictureDeletedSuccessfully: string;
   failedToDeleteProfilePicture: string;
+  /* -- Friend Request -- */
+  noFriendRequestsFound: string;
   friendRequestNotFound: string;
   friendRequestSent: string;
-  failedToSendFriendRequest: string;
   friendAlreadyRequested: string;
   friendRequestAcceptedSuccessfully: string;
   friendRequestUpdatedSuccessfully: string;
   friendRequestAlreadyUpdated: string;
-  noFriendRequestsFound: string;
+  failedToSendFriendRequest: string;
   cannotSendRequestToYourself: string;
+  /* -- Friend -- */
+  noFriendsFound: string;
   friendNotFound: string;
   friendExist: string;
-  noFriendsFound: string;
   friendDeletedSuccessfully: string;
   failedToDeleteFriend: string;
+  /* -- Relationship Request -- */
   relationshipRequestNotFound: string;
+  noRelationshipRequestsFound: string;
   relationshipRequestSent: string;
-  failedToSendRelationshipRequest: string;
-  relationshipAlreadyRequested: string;
   relationshipRequestAcceptedSuccessfully: string;
   relationshipRequestUpdatedSuccessfully: string;
-  relationshipRequestAlreadyUpdated: string;
-  noRelationshipRequestsFound: string;
   cannotSendRelationRequestToYourself: string;
+  relationshipAlreadyRequested: string;
+  relationshipRequestAlreadyUpdated: string;
+  failedToSendRelationshipRequest: string;
+  /* -- Relationship -- */
   relationshipNotFound: string;
   noRelationshipsFound: string;
   relationshipCreatedSuccessfully: string;
@@ -86,9 +98,37 @@ export interface ErrorMessages {
   relationshipUpdatedSuccessfully: string;
   failedToUpdateRelationship: string;
   failedToDeleteRelationship: string;
+  /* -- Visit -- */
   cannotVisitYourself: string;
   visitCreatedSuccessfully: string;
   failedToCreateVisit: string;
   visitUpdatedSuccessfully: string;
   failedToUpdateVisit: string;
+  /* -- Group -- */
+  groupNotFound: string;
+  groupCreatedSuccessfully: string;
+  groupUpdatedSuccessfully: string;
+  groupDeletedSuccessfully: string;
+  failedToCreateGroup: string;
+  failedToUpdateGroup: string;
+  failedToDeleteGroup: string;
+  /* -- Group Request -- */
+  noGroupRequestsFound: string;
+  groupRequestNotFound: string;
+  groupRequestSentSuccessfully: string;
+  groupRequestUpdatedSuccessfully: string;
+  groupRequestAlreadySent: string;
+  groupRequestAlreadyUpdated: string;
+  memberAlreadyExistInGroup: string;
+  failedToSendGroupRequest: string;
+  failedToUpdateGroupRequest: string;
+  notAuthorized: string;
+  /* -- Group Member -- */
+  groupMemberNotFound: string;
+  groupMemberCreatedSuccessfully: string;
+  groupMemberUpdatedSuccessfully: string;
+  groupMemberDeletedSuccessfully: string;
+  failedToCreateGroupMember: string;
+  failedToUpdateGroupMember: string;
+  failedToDeleteGroupMember: string;
 }
