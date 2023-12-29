@@ -24,6 +24,7 @@ import { FriendsModule } from './modules/friends/friends.module';
 import { RelationshipsModule } from './modules/relationships/relationships.module';
 import { VisitorModule } from './modules/visitor/visitor.module';
 import { GroupModule } from './modules/group/group.module';
+import { PageModule } from './modules/page/page.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { GroupModule } from './modules/group/group.module';
     RelationshipsModule,
     VisitorModule,
     GroupModule,
+    PageModule,
   ],
   controllers: [],
   providers: [JwtService],
