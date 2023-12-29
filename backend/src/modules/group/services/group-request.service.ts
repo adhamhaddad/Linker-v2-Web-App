@@ -133,7 +133,7 @@ export class GroupRequestService {
       //@ts-ignore
       group: { uuid },
     };
-    let order: OrderByCondition = { 'groupRequest.created_at': 'DESC' };
+    const order: OrderByCondition = { 'groupRequest.created_at': 'DESC' };
     query.paginate = query.paginate || 15;
     query.page = query.page || 1;
     const skip = (query.page - 1) * query.paginate;

@@ -131,4 +131,30 @@ export interface ErrorMessages {
   failedToCreateGroupMember: string;
   failedToUpdateGroupMember: string;
   failedToDeleteGroupMember: string;
+  /* -- Page -- */
+  pageNotFound: string;
+  pageCreatedSuccessfully: string;
+  pageUpdatedSuccessfully: string;
+  pageDeletedSuccessfully: string;
+  failedToCreatePage: string;
+  failedToUpdatePage: string;
+  failedToDeletePage: string;
+  /* -- Page Admins -- */
+  pageAdminNotFound: string;
+  pageAdminCreatedSuccessfully: string;
+  pageAdminUpdatedSuccessfully: string;
+  pageAdminDeletedSuccessfully: string;
+  failedToCreatePageAdmin: string;
+  failedToUpdatePageAdmin: string;
+  failedToDeletePageAdmin: string;
+  pageAdminExist: string;
+  /* -- Page Followers -- */
+  pageFollowingCreatedSuccessfully: string;
+  pageUnFollowingSuccessfully: string;
+  pageFollowerUpdatedSuccessfully: string;
+  failedToFollowingPage: string;
+  failedToUnFollowPage: string;
+  failedToUpdatePageFollower: string;
+  alreadyFollowingPage: string;
+  notFollowingPage: string;
 }

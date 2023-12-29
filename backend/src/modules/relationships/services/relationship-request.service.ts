@@ -293,11 +293,7 @@ export class RelationshipRequestService {
     };
   }
 
-  async getRelationshipRequests(
-    user: User,
-    lang: string,
-    sent: boolean = false,
-  ) {
+  async getRelationshipRequests(user: User, lang: string, sent = false) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {

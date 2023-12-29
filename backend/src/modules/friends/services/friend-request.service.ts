@@ -173,7 +173,7 @@ export class FriendRequestService {
     };
   }
 
-  async getFriendRequests(user: User, lang: string, sent: boolean = false) {
+  async getFriendRequests(user: User, lang: string, sent = false) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
