@@ -14,7 +14,7 @@ import { UpdateAboutDto } from '../dto/update-about.dto';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('user/about')
+@Controller('users/about')
 export class AboutController {
   constructor(private readonly aboutService: AboutService) {}
 

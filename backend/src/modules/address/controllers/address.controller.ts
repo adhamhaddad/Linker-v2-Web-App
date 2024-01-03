@@ -14,7 +14,7 @@ import { UpdateAddressDto } from '../dto/update-address.dto';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('user/address')
+@Controller('users/addresses')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
