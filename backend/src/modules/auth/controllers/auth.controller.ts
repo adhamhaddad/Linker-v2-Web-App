@@ -63,11 +63,14 @@ export class AuthController {
       headers,
       ip,
     );
+    const expiresIn = 3 * 60 * 60 * 1000;
+    const expirationDate = new Date(Date.now() + expiresIn);
+
     response.cookie('access_token', token, {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
-      expires: new Date(Date.now() + 50 * 60 * 1000),
+      expires: expirationDate,
     });
 
     return { message, data };

@@ -1,5 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import { GetUserSerialization } from 'src/modules/user/serializers/get-user.serialization';
+import { GroupMemberSerialization } from './group-member.serialization';
 
 export class GroupSerialization {
   @Expose({ name: 'uuid' })
@@ -20,6 +21,10 @@ export class GroupSerialization {
 
   @Expose({ name: 'status' })
   status: Date;
+
+  @Type(() => GroupMemberSerialization)
+  @Expose({ name: 'members' })
+  members: GroupMemberSerialization;
 
   @Expose({ name: 'created_at' })
   createdAt: Date;

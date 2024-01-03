@@ -1,12 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Brackets,
-  In,
-  OrderByCondition,
-  Repository,
-  SelectQueryBuilder,
-} from 'typeorm';
+import { In, OrderByCondition, Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { User } from 'src/modules/auth/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
@@ -19,6 +13,7 @@ import {
   IGroupMember,
 } from '../interfaces/group-member.interface';
 import { GroupMemberSerialization } from '../serializers/group-member.serialization';
+import { GroupPermissions } from 'src/constants';
 
 @Injectable()
 export class GroupMemberService {
@@ -27,8 +22,6 @@ export class GroupMemberService {
     private readonly groupMemberRepository: Repository<GroupMember>,
     @InjectRepository(Group)
     private readonly groupRepository: Repository<Group>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -42,33 +35,25 @@ export class GroupMemberService {
   }
 
   // Helper function to check my authority
-  async isHasAuthority(groupUuid: string, memberUuid: string) {
-    const groupMember = await this.groupMemberRepository.findOne({
+  async isHasAuthority(groupUuid: string, memberUuid: string, roles: string[]) {
+    const authority = await this.groupMemberRepository.findOne({
       where: {
         group: { uuid: groupUuid },
         member: { uuid: memberUuid },
-        role: In(['owner', 'admin', 'moderator']),
+        role: In(roles),
       },
       relations: ['member'],
     });
 
-    return groupMember || false;
+    return authority || false;
   }
 
-  // Helper function to check if user exist in group
-  private async isGroupMemberExist(groupUuid: string, memberUuid: string) {
-    const groupMember = await this.groupMemberRepository.findOne({
-      where: {
-        group: { uuid: groupUuid },
-        member: { uuid: memberUuid },
-      },
-      relations: ['member'],
-    });
-
-    return groupMember || false;
-  }
-
-  async createGroupMember(group: Group, member: User, lang: string) {
+  async createGroupMember(
+    group: Group,
+    member: User,
+    lang: string,
+    role = GroupUserRole.MEMBER,
+  ) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -80,6 +65,7 @@ export class GroupMemberService {
     const groupMemberCreated = this.groupMemberRepository.create({
       group,
       member,
+      role,
     });
     const groupMember = await this.groupMemberRepository.save(
       groupMemberCreated,
@@ -110,7 +96,11 @@ export class GroupMemberService {
       throw new HttpException(errorMessage.groupNotFound, HttpStatus.NOT_FOUND);
 
     // Check that user is exist in group
-    const isMember = await this.isGroupMemberExist(uuid, user.uuid);
+    const isMember = await this.isHasAuthority(
+      uuid,
+      user.uuid,
+      GroupPermissions.AllPermissions,
+    );
     if (!isMember)
       throw new HttpException(
         errorMessage.groupMemberNotFound,
@@ -191,16 +181,24 @@ export class GroupMemberService {
       throw new HttpException(errorMessage.groupNotFound, HttpStatus.NOT_FOUND);
 
     // Check that user is exist in group
-    const isGroupMember = await this.isGroupMemberExist(groupUuid, memberUuid);
+    const isGroupMember = await this.isHasAuthority(
+      groupUuid,
+      memberUuid,
+      GroupPermissions.MemberPermission,
+    );
     if (!isGroupMember)
       throw new HttpException(
         errorMessage.groupMemberNotFound,
         HttpStatus.NOT_FOUND,
       );
 
-    // Check that member has authority to delete
-    const authorityMember = await this.isHasAuthority(groupUuid, user.uuid);
-    if (!authorityMember)
+    // Check that user has authority to update the member
+    const isAuthority = await this.isHasAuthority(
+      groupUuid,
+      user.uuid,
+      GroupPermissions.AdminPermission,
+    );
+    if (!isAuthority)
       throw new HttpException(
         errorMessage.notAuthorized,
         HttpStatus.UNAUTHORIZED,
@@ -214,12 +212,15 @@ export class GroupMemberService {
       );
     // Update member
     /*
-      1- Ban
-      2- Authority
-      3- Mute
+    1- Authority
+      ** Pass owner member ship [OwnerPermission]
+      ** Sign admin member ship [SuperPermission]
+    2- Ban [AdminPermission]
+    3- Mute [AdminPermission]
     */
 
-    isGroupMember.role = body.role;
+    // isGroupMember.is_banned = body.is_banned;
+    // isGroupMember.role = body.role;
     const updatedGroupMember = await this.groupMemberRepository.save(
       isGroupMember,
     );
@@ -249,15 +250,21 @@ export class GroupMemberService {
     );
 
     // Check that member has authority to delete
-    const authorityMember = await this.isHasAuthority(groupUuid, user.uuid);
-    if (!authorityMember)
+    const isAuthority = await this.isHasAuthority(
+      groupUuid,
+      user.uuid,
+      GroupPermissions.AdminPermission,
+    );
+    if (!isAuthority)
       throw new HttpException(
         errorMessage.failedToDeleteGroupMember,
         HttpStatus.UNAUTHORIZED,
       );
 
     // Check that user exist in group
-    const member = await this.isGroupMemberExist(groupUuid, memberUuid);
+    const member = await this.isHasAuthority(groupUuid, memberUuid, [
+      GroupUserRole.MEMBER,
+    ]);
     if (!member)
       throw new HttpException(
         errorMessage.groupMemberNotFound,

@@ -11,6 +11,8 @@ import { UpdatePageFollowerDto } from '../dto/update-page-follower.dto';
 import { PageFollowerSerialization } from '../serializers/page-follower.serialization';
 import { PageService } from './page.service';
 import { PageAdminService } from './page-admin.service';
+import { PagePermissions } from 'src/constants';
+import { PageStatusType } from '../interfaces/page.interface';
 
 @Injectable()
 export class PageFollowerService {
@@ -44,7 +46,7 @@ export class PageFollowerService {
     );
 
     // Check Page Exist
-    const page = await this.pageService.getPageByUuid(pageUuid, lang);
+    const page = await this.pageService.checkPage(pageUuid, lang);
 
     // Check that user is unFollowing the page
     const isFollowing = await this.isFollowing(pageUuid, user.uuid);
@@ -83,17 +85,29 @@ export class PageFollowerService {
     );
 
     // Check that page is exist
-    const page = await this.pageService.getPageByUuid(uuid, lang);
+    const page = await this.pageService.checkPage(uuid, lang);
 
     // Check that page is public
-    if (page.status !== 'public') {
-      // Check that if its not public so user exist in followers
+    if (page.status === PageStatusType.PRIVATE) {
+      // Check that user is following the page
       const isFollowing = await this.isFollowing(uuid, user.uuid);
       if (!isFollowing)
         throw new HttpException(
           errorMessage.notFollowingPage,
           HttpStatus.NOT_FOUND,
         );
+
+      // Check that user is has authority
+      // const isAuthority = await this.pageAdminService.isHasAuthority(
+      //   uuid,
+      //   user.uuid,
+      //   PagePermissions.AdminPermission,
+      // );
+      // if (!isAuthority)
+      //   throw new HttpException(
+      //     errorMessage.notAuthorized,
+      //     HttpStatus.UNAUTHORIZED,
+      //   );
     }
 
     const selector: Partial<IPageFollower> = {};
@@ -167,7 +181,7 @@ export class PageFollowerService {
     );
 
     // Check that page exist
-    await this.pageService.getPageByUuid(pageUuid, lang);
+    await this.pageService.checkPage(pageUuid, lang);
 
     // Check that follower is exist
     const isFollowing = await this.isFollowing(pageUuid, followerUuid);
@@ -177,12 +191,13 @@ export class PageFollowerService {
         HttpStatus.NOT_FOUND,
       );
 
-    // Check that member has authority to delete
-    const authorityUser = await this.pageAdminService.isHasAuthority(
+    // Check that user has authority to update follower
+    const isAuthority = await this.pageAdminService.isHasAuthority(
       pageUuid,
       user.uuid,
+      PagePermissions.AdminPermission,
     );
-    if (!authorityUser)
+    if (!isAuthority)
       throw new HttpException(
         errorMessage.notAuthorized,
         HttpStatus.UNAUTHORIZED,
@@ -214,7 +229,7 @@ export class PageFollowerService {
     );
 
     // Check that page exist
-    await this.pageService.getPageByUuid(uuid, lang);
+    await this.pageService.checkPage(uuid, lang);
 
     // Check that user is following the page
     const isFollowing = await this.isFollowing(uuid, user.uuid);

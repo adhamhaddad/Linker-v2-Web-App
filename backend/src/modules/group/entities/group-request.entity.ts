@@ -22,11 +22,11 @@ export class GroupRequest implements IGroupRequest {
   @Generated('uuid')
   uuid: string;
 
-  @ManyToOne(() => Group)
+  @ManyToOne(() => Group, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'group_id' })
   group: Group;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'requester_id' })
   requester: User;
 

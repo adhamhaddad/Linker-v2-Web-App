@@ -13,6 +13,7 @@ import { PageStatusType, IPage } from '../interfaces/page.interface';
 import { User } from 'src/modules/auth/entities/user.entity';
 import { PageAdmin } from './page-admin.entity';
 import { PageFollower } from './page-follower.entity';
+import { Post } from 'src/modules/post/entities/post.entity';
 
 @Entity({ name: 'pages' })
 export class Page implements IPage {
@@ -22,6 +23,10 @@ export class Page implements IPage {
   @Column({ type: 'uuid', unique: true, nullable: false })
   @Generated('uuid')
   uuid: string;
+
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'creator_id' })
+  creator: User;
 
   @Column({ type: 'varchar', length: 200, nullable: true })
   profile_url: string;
@@ -37,10 +42,6 @@ export class Page implements IPage {
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   status: PageStatusType;
-
-  @ManyToOne(() => User, { nullable: false, onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'creator_id' })
-  creator: User;
 
   @OneToMany(() => PageAdmin, (admin) => admin.page)
   admins: PageAdmin[];

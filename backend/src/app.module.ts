@@ -25,6 +25,8 @@ import { RelationshipsModule } from './modules/relationships/relationships.modul
 import { VisitorModule } from './modules/visitor/visitor.module';
 import { GroupModule } from './modules/group/group.module';
 import { PageModule } from './modules/page/page.module';
+import { PostModule } from './modules/post/post.module';
+import { ProfileModule } from './modules/profile/profile.module';
 
 @Module({
   imports: [
@@ -61,6 +63,7 @@ import { PageModule } from './modules/page/page.module';
     RedisModule,
     AuthModule,
     UserModule,
+    ProfileModule,
     AddressModule,
     AboutModule,
     PhoneModule,
@@ -72,6 +75,7 @@ import { PageModule } from './modules/page/page.module';
     VisitorModule,
     GroupModule,
     PageModule,
+    PostModule,
   ],
   controllers: [],
   providers: [JwtService],

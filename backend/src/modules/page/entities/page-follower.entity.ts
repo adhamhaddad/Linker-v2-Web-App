@@ -11,6 +11,7 @@ import {
 import { IPageFollower } from '../interfaces/page-follower.interface';
 import { User } from 'src/modules/auth/entities/user.entity';
 import { Page } from './page.entity';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Entity({ name: 'page_followers' })
 export class PageFollower implements IPageFollower {
@@ -21,11 +22,11 @@ export class PageFollower implements IPageFollower {
   @Generated('uuid')
   uuid: string;
 
-  @ManyToOne(() => Page)
+  @ManyToOne(() => Page, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'page_id' })
   page: Page;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'follower_id' })
   follower: User;
 

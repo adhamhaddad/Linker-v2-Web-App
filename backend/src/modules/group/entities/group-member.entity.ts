@@ -14,6 +14,7 @@ import {
 } from '../interfaces/group-member.interface';
 import { User } from 'src/modules/auth/entities/user.entity';
 import { Group } from './group.entity';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Entity({ name: 'group_members' })
 export class GroupMember implements IGroupMember {
@@ -24,13 +25,17 @@ export class GroupMember implements IGroupMember {
   @Generated('uuid')
   uuid: string;
 
-  @ManyToOne(() => Group)
+  @ManyToOne(() => Group, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'group_id' })
   group: Group;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'member_id' })
   member: User;
+
+  @ManyToOne(() => Profile, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'profile_id' })
+  profile: Profile;
 
   @Column({
     type: 'enum',

@@ -21,11 +21,11 @@ export class PageAdmin implements IPageAdmin {
   @Generated('uuid')
   uuid: string;
 
-  @ManyToOne(() => Page)
+  @ManyToOne(() => Page, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'page_id' })
   page: Page;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'admin_id' })
   admin: User;
 
