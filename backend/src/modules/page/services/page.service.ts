@@ -11,21 +11,20 @@ import { plainToClass } from 'class-transformer';
 import { PageSerialization } from '../serializers/page.serialization';
 import { FilterPageDTO } from '../dto/filter-page.dto';
 import { IPage } from '../interfaces/page.interface';
-import { PageAdminRole } from '../interfaces/page-admin.interface';
-import { PageAdmin } from '../entities/page-admin.entity';
+import { PageAdminService } from './page-admin.service';
+import { PagePermissions } from 'src/constants';
 
 @Injectable()
 export class PageService {
   constructor(
     @InjectRepository(Page)
     private readonly pageRepository: Repository<Page>,
-    @InjectRepository(PageAdmin)
-    private readonly pageAdminRepository: Repository<PageAdmin>,
+    private readonly pageAdminService: PageAdminService,
     private readonly i18nService: I18nService,
   ) {}
 
   // Helper function to check page exist
-  async getPageByUuid(uuid: string, lang: string) {
+  async checkPage(uuid: string, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -35,7 +34,6 @@ export class PageService {
 
     const page = await this.pageRepository.findOne({
       where: { uuid },
-      relations: ['creator'],
     });
     if (!page)
       throw new HttpException(errorMessage.pageNotFound, HttpStatus.NOT_FOUND);
@@ -62,17 +60,7 @@ export class PageService {
         HttpStatus.BAD_REQUEST,
       );
 
-    const pageOwnerCreated = this.pageAdminRepository.create({
-      page,
-      admin: user,
-      role: PageAdminRole.OWNER,
-    });
-    const pageOwner = await this.pageAdminRepository.save(pageOwnerCreated);
-    if (!pageOwner)
-      throw new HttpException(
-        errorMessage.failedToCreatePageAdmin,
-        HttpStatus.BAD_REQUEST,
-      );
+    await this.pageAdminService.createPageOwner(page, user, lang);
 
     return {
       message: errorMessage.pageCreatedSuccessfully,
@@ -175,21 +163,28 @@ export class PageService {
     );
 
     const page = await this.pageRepository.findOne({
-      where: { uuid, creator: { id: user.id } },
+      where: { uuid },
     });
     if (!page)
       throw new HttpException(errorMessage.pageNotFound, HttpStatus.NOT_FOUND);
 
-    const { affected } = await this.pageRepository.update({ uuid }, body);
-    if (!affected)
+    const isAdmin = await this.pageAdminService.isHasAuthority(
+      uuid,
+      user.uuid,
+      PagePermissions.SuperPermission,
+    );
+    if (!isAdmin)
+      throw new HttpException(
+        errorMessage.notAuthorized,
+        HttpStatus.UNAUTHORIZED,
+      );
+
+    const updatedPage = await this.pageRepository.save({ ...page, ...body });
+    if (!updatedPage)
       throw new HttpException(
         errorMessage.failedToUpdatePage,
         HttpStatus.BAD_REQUEST,
       );
-
-    const updatedPage = await this.pageRepository.findOne({
-      where: { uuid, creator: { id: user.id } },
-    });
 
     return {
       message: errorMessage.pageUpdatedSuccessfully,
@@ -206,10 +201,21 @@ export class PageService {
     );
 
     const page = await this.pageRepository.findOne({
-      where: { uuid, creator: { id: user.id } },
+      where: { uuid },
     });
     if (!page)
       throw new HttpException(errorMessage.pageNotFound, HttpStatus.NOT_FOUND);
+
+    const isOwner = await this.pageAdminService.isHasAuthority(
+      uuid,
+      user.uuid,
+      PagePermissions.OwnerPermission,
+    );
+    if (!isOwner)
+      throw new HttpException(
+        errorMessage.notAuthorized,
+        HttpStatus.UNAUTHORIZED,
+      );
 
     const { affected } = await this.pageRepository.delete({ uuid });
     if (!affected)

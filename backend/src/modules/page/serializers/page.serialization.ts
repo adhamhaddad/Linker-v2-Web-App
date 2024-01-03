@@ -1,4 +1,5 @@
 import { Expose, Type } from 'class-transformer';
+import { PostSerialization } from 'src/modules/post/serializers/post.serialization';
 import { GetUserSerialization } from 'src/modules/user/serializers/get-user.serialization';
 
 export class PageSerialization {
@@ -17,6 +18,10 @@ export class PageSerialization {
 
   @Expose({ name: 'status' })
   status: Date;
+
+  @Type(() => PostSerialization)
+  @Expose({ name: 'posts' })
+  posts: PostSerialization[];
 
   @Expose({ name: 'created_at' })
   createdAt: Date;

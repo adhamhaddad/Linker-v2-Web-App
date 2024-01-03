@@ -12,6 +12,8 @@ import { GroupSerialization } from '../serializers/group.serialization';
 import { IGroup } from '../interfaces/group.interface';
 import { FilterGroupDTO } from '../dto/filter-group.dto';
 import { GroupMemberService } from './group-member.service';
+import { GroupUserRole } from '../interfaces/group-member.interface';
+import { GroupPermissions } from 'src/constants';
 
 @Injectable()
 export class GroupService {
@@ -22,7 +24,22 @@ export class GroupService {
     private readonly i18nService: I18nService,
   ) {}
 
-  async createGroup(createGroupDto: CreateGroupDto, user: User, lang: string) {
+  async checkGroup(uuid: string, lang: string) {
+    const errorMessage: ErrorMessages = this.i18nService.translate(
+      'error-messages',
+      {
+        lang,
+      },
+    );
+
+    const group = await this.groupRepository.findOne({ where: { uuid } });
+    if (!group)
+      throw new HttpException(errorMessage.groupNotFound, HttpStatus.NOT_FOUND);
+
+    return group;
+  }
+
+  async createGroup(body: CreateGroupDto, user: User, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -32,7 +49,7 @@ export class GroupService {
 
     const groupCreated = this.groupRepository.create({
       creator: user,
-      ...createGroupDto,
+      ...body,
     });
     const group = await this.groupRepository.save(groupCreated);
     if (!group)
@@ -41,7 +58,12 @@ export class GroupService {
         HttpStatus.BAD_REQUEST,
       );
 
-    await this.groupMemberService.createGroupMember(group, user, lang);
+    await this.groupMemberService.createGroupMember(
+      group,
+      user,
+      lang,
+      GroupUserRole.OWNER,
+    );
 
     return {
       message: errorMessage.groupCreatedSuccessfully,
@@ -144,23 +166,25 @@ export class GroupService {
     );
 
     const group = await this.groupRepository.findOne({
-      where: { uuid, creator: { id: user.id } },
-      relations: ['creator'],
+      where: { uuid },
     });
     if (!group)
       throw new HttpException(errorMessage.groupNotFound, HttpStatus.NOT_FOUND);
 
-    const { affected } = await this.groupRepository.update({ uuid }, body);
-    if (!affected)
+    const isAdmin = await this.groupMemberService.isHasAuthority(
+      uuid,
+      user.uuid,
+      GroupPermissions.SuperPermission,
+    );
+    if (!isAdmin)
+      throw new HttpException(errorMessage.notAuthorized, HttpStatus.NOT_FOUND);
+
+    const updatedGroup = await this.groupRepository.save({ ...group, ...body });
+    if (!updatedGroup)
       throw new HttpException(
         errorMessage.failedToUpdateGroup,
         HttpStatus.BAD_REQUEST,
       );
-
-    const updatedGroup = await this.groupRepository.findOne({
-      where: { uuid, creator: { id: user.id } },
-      relations: ['creator'],
-    });
 
     return {
       message: errorMessage.groupUpdatedSuccessfully,
@@ -176,11 +200,20 @@ export class GroupService {
       },
     );
 
-    const group = await this.groupRepository.findOne({
-      where: { uuid, creator: { id: user.id } },
-    });
+    const group = await this.groupRepository.findOne({ where: { uuid } });
     if (!group)
       throw new HttpException(errorMessage.groupNotFound, HttpStatus.NOT_FOUND);
+
+    const isOwner = await this.groupMemberService.isHasAuthority(
+      uuid,
+      user.uuid,
+      GroupPermissions.OwnerPermission,
+    );
+    if (!isOwner)
+      throw new HttpException(
+        errorMessage.notAuthorized,
+        HttpStatus.UNAUTHORIZED,
+      );
 
     const { affected } = await this.groupRepository.delete({ uuid });
     if (!affected)

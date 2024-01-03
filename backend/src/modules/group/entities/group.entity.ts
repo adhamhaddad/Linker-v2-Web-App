@@ -41,7 +41,7 @@ export class Group implements IGroup {
   @Column({ type: 'varchar', length: 100, nullable: false })
   status: GroupStatusType;
 
-  @ManyToOne(() => User, { nullable: false, onDelete: 'RESTRICT' })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'creator_id' })
   creator: User;
 

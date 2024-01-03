@@ -17,6 +17,7 @@ import { GroupMember } from '../entities/group-member.entity';
 import { GroupRequestSerialization } from '../serializers/group-request.serialization';
 import { IGroupRequest } from '../interfaces/group-request.interface';
 import { FilterGroupRequestDTO } from '../dto/filter-group-request.dto';
+import { GroupPermissions } from 'src/constants';
 
 @Injectable()
 export class GroupRequestService {
@@ -118,11 +119,12 @@ export class GroupRequestService {
       },
     );
 
-    const authorityMember = await this.groupMemberService.isHasAuthority(
+    const isAuthority = await this.groupMemberService.isHasAuthority(
       uuid,
       user.uuid,
+      GroupPermissions.AdminPermission,
     );
-    if (!authorityMember)
+    if (!isAuthority)
       throw new HttpException(
         errorMessage.notAuthorized,
         HttpStatus.UNAUTHORIZED,
@@ -183,7 +185,7 @@ export class GroupRequestService {
     const groupRequest = await this.groupRequestRepository.findOne({
       where: {
         uuid: requestUuid,
-        group: { uuid: groupUuid, creator: { id: user.id } },
+        group: { uuid: groupUuid },
       },
       relations: ['group', 'requester'],
     });
@@ -194,6 +196,18 @@ export class GroupRequestService {
       throw new HttpException(
         errorMessage.groupRequestAlreadyUpdated,
         HttpStatus.BAD_REQUEST,
+      );
+
+    // Is user has authority to update request
+    const isAuthority = await this.groupMemberService.isHasAuthority(
+      groupUuid,
+      user.uuid,
+      GroupPermissions.AdminPermission,
+    );
+    if (!isAuthority)
+      throw new HttpException(
+        errorMessage.notAuthorized,
+        HttpStatus.UNAUTHORIZED,
       );
 
     groupRequest.status = UpdateRequestStatus[status.toUpperCase()];

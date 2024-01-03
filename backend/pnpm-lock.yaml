@@ -101,6 +101,9 @@ dependencies:
   typeorm:
     specifier: ^0.3.17
     version: 0.3.17(ioredis@5.3.2)(pg@8.11.3)(redis@4.6.10)(ts-node@10.9.1)
+  typeorm-polymorphic:
+    specifier: ^1.0.0
+    version: 1.0.0(typeorm@0.3.17)
 
 devDependencies:
   '@nestjs/cli':
@@ -6033,6 +6036,14 @@ packages:
       sinon: 17.0.1
       typeorm: 0.3.17(ioredis@5.3.2)(pg@8.11.3)(redis@4.6.10)(ts-node@10.9.1)
     dev: true
+
+  /typeorm-polymorphic@1.0.0(typeorm@0.3.17):
+    resolution: {integrity: sha512-jEvdHjdFFKjU072QaAg8JrC2YwtpPY4NgBNVdXjMZToh5liaDFKrxT07frQDBnyazyzD1FDHcRHDlT2QhMFW2Q==}
+    peerDependencies:
+      typeorm: ^0.3.0
+    dependencies:
+      typeorm: 0.3.17(ioredis@5.3.2)(pg@8.11.3)(redis@4.6.10)(ts-node@10.9.1)
+    dev: false
 
   /typeorm@0.3.17(ioredis@5.3.2)(pg@8.11.3)(redis@4.6.10)(ts-node@10.9.1):
     resolution: {integrity: sha512-UDjUEwIQalO9tWw9O2A4GU+sT3oyoUXheHJy4ft+RFdnRdQctdQ34L9SqE2p7LdwzafHx1maxT+bqXON+Qnmig==}

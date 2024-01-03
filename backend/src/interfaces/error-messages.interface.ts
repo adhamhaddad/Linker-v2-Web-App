@@ -14,6 +14,13 @@ export interface ErrorMessages {
   passwordMismatch: string;
   requestSuccessful: string;
   requestFailed: string;
+  /* -- User -- */
+  /* -- Profile -- */
+  profileNotFound: string;
+  profileCreatedSuccessfully: string;
+  profileUpdatedSuccessfully: string;
+  failedToCreateProfile: string;
+  failedToUpdateProfile: string;
   /* -- Address -- */
   addressNotFound: string;
   addressExist: string;
@@ -157,4 +164,49 @@ export interface ErrorMessages {
   failedToUpdatePageFollower: string;
   alreadyFollowingPage: string;
   notFollowingPage: string;
+  /* -- Post -- */
+  postNotFound: string;
+  postCreatedSuccessfully: string;
+  postUpdatedSuccessfully: string;
+  postDeletedSuccessfully: string;
+  failedToCreatePost: string;
+  failedToUpdatePost: string;
+  failedToDeletePost: string;
+  /* -- Post Likes -- */
+  postLikedSuccessfully: string;
+  postUnLikedSuccessfully: string;
+  failedToLikePost: string;
+  failedToUnLikePost: string;
+  postAlreadyLiked: string;
+  postAlreadyUnLiked: string;
+  /* -- Post Comments -- */
+  postCommentNotFound: string;
+  postCommentCreatedSuccessfully: string;
+  postCommentUpdatedSuccessfully: string;
+  postCommentDeletedSuccessfully: string;
+  failedToCreatePostComment: string;
+  failedToUpdatePostComment: string;
+  failedToDeletePostComment: string;
+  /* -- Comment Likes -- */
+  commentLikedSuccessfully: string;
+  commentUnLikedSuccessfully: string;
+  failedToLikeComment: string;
+  failedToUnLikeComment: string;
+  commentAlreadyLiked: string;
+  commentAlreadyUnLiked: string;
+  /* -- Comment Replies -- */
+  commentReplyNotFound: string;
+  commentReplyCreatedSuccessfully: string;
+  commentReplyUpdatedSuccessfully: string;
+  commentReplyDeletedSuccessfully: string;
+  failedToCreateCommentReply: string;
+  failedToUpdateCommentReply: string;
+  failedToDeleteCommentReply: string;
+  /* -- Reply Likes -- */
+  replyLikedSuccessfully: string;
+  replyUnLikedSuccessfully: string;
+  failedToLikeReply: string;
+  failedToUnLikeReply: string;
+  replyAlreadyLiked: string;
+  replyAlreadyUnLiked: string;
 }
