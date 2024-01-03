@@ -14,7 +14,7 @@ import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 import { UpdateRequestStatusDto } from '../dto/update-relationship-request.dto';
 
 @UseGuards(JwtAuthGuard)
-@Controller('user/relationship-requests')
+@Controller('users/relationship-requests')
 export class RelationshipRequestController {
   constructor(
     private readonly relationshipRequestService: RelationshipRequestService,

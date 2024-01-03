@@ -16,11 +16,11 @@ import { Lang } from 'src/decorators/lang.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('user')
+@Controller('users')
 export class JobController {
   constructor(private readonly jobService: JobService) {}
 
-  @Post('job')
+  @Post('jobs')
   async createJob(
     @Body() body: CreateJobDto,
     @User() user,
@@ -30,19 +30,19 @@ export class JobController {
     return { message, data };
   }
 
-  @Get(':id/job')
+  @Get(':id/jobs')
   async getJobsByUserId(@Param('id') uuid: string, @Lang() lang: string) {
     const { message, data } = await this.jobService.getJobsByUserId(uuid, lang);
     return { message, data };
   }
 
-  @Get('job/:id')
+  @Get('jobs/:id')
   async getJobById(@Param('id') uuid: string, @Lang() lang: string) {
     const { message, data } = await this.jobService.getJobById(uuid, lang);
     return { message, data };
   }
 
-  @Patch('job/:id')
+  @Patch('jobs/:id')
   async updateJob(
     @Param('id') uuid: string,
     @Body() body: UpdateJobDto,
@@ -58,7 +58,7 @@ export class JobController {
     return { message, data };
   }
 
-  @Delete('job/:id')
+  @Delete('jobs/:id')
   async deleteJob(
     @Param('id') uuid: string,
     @User() user,

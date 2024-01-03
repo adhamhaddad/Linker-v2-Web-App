@@ -16,7 +16,7 @@ import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 import { UpdateEducationDto } from '../dto/update-education.dto';
 
 @UseGuards(JwtAuthGuard)
-@Controller('user')
+@Controller('users')
 export class EducationController {
   constructor(private readonly educationService: EducationService) {}
 

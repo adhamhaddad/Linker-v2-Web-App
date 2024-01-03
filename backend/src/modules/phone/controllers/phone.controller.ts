@@ -14,7 +14,7 @@ import { PhoneService } from '../services/phone.service';
 import { VerifyOTPDto } from 'src/modules/auth/dto/verify-otp.dto';
 
 @UseGuards(JwtAuthGuard)
-@Controller('user/phone')
+@Controller('users/phones')
 export class PhoneController {
   constructor(private readonly phoneService: PhoneService) {}
 

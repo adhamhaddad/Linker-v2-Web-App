@@ -16,7 +16,7 @@ import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 import { CreateRelationshipDto } from '../dto/create-relationship.dto';
 
 @UseGuards(JwtAuthGuard)
-@Controller('user')
+@Controller('users')
 export class RelationshipController {
   constructor(private readonly relationshipService: RelationshipService) {}
 

@@ -1,14 +1,29 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 import { ProfileService } from '../services/profile.service';
 import { Lang } from 'src/decorators/lang.decorator';
 import { User } from 'src/decorators/user.decorator';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
+import { FilterProfileDTO } from '../dto/filter-profile.dto';
 
 @UseGuards(JwtAuthGuard)
-@Controller('profiles')
+@Controller('users/profiles')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
+
+  @Get()
+  async getProfiles(@Query() query: FilterProfileDTO) {
+    const { data, total, meta } = await this.profileService.getProfiles(query);
+    return { data, total, meta };
+  }
 
   @Get(':id')
   async getProfileById(@Param('id') uuid: string, @Lang() lang: string) {

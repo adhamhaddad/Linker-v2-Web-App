@@ -5,7 +5,7 @@ import { User } from 'src/decorators/user.decorator';
 import { Lang } from 'src/decorators/lang.decorator';
 
 @UseGuards(JwtAuthGuard)
-@Controller('user')
+@Controller('users')
 export class FriendController {
   constructor(private readonly friendsService: FriendService) {}
 

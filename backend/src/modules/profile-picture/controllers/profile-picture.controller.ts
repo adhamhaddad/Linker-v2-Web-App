@@ -15,11 +15,11 @@ import { ProfilePictureService } from '../services/profile-picture.service';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('user')
+@Controller('users')
 export class ProfilePictureController {
   constructor(private readonly profilePictureService: ProfilePictureService) {}
 
-  @Post('profile-picture/upload')
+  @Post('profile-pictures')
   @UseInterceptors(FileInterceptor('file'))
   async uploadPhoto(@UploadedFile() file, @User() user, @Lang() lang: string) {
     const { message, data } =
@@ -27,14 +27,7 @@ export class ProfilePictureController {
     return { message, data };
   }
 
-  @Get('profile-picture/:id')
-  async getProfilePictureById(@Param('id') uuid: string, @Lang() lang: string) {
-    const { message, data } =
-      await this.profilePictureService.getProfilePictureById(uuid, lang);
-    return { message, data };
-  }
-
-  @Get(':id/profile-picture')
+  @Get(':id/profile-pictures')
   async getProfilePictureByUserId(
     @Param('id') uuid: string,
     @Lang() lang: string,
@@ -44,7 +37,14 @@ export class ProfilePictureController {
     return { message, data };
   }
 
-  @Delete('profile-picture/delete/:id')
+  @Get('profile-pictures/:id')
+  async getProfilePictureById(@Param('id') uuid: string, @Lang() lang: string) {
+    const { message, data } =
+      await this.profilePictureService.getProfilePictureById(uuid, lang);
+    return { message, data };
+  }
+
+  @Delete('profile-pictures/:id')
   async deletePhoto(
     @Param('id') uuid: string,
     @User() user,
