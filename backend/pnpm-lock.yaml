@@ -104,6 +104,9 @@ dependencies:
   typeorm-polymorphic:
     specifier: ^1.0.0
     version: 1.0.0(typeorm@0.3.17)
+  uuid:
+    specifier: ^9.0.1
+    version: 9.0.1
 
 devDependencies:
   '@nestjs/cli':
