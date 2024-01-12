@@ -225,5 +225,10 @@
   "failedToDeleteMessage": "فشل في حذف الرسالة",
   "messageReactedSuccessfully": "تم الإعجاب بالرسالة بنجاح",
   "messageUnReactSuccessfully": "تمت إزالة الإعجاب بنجاح",
-  "messageAlreadyReacted": "لقد قمت بالفعل بالرد على هذه الرسالة"
+  "messageAlreadyReacted": "لقد قمت بالفعل بالرد على هذه الرسالة",
+  "settingsNotFound": "الإعدادات غير موجودة",
+  "settingsCreatedSuccessfully": "تم إنشاء الإعدادات بنجاح",
+  "settingsUpdatedSuccessfully": "تم تحديث الإعدادات بنجاح",
+  "failedToCreateSettings": "فشل في إنشاء الإعدادات",
+  "failedToUpdateSettings": "فشل في تحديث الإعدادات"
 }

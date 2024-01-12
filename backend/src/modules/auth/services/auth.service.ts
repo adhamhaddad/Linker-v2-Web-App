@@ -28,6 +28,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RegistrationDto } from '../dto/registeration.dto';
 import { PasswordResetDto } from '../dto/password-reset.dto';
 import { ProfileService } from 'src/modules/profile/services/profile.service';
+import { SettingService } from 'src/modules/settings/services/setting.service';
 
 @Injectable()
 export class AuthService {
@@ -38,6 +39,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly utils: Utils,
     private readonly profileService: ProfileService,
+    private readonly settingService: SettingService,
     private readonly userActivityService: ActivityService,
     private readonly i18nService: I18nService,
   ) {}
@@ -83,7 +85,9 @@ export class AuthService {
     const userSaveInitiate = this.userRepository.create(body);
     const user = await this.userRepository.save(userSaveInitiate);
 
+    // Initiate User profile and settings
     const profile = await this.profileService.createProfile(user, lang);
+    const settings = await this.settingService.createSettings(user, lang);
 
     return {
       data: { ...this.serializeUser(user), otp },

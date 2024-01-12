@@ -226,5 +226,10 @@
   "failedToDeleteMessage": "Failed to delete message",
   "messageReactedSuccessfully": "Message reacted to successfully",
   "messageUnReactSuccessfully": "Reaction removed successfully",
-  "messageAlreadyReacted": "You've already reacted to this message"
+  "messageAlreadyReacted": "You've already reacted to this message",
+  "settingsNotFound": "Settings not found",
+  "settingsCreatedSuccessfully": "Settings created successfully",
+  "settingsUpdatedSuccessfully": "Settings updated successfully",
+  "failedToCreateSettings": "Failed to create settings",
+  "failedToUpdateSettings": "Failed to update settings"
 }

@@ -261,4 +261,10 @@ export interface ErrorMessages {
   messageReactedSuccessfully: string;
   messageUnReactSuccessfully: string;
   messageAlreadyReacted: string;
+  /* -- Settings -- */
+  settingsNotFound: string;
+  settingsCreatedSuccessfully: string;
+  settingsUpdatedSuccessfully: string;
+  failedToCreateSettings: string;
+  failedToUpdateSettings: string;
 }

@@ -28,6 +28,7 @@ import { PageModule } from './modules/page/page.module';
 import { PostModule } from './modules/post/post.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { SettingModule } from './modules/settings/setting.module';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { ChatModule } from './modules/chat/chat.module';
     PageModule,
     PostModule,
     ChatModule,
+    SettingModule,
   ],
   controllers: [],
   providers: [JwtService],
