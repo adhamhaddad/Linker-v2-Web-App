@@ -14,10 +14,12 @@ import { ActivityService } from './services/activity.service';
 import { OtpController } from './controllers/otp.controller';
 import { Profile } from '../profile/entities/profile.entity';
 import { ProfileService } from '../profile/services/profile.service';
+import { Setting } from '../settings/entities/setting.entity';
+import { SettingService } from '../settings/services/setting.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, UserActivity, Profile]),
+    TypeOrmModule.forFeature([User, UserActivity, Profile, Setting]),
     PassportModule,
     JwtModule.registerAsync(jwtFactory),
     RedisModule,
@@ -26,6 +28,7 @@ import { ProfileService } from '../profile/services/profile.service';
     AuthService,
     User,
     ProfileService,
+    SettingService,
     ActivityService,
     PasswordHash,
     Utils,
