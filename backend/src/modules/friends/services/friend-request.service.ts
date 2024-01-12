@@ -15,6 +15,8 @@ import {
   UpdateRequestStatus,
 } from '../dto/update-request-status.dto';
 import { UpdateFriendRequestSerialization } from '../serializers/update-friend-request.serialization';
+import { ChatService } from 'src/modules/chat/services/chat.service';
+import { ChatType } from 'src/modules/chat/interfaces/chat.interface';
 
 @Injectable()
 export class FriendRequestService {
@@ -25,6 +27,7 @@ export class FriendRequestService {
     private readonly friendRepository: Repository<Friend>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly chatService: ChatService,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -161,6 +164,16 @@ export class FriendRequestService {
         user2: friendRequest.recipient,
       });
       const friend = await this.friendRepository.save(friendCreated);
+
+      await this.chatService.createChat(
+        {
+          userId: friend.user1.id,
+          type: ChatType.CHAT,
+        },
+        user,
+        lang,
+      );
+
       return {
         message: errorMessage.friendRequestAcceptedSuccessfully,
         data: this.serializeUpdateFriendRequest(updatedRequest),

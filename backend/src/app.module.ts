@@ -27,6 +27,7 @@ import { GroupModule } from './modules/group/group.module';
 import { PageModule } from './modules/page/page.module';
 import { PostModule } from './modules/post/post.module';
 import { ProfileModule } from './modules/profile/profile.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { ProfileModule } from './modules/profile/profile.module';
     GroupModule,
     PageModule,
     PostModule,
+    ChatModule,
   ],
   controllers: [],
   providers: [JwtService],

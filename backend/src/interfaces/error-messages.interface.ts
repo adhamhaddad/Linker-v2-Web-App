@@ -209,4 +209,56 @@ export interface ErrorMessages {
   failedToUnLikeReply: string;
   replyAlreadyLiked: string;
   replyAlreadyUnLiked: string;
+  /* -- Chats -- */
+  chatNotFound: string;
+  chatCreatedSuccessfully: string;
+  chatUpdatedSuccessfully: string;
+  chatDeletedSuccessfully: string;
+  failedToCreateChat: string;
+  failedToUpdateChat: string;
+  failedToDeleteChat: string;
+  chatAlreadyExist: string;
+  /* -- Group Chat -- */
+  groupChatNotFound: string;
+  groupChatCreatedSuccessfully: string;
+  groupChatUpdatedSuccessfully: string;
+  groupChatDeletedSuccessfully: string;
+  failedToCreateGroupChat: string;
+  failedToUpdateGroupChat: string;
+  failedToDeleteGroupChat: string;
+  /* -- Group Chat Members -- */
+  groupChatMemberNotFound: string;
+  groupChatMemberCreatedSuccessfully: string;
+  groupChatMemberUpdatedSuccessfully: string;
+  groupChatMemberDeletedSuccessfully: string;
+  failedToCreateGroupChatMember: string;
+  failedToUpdateGroupChatMember: string;
+  failedToDeleteGroupChatMember: string;
+  groupChatMemberAlreadyExist: string;
+  /* -- Archived Chats -- */
+  chatArchivedNotFound: string;
+  chatArchivedSuccessfully: string;
+  chatUnArchivedSuccessfully: string;
+  failedToArchiveChat: string;
+  failedToUnArchiveChat: string;
+  chatAlreadyArchived: string;
+  chatAlreadyUnArchived: string;
+  /* -- Conversation -- */
+  conversationNotFound: string;
+  conversationCreatedSuccessfully: string;
+  conversationDeletedSuccessfully: string;
+  failedToCreateConversation: string;
+  failedToDeleteConversation: string;
+  /* -- Messages -- */
+  messageNotFound: string;
+  messageCreatedSuccessfully: string;
+  messageUpdatedSuccessfully: string;
+  messageDeletedSuccessfully: string;
+  failedToCreateMessage: string;
+  failedToUpdateMessage: string;
+  failedToDeleteMessage: string;
+  /* -- Message Reactions -- */
+  messageReactedSuccessfully: string;
+  messageUnReactSuccessfully: string;
+  messageAlreadyReacted: string;
 }
