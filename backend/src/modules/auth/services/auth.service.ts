@@ -19,7 +19,7 @@ import { plainToClass } from 'class-transformer';
 import { VerifyOTPDto } from '../dto/verify-otp.dto';
 import { SendOTPDto } from '../dto/send-otp.dto';
 import { UserActivityTypeMessages } from 'src/constants';
-import { ActivityService } from './activity.service';
+import { ActivityService } from '../../activity/services/activity.service';
 import { LoginDto } from '../dto/login.dto';
 import { PasswordResetCompleteDto } from '../dto/password-reset-complete.dto';
 import { PasswordResetVerifyDto } from '../dto/password-reset-verify.dto';
@@ -155,11 +155,10 @@ export class AuthService {
     const user = await this.getUser(username, lang);
     if (!user)
       throw new HttpException(
-        errorMessage.userNotFound,
+        errorMessage.invalidUsernameOrPassword,
         HttpStatus.BAD_REQUEST,
       );
 
-    // check for admin type
     const { salt } = user;
 
     const isPasswordMatch = await bcrypt.compare(
@@ -176,7 +175,7 @@ export class AuthService {
     await this.utils.redisSetValueDuration(
       `${user.email}-loginOtpPasswordVerified`,
       '1',
-      120,
+      600,
     );
     const otp = await this.utils.sendOtpMessage(user.email, 'login');
 
@@ -214,7 +213,7 @@ export class AuthService {
     //user check
     const { username, otp } = body;
     const user = await this.userRepository.findOne({
-      where: [{ email: username }, { username: username }],
+      where: { email: username },
     });
 
     if (!user)
@@ -269,7 +268,7 @@ export class AuthService {
 
     //user check
     const user = await this.userRepository.findOne({
-      where: [{ email: username }, { username: username }],
+      where: { email: username },
     });
 
     if (!user)
@@ -390,6 +389,29 @@ export class AuthService {
     }
 
     return { message: errorMessage.resendAfter60Seconds };
+  }
+
+  async authMe(user: User, lang: string) {
+    const errorMessage: ErrorMessages = this.i18nService.translate(
+      'error-messages',
+      {
+        lang,
+      },
+    );
+
+    const userData = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
+    if (!userData)
+      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+
+    const token = await this.jwtService.signAsync({ user });
+
+    return {
+      message: 'Token generated Successfully',
+      data: this.serializeUser(userData),
+      token,
+    };
   }
 
   @UseGuards(AuthGuard('jwt'))

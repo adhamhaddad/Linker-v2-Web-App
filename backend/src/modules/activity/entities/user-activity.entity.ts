@@ -8,11 +8,12 @@ import {
   ManyToOne,
   Generated,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../../auth/entities/user.entity';
 import { UserActivityTypeMessages } from 'src/constants/user-activity-type';
+import { IActivity } from '../interfaces/activity.interface';
 
 @Entity({ name: 'user_activities' })
-export class UserActivity {
+export class UserActivity implements IActivity {
   @PrimaryGeneratedColumn()
   id: number;
 

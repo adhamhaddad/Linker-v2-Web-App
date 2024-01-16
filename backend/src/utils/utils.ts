@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import * as redis from 'redis';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from 'src/modules/redis/redis.service';
 
 @Injectable()
 export class Utils {
-  private readonly redisClient: redis.RedisClientType;
-
   constructor(
     private readonly configService: ConfigService,
     private readonly redisService: RedisService,
@@ -43,10 +40,10 @@ export class Utils {
     this.redisService.closeRedisClient();
   }
 
-  async sendOtpMessage(phone: string, source: string): Promise<any> {
+  async sendOtpMessage(email: string, source: string): Promise<any> {
     try {
       const otp = this.generateOTP();
-      const key = `${phone}-${source}`;
+      const key = `${email}-${source}`;
       const otpRedisValue = await this.redisGetValue(key);
 
       if (otpRedisValue) {

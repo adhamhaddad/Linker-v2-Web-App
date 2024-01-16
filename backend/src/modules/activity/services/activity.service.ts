@@ -1,20 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsOrder, FindOptionsWhere, Like, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { UserActivity } from '../entities/user-activity.entity';
 import { UserActivityDTO } from '../dto/activity.dto';
 import { ActivityListSerialization } from '../serializers/activity.serialization';
 import { plainToClass } from 'class-transformer';
-import {
-  ActivityLogsSortOptions,
-  FilterActivityLogsDTO,
-} from '../dto/filter-activity-logs.dto';
+import { User } from '../../auth/entities/user.entity';
+import { ErrorMessages } from 'src/interfaces/error-messages.interface';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class ActivityService {
   constructor(
     @InjectRepository(UserActivity)
     private readonly userActivityRepository: Repository<UserActivity>,
+    private readonly i18nService: I18nService,
   ) {}
 
   async store(userActivity: UserActivityDTO) {
@@ -60,47 +60,24 @@ export class ActivityService {
     });
   }
 
-  async findAll(filterActivityLogsDTO: FilterActivityLogsDTO) {
-    const selector: FindOptionsWhere<UserActivity> = {};
-    filterActivityLogsDTO.paginate = filterActivityLogsDTO?.paginate
-      ? filterActivityLogsDTO?.paginate
-      : 15;
-    filterActivityLogsDTO.page = filterActivityLogsDTO?.page
-      ? filterActivityLogsDTO?.page
-      : 1;
-    const skip =
-      (filterActivityLogsDTO.page - 1) * filterActivityLogsDTO?.paginate;
-    let order: FindOptionsOrder<UserActivity> = {
-      created_at: 'DESC',
+  async findByUserId(user: User, lang: string) {
+    const errorMessage: ErrorMessages = this.i18nService.translate(
+      'error-messages',
+      {
+        lang,
+      },
+    );
+
+    const selector: FindOptionsWhere<UserActivity> = {
+      user_id: user.id,
     };
-
-    //sorting
-    if (filterActivityLogsDTO?.sort) {
-      const orderDirection = filterActivityLogsDTO.sort.startsWith('-')
-        ? 'DESC'
-        : 'ASC';
-      const orderKey = filterActivityLogsDTO.sort.replace(/^-/, '');
-      switch (orderKey) {
-        case ActivityLogsSortOptions.DATE:
-          order = { created_at: orderDirection };
-          break;
-      }
-    }
-
-    if (filterActivityLogsDTO?.search) {
-      const { search } = filterActivityLogsDTO;
-      selector.description = Like(`%${search}%`);
-    }
-
-    //show only logged user logs if the role is not admin
     const whereClause = selector;
 
     const [activityLogs, total] = await Promise.all([
       this.userActivityRepository.find({
         where: whereClause,
-        order,
-        skip: skip,
-        take: filterActivityLogsDTO.paginate,
+        order: { created_at: 'DESC' },
+        take: 5,
       }),
       this.userActivityRepository.count({
         where: selector,
@@ -108,15 +85,47 @@ export class ActivityService {
     ]);
 
     return {
-      data: activityLogs.map((activity) => {
-        return plainToClass(ActivityListSerialization, activity);
-      }),
-      meta: {
-        total,
-        currentPage: filterActivityLogsDTO.page,
-        eachPage: filterActivityLogsDTO.paginate,
-        lastPage: Math.ceil(total / filterActivityLogsDTO.paginate),
-      },
+      message: '',
+      data: activityLogs.map((log) => this.serializeUserActivity(log)),
+      total,
     };
+  }
+
+  async deleteActivity(uuid: string, user: User, lang: string) {
+    const errorMessage: ErrorMessages = this.i18nService.translate(
+      'error-messages',
+      {
+        lang,
+      },
+    );
+
+    const activity = await this.userActivityRepository.find({
+      where: { uuid, user_id: user.id },
+    });
+    if (!activity)
+      throw new HttpException(
+        errorMessage.userActivityNotFound,
+        HttpStatus.NOT_FOUND,
+      );
+
+    const { affected } = await this.userActivityRepository.delete({ uuid });
+    if (!affected)
+      throw new HttpException(
+        errorMessage.failedToDeleteUserActivity,
+        HttpStatus.BAD_REQUEST,
+      );
+
+    return {
+      message: errorMessage.userActivityDeletedSuccessfully,
+      data: this.serializeUserActivity(activity),
+    };
+  }
+
+  serializeUserActivity(activity) {
+    return plainToClass(ActivityListSerialization, activity, {
+      excludeExtraneousValues: true,
+      enableCircularCheck: true,
+      strategy: 'excludeAll',
+    });
   }
 }

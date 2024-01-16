@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Headers,
   HttpCode,
   HttpException,
@@ -9,6 +10,7 @@ import {
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { RegistrationDto } from '../dto/registeration.dto';
 import { Lang } from 'src/decorators/lang.decorator';
@@ -20,6 +22,8 @@ import { LoginDto } from '../dto/login.dto';
 import { PasswordResetVerifyDto } from '../dto/password-reset-verify.dto';
 import { PasswordResetCompleteDto } from '../dto/password-reset-complete.dto';
 import { PasswordResetDto } from '../dto/password-reset.dto';
+import { User } from 'src/decorators/user.decorator';
+import { JwtAuthGuard } from '../guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -73,7 +77,7 @@ export class AuthController {
       expires: expirationDate,
     });
 
-    return { message, data };
+    return { message, data: { user: data, token: token } };
   }
 
   @Post('logout')
@@ -125,5 +129,12 @@ export class AuthController {
       lang,
     );
     return { message, data };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async authMe(@User() user: any, @Lang() lang: string) {
+    const { message, data, token } = await this.authService.authMe(user, lang);
+    return { message, data: { user: data, token } };
   }
 }

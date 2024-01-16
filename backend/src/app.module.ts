@@ -6,9 +6,10 @@ import { databaseConfig, mongoConfig, appConfig, config } from './config';
 import { TypeOrmConfigService } from './database/sql/typeorm-config.service';
 import { MongoConfigService } from './database/mongo/mongo-config.service';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
-import { AuthModule } from './modules/auth/auth.module';
-import { UserModule } from './modules/user/user.module';
 import * as path from 'path';
+import { AuthModule } from './modules/auth/auth.module';
+import { ActivityModule } from './modules/activity/activity.module';
+import { UserModule } from './modules/user/user.module';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { JwtService } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -64,6 +65,7 @@ import { SettingModule } from './modules/settings/setting.module';
     ScheduleModule.forRoot(),
     RedisModule,
     AuthModule,
+    ActivityModule,
     UserModule,
     ProfileModule,
     AddressModule,
