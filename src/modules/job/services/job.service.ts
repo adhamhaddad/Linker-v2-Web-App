@@ -29,7 +29,7 @@ export class JobService {
     );
 
     const jobCreated = this.jobRepository.create({
-      user_id: user.id,
+      user: { id: user.id },
       ...createJobDto,
     });
     const job = await this.jobRepository.save(jobCreated);
@@ -81,7 +81,7 @@ export class JobService {
       throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
 
     const job = await this.jobRepository.find({
-      where: { user_id: user.id },
+      where: { user: { id: user.id } },
     });
     if (!job)
       throw new HttpException(errorMessage.jobNotFound, HttpStatus.NOT_FOUND);
@@ -106,7 +106,7 @@ export class JobService {
     );
 
     const job = await this.jobRepository.find({
-      where: { uuid, user_id: user.id },
+      where: { uuid, user: { id: user.id } },
     });
     if (!job)
       throw new HttpException(errorMessage.jobNotFound, HttpStatus.NOT_FOUND);
@@ -140,7 +140,7 @@ export class JobService {
     );
 
     const job = await this.jobRepository.findOne({
-      where: { uuid, user_id: user.id },
+      where: { uuid, user: { id: user.id } },
     });
     if (!job)
       throw new HttpException(errorMessage.jobNotFound, HttpStatus.NOT_FOUND);

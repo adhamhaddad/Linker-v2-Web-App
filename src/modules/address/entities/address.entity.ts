@@ -26,11 +26,11 @@ export class Address implements IAddress {
   @Column({ type: 'varchar', length: 100, nullable: true })
   city: string;
 
-  @Column({ type: 'int', nullable: false })
-  user_id: number;
-
-  @OneToOne(() => User, (user) => user.address)
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  @OneToOne(() => User, (user) => user.address, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })

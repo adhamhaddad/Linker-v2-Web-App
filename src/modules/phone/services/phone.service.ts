@@ -53,7 +53,7 @@ export class PhoneService {
     );
 
     const phoneCreated = this.phoneRepository.create({
-      user_id: user.id,
+      user: { id: user.id },
       ...createPhoneDto,
     });
     const phone = await this.phoneRepository.save(phoneCreated);
@@ -74,7 +74,7 @@ export class PhoneService {
     //phone check
     const { username, otp } = verifyOtpDto;
     const phoneNumber = await this.phoneRepository.findOne({
-      where: { phone: username, user_id: user.id },
+      where: { phone: username, user: { id: user.id } },
     });
     if (!phoneNumber)
       throw new HttpException(errorMessage.phoneNotFound, HttpStatus.NOT_FOUND);
@@ -118,7 +118,7 @@ export class PhoneService {
     );
 
     const phone = await this.phoneRepository.findOne({
-      where: { uuid, user_id: user.id },
+      where: { uuid, user: { id: user.id } },
     });
     if (!phone)
       throw new HttpException(errorMessage.phoneNotFound, HttpStatus.NOT_FOUND);

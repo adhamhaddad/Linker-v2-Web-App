@@ -85,10 +85,6 @@ export class AuthService {
     const userSaveInitiate = this.userRepository.create(body);
     const user = await this.userRepository.save(userSaveInitiate);
 
-    // Initiate User profile and settings
-    const profile = await this.profileService.createProfile(user, lang);
-    const settings = await this.settingService.createSettings(user, lang);
-
     return {
       data: { ...this.serializeUser(user), otp },
       message: errorMessage.otpForVerification,
@@ -135,6 +131,10 @@ export class AuthService {
     );
     if (affected == 1) message = errorMessage.verificationSuccessful;
     else message = errorMessage.verificationFailed;
+
+    // Initiate User profile and settings
+    const profile = await this.profileService.createProfile(user, lang);
+    const settings = await this.settingService.createSettings(user, lang);
 
     return {
       message,

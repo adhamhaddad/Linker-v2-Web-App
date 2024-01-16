@@ -33,7 +33,7 @@ export class EducationService {
     );
 
     const educationCreated = this.educationRepository.create({
-      user_id: user.id,
+      user: { id: user.id },
       ...createEducationDto,
     });
     const education = await this.educationRepository.save(educationCreated);
@@ -88,7 +88,7 @@ export class EducationService {
       throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
 
     const education = await this.educationRepository.find({
-      where: { user_id: user.id },
+      where: { user: { id: user.id } },
     });
     if (!education)
       throw new HttpException(
@@ -116,7 +116,7 @@ export class EducationService {
     );
 
     const education = await this.educationRepository.find({
-      where: { uuid, user_id: user.id },
+      where: { uuid, user: { id: user.id } },
     });
     if (!education)
       throw new HttpException(
@@ -153,7 +153,7 @@ export class EducationService {
     );
 
     const education = await this.educationRepository.findOne({
-      where: { uuid, user_id: user.id },
+      where: { uuid, user: { id: user.id } },
     });
     if (!education)
       throw new HttpException(
