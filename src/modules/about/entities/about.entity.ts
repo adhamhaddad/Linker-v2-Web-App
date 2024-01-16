@@ -23,11 +23,11 @@ export class About implements IAbout {
   @Column({ type: 'text', nullable: false })
   about: string;
 
-  @Column({ type: 'int', nullable: false })
-  user_id: number;
-
-  @OneToOne(() => User, (user) => user.about)
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  @OneToOne(() => User, (user) => user.about, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })

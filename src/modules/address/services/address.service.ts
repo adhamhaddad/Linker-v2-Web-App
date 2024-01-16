@@ -31,7 +31,7 @@ export class AddressService {
     );
 
     const checkAddress = await this.addressRepository.findOne({
-      where: { user_id: user.id },
+      where: { user: { id: user.id } },
     });
     if (checkAddress)
       throw new HttpException(
@@ -40,7 +40,7 @@ export class AddressService {
       );
 
     const addressCreated = this.addressRepository.create({
-      user_id: user.id,
+      user: user,
       ...createAddressDto,
     });
     const address = await this.addressRepository.save(addressCreated);
@@ -100,7 +100,7 @@ export class AddressService {
     );
 
     const address = await this.addressRepository.findOne({
-      where: { uuid, user_id: user.id },
+      where: { uuid, user: { id: user.id } },
     });
     if (!address)
       throw new HttpException(

@@ -27,13 +27,13 @@ export class AboutService {
     );
 
     const checkAbout = await this.aboutRepository.findOne({
-      where: { user_id: user.id },
+      where: { user: { id: user.id } },
     });
     if (checkAbout)
       throw new HttpException(errorMessage.aboutExist, HttpStatus.BAD_REQUEST);
 
     const aboutCreated = this.aboutRepository.create({
-      user_id: user.id,
+      user: user,
       ...createAboutDto,
     });
     const about = await this.aboutRepository.save(aboutCreated);
@@ -90,7 +90,7 @@ export class AboutService {
     );
 
     const about = await this.aboutRepository.findOne({
-      where: { uuid, user_id: user.id },
+      where: { uuid, user: { id: user.id } },
     });
     if (!about)
       throw new HttpException(errorMessage.aboutNotFound, HttpStatus.NOT_FOUND);

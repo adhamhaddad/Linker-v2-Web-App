@@ -23,11 +23,11 @@ export class Phone implements IPhone {
   @Column({ type: 'varchar', length: 100, nullable: false })
   phone: string;
 
-  @Column({ type: 'int', nullable: false })
-  user_id: number;
-
-  @ManyToOne(() => User, (user) => user.phone)
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  @ManyToOne(() => User, (user) => user.phone, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @Column({ type: 'date', nullable: true })

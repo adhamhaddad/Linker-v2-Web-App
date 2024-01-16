@@ -21,11 +21,10 @@ export class ActivityService {
     const { user_id, login_ip_address, type } = userActivity;
     const description = `${type} from  ip ${login_ip_address} address`;
     const activityCount = await this.activityCheck(user_id);
-
     if (activityCount == 5) {
       //fetching the last 5 activities
       const activities = await this.userActivityRepository.find({
-        where: { user_id },
+        where: { user: { id: user_id } },
         take: 5,
       });
 
@@ -37,6 +36,7 @@ export class ActivityService {
       const data = await this.userActivityRepository.save({
         id: activities.at(0).id,
         ...userActivity,
+        user: { id: user_id },
         description,
       });
 
@@ -45,6 +45,7 @@ export class ActivityService {
       //store the activity
       const data = await this.userActivityRepository.save({
         ...userActivity,
+        user: { id: user_id },
         description,
       });
 
@@ -55,7 +56,7 @@ export class ActivityService {
   activityCheck(userId: number) {
     return this.userActivityRepository.count({
       where: {
-        user_id: userId,
+        user: { id: userId },
       },
     });
   }
@@ -69,7 +70,7 @@ export class ActivityService {
     );
 
     const selector: FindOptionsWhere<UserActivity> = {
-      user_id: user.id,
+      user: { id: user.id },
     };
     const whereClause = selector;
 
@@ -100,7 +101,7 @@ export class ActivityService {
     );
 
     const activity = await this.userActivityRepository.find({
-      where: { uuid, user_id: user.id },
+      where: { uuid, user: { id: user.id } },
     });
     if (!activity)
       throw new HttpException(

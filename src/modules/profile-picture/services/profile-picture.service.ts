@@ -32,7 +32,7 @@ export class ProfilePictureService {
     await fs.move(file.path, newPath);
 
     const profileCreated = this.profilePictureRepository.create({
-      user_id: user.id,
+      user: { id: user.id },
       image_url: newPath,
     });
     const profilePicture = await this.profilePictureRepository.save(
@@ -63,7 +63,7 @@ export class ProfilePictureService {
       throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
 
     const profilePicture = await this.profilePictureRepository.find({
-      where: { user_id: user.id },
+      where: { user: { id: user.id } },
     });
     if (!profilePicture)
       throw new HttpException(
@@ -109,7 +109,7 @@ export class ProfilePictureService {
     );
 
     const profilePicture = await this.profilePictureRepository.findOne({
-      where: { uuid, user_id: user.id },
+      where: { uuid, user: { id: user.id } },
     });
     if (!profilePicture)
       throw new HttpException(

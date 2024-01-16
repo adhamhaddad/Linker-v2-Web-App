@@ -20,7 +20,7 @@ export class Profile implements IProfile {
   @Generated('uuid')
   uuid: string;
 
-  @OneToOne(() => User, { nullable: false, onDelete: 'RESTRICT' })
+  @OneToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 

@@ -39,13 +39,10 @@ export class UserActivity implements IActivity {
   @Column({ type: 'enum', enum: UserActivityTypeMessages })
   type: UserActivityTypeMessages;
 
-  @Column({ type: 'integer', nullable: false })
-  user_id: number;
-
   @Column({ type: 'varchar', nullable: true })
   description: string;
 
-  @ManyToOne(() => User, { nullable: false, onDelete: 'RESTRICT' })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 

@@ -32,10 +32,7 @@ export class Job implements IJob {
   @Column({ type: 'date', nullable: true })
   end_date: Date;
 
-  @Column({ type: 'integer', nullable: false })
-  user_id: number;
-
-  @ManyToOne(() => User, { nullable: false, onDelete: 'RESTRICT' })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 

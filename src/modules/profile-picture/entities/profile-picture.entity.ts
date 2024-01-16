@@ -23,10 +23,7 @@ export class ProfilePicture implements IProfilePicture {
   @Column({ type: 'varchar', length: 100, nullable: false })
   image_url: string;
 
-  @Column({ type: 'integer', nullable: false })
-  user_id: number;
-
-  @ManyToOne(() => User, { nullable: false, onDelete: 'RESTRICT' })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
