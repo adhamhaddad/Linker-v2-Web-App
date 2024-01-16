@@ -1,5 +1,4 @@
 import { registerAs } from '@nestjs/config';
-
 import type { MongoConfig } from './config.type';
 
 export default registerAs<MongoConfig>('mongo', () => ({
