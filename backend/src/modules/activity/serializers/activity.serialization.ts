@@ -30,7 +30,4 @@ export class ActivityListSerialization {
 
   @Expose({ name: 'updated_at' })
   updatedAt: Date;
-
-  @Expose({ name: 'deleted_at' })
-  deletedAt: Date;
 }

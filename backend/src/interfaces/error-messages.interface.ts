@@ -14,6 +14,12 @@ export interface ErrorMessages {
   passwordMismatch: string;
   requestSuccessful: string;
   requestFailed: string;
+  /* -- User Activities -- */
+  userActivityNotFound: string;
+  userActivityCreatedSuccessfully: string;
+  userActivityDeletedSuccessfully: string;
+  failedToCreateUserActivity: string;
+  failedToDeleteUserActivity: string;
   /* -- User -- */
   /* -- Profile -- */
   profileNotFound: string;
