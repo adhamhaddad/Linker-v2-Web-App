@@ -15,6 +15,8 @@ export class AboutService {
   constructor(
     @InjectRepository(About)
     private readonly aboutRepository: Repository<About>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -32,8 +34,16 @@ export class AboutService {
     if (checkAbout)
       throw new HttpException(errorMessage.aboutExist, HttpStatus.BAD_REQUEST);
 
+    const { profile } = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ['profile'],
+    });
+    if (!profile)
+      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+
     const aboutCreated = this.aboutRepository.create({
-      user: user,
+      user,
+      profile,
       ...createAboutDto,
     });
     const about = await this.aboutRepository.save(aboutCreated);

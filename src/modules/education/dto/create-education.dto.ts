@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   Matches,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateEducationDto {
@@ -38,4 +39,11 @@ export class CreateEducationDto {
   })
   @Expose({ name: 'endDate' })
   end_date: Date;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  @MaxLength(2000)
+  @Expose({ name: 'description' })
+  description: string;
 }

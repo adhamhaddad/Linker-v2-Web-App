@@ -11,47 +11,53 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Lang } from 'src/decorators/lang.decorator';
 import { User } from 'src/decorators/user.decorator';
-import { ProfilePictureService } from '../services/profile-picture.service';
+import { CoverPictureService } from '../services/cover-picture.service';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
-export class ProfilePictureController {
-  constructor(private readonly profilePictureService: ProfilePictureService) {}
+export class CoverPictureController {
+  constructor(private readonly coverPictureService: CoverPictureService) {}
 
-  @Post('profile-pictures')
+  @Post('cover-pictures')
   @UseInterceptors(FileInterceptor('imageUrl'))
   async uploadPhoto(@UploadedFile() file, @User() user, @Lang() lang: string) {
-    const { message, data } =
-      await this.profilePictureService.uploadProfilePicture(file, user, lang);
+    const { message, data } = await this.coverPictureService.uploadCoverPicture(
+      file,
+      user,
+      lang,
+    );
     return { message, data };
   }
 
-  @Get(':id/profile-pictures')
-  async getProfilePictureByUserId(
+  @Get(':id/cover-pictures')
+  async getCoverPictureByUserId(
     @Param('id') uuid: string,
     @Lang() lang: string,
   ) {
     const { message, data } =
-      await this.profilePictureService.getProfilePictureByUserId(uuid, lang);
+      await this.coverPictureService.getCoverPictureByUserId(uuid, lang);
     return { message, data };
   }
 
-  @Get('profile-pictures/:id')
-  async getProfilePictureById(@Param('id') uuid: string, @Lang() lang: string) {
+  @Get('cover-pictures/:id')
+  async getCoverPictureById(@Param('id') uuid: string, @Lang() lang: string) {
     const { message, data } =
-      await this.profilePictureService.getProfilePictureById(uuid, lang);
+      await this.coverPictureService.getCoverPictureById(uuid, lang);
     return { message, data };
   }
 
-  @Delete('profile-pictures/:id')
+  @Delete('cover-pictures/:id')
   async deletePhoto(
     @Param('id') uuid: string,
     @User() user,
     @Lang() lang: string,
   ) {
-    const { message, data } =
-      await this.profilePictureService.deleteProfilePicture(uuid, user, lang);
+    const { message, data } = await this.coverPictureService.deleteCoverPicture(
+      uuid,
+      user,
+      lang,
+    );
     return { message, data };
   }
 }

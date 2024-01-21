@@ -5,7 +5,7 @@ import { Lang } from 'src/decorators/lang.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('users/visitors')
+@Controller('profile/visitors')
 export class VisitorController {
   constructor(private readonly visitorService: VisitorService) {}
 

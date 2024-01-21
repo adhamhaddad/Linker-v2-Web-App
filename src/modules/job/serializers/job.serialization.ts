@@ -16,6 +16,9 @@ export class JobSerialization {
   @Expose({ name: 'end_date' })
   endDate: Date;
 
+  @Expose({ name: 'description' })
+  description: string;
+
   @Expose({ name: 'created_at' })
   createdAt: Date;
 

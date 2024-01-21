@@ -7,9 +7,6 @@ export class GetUserSerialization {
   @Expose({ name: 'first_name' })
   firstName: string;
 
-  @Expose({ name: 'middle_name' })
-  middleName: string;
-
   @Expose({ name: 'last_name' })
   lastName: string;
 

@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { IJob } from '../interfaces/job.interface';
 import { User } from 'src/modules/auth/entities/user.entity';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Entity({ name: 'jobs' })
 export class Job implements IJob {
@@ -32,9 +33,16 @@ export class Job implements IJob {
   @Column({ type: 'date', nullable: true })
   end_date: Date;
 
+  @Column({ type: 'varchar', length: 2000, nullable: true })
+  description: string;
+
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @ManyToOne(() => Profile, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'profile_id' })
+  profile: Profile;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   created_at: Date;

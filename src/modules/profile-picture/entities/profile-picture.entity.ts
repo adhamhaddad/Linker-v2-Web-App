@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { IProfilePicture } from '../interfaces/profile.interface';
 import { User } from 'src/modules/auth/entities/user.entity';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Entity({ name: 'profile_pictures' })
 export class ProfilePicture implements IProfilePicture {
@@ -26,6 +27,10 @@ export class ProfilePicture implements IProfilePicture {
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @ManyToOne(() => Profile, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'profile_id' })
+  profile: Profile;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   created_at: Date;

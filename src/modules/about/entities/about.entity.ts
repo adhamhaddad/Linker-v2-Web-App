@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { IAbout } from '../interfaces/about.interface';
 import { User } from 'src/modules/auth/entities/user.entity';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Entity({ name: 'about' })
 export class About implements IAbout {
@@ -20,7 +21,7 @@ export class About implements IAbout {
   @Generated('uuid')
   uuid: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'varchar', length: 2000, nullable: true })
   about: string;
 
   @OneToOne(() => User, (user) => user.about, {
@@ -29,6 +30,13 @@ export class About implements IAbout {
   })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @OneToOne(() => Profile, (profile) => profile.about, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'profile_id' })
+  profile: Profile;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   created_at: Date;

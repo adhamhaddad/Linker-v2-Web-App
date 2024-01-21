@@ -1,6 +1,6 @@
 import { RequestStatus } from 'src/constants/request-status';
 
-export class IRelationshipRequest {
+export interface IRelationshipRequest {
   id: number;
   uuid: string;
   status: RequestStatus;

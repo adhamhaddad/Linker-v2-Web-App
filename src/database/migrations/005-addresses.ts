@@ -29,6 +29,11 @@ export class Addresses1700377299278 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'profile_id',
+            type: 'integer',
+            isNullable: false,
+          },
+          {
             name: 'country',
             type: 'varchar',
             isNullable: false,
@@ -60,6 +65,17 @@ export class Addresses1700377299278 implements MigrationInterface {
         columnNames: ['user_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
+        onDelete: 'CASCADE',
+        onUpdate: 'NO ACTION',
+      }),
+    );
+
+    await queryRunner.createForeignKey(
+      'addresses',
+      new TableForeignKey({
+        columnNames: ['profile_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'profiles',
         onDelete: 'CASCADE',
         onUpdate: 'NO ACTION',
       }),

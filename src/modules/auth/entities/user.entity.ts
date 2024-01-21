@@ -26,6 +26,7 @@ import { Visitor } from 'src/modules/visitor/entities/visitor.entity';
 import { Group } from 'src/modules/group/entities/group.entity';
 import { GroupMember } from 'src/modules/group/entities/group-member.entity';
 import { GroupRequest } from 'src/modules/group/entities/group-request.entity';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Entity({ name: 'users' })
 export class User implements IUser {
@@ -51,6 +52,9 @@ export class User implements IUser {
   @Column({ type: 'varchar', length: 100, nullable: false })
   gender: Gender;
 
+  @Column({ type: 'date', nullable: false })
+  birth_date: Date;
+
   @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
   email: string;
 
@@ -71,6 +75,9 @@ export class User implements IUser {
 
   @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp' })
   deleted_at: Date;
+
+  @OneToOne(() => Profile, (profile) => profile.user)
+  profile: Profile;
 
   @OneToOne(() => Address, (address) => address.user)
   address: Address;
