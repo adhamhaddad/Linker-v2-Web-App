@@ -74,9 +74,15 @@ export interface ErrorMessages {
   /* -- Profile Picture -- */
   profilePictureNotFound: string;
   profilePictureCreatedSuccessfully: string;
-  failedToCreateProfilePicture: string;
   profilePictureDeletedSuccessfully: string;
+  failedToCreateProfilePicture: string;
   failedToDeleteProfilePicture: string;
+  /* -- Cover Picture -- */
+  coverPictureNotFound: string;
+  coverPictureCreatedSuccessfully: string;
+  coverPictureDeletedSuccessfully: string;
+  failedToCreateCoverPicture: string;
+  failedToDeleteCoverPicture: string;
   /* -- Friend Request -- */
   noFriendRequestsFound: string;
   friendRequestNotFound: string;

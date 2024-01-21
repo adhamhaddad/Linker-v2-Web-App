@@ -32,8 +32,16 @@ export class EducationService {
       },
     );
 
+    const { profile } = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ['profile'],
+    });
+    if (!profile)
+      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+
     const educationCreated = this.educationRepository.create({
-      user: { id: user.id },
+      user,
+      profile,
       ...createEducationDto,
     });
     const education = await this.educationRepository.save(educationCreated);

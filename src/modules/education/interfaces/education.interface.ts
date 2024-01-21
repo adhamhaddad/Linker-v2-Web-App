@@ -1,4 +1,4 @@
-export class IEducation {
+export interface IEducation {
   id: number;
   uuid: string;
   name: string;
@@ -6,6 +6,7 @@ export class IEducation {
   degree: string;
   start_date: Date;
   end_date: Date | null;
+  description: string | null;
   created_at: Date;
   updated_at: Date;
 }

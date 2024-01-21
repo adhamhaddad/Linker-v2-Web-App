@@ -11,12 +11,16 @@ import { ProfileSerialization } from '../serializers/profile.serialization';
 import { GetProfilesSerialization } from '../serializers/get-profiles.serialization';
 import { FilterProfileDTO } from '../dto/filter-profile.dto';
 import { IProfile } from '../interfaces/profile.interface';
+import { IProfileHeader } from '../interfaces/profile-header.interface';
+import { IProfileSettings } from '../interfaces/profile-settings.interface';
 
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -94,8 +98,8 @@ export class ProfileService {
 
     if (keyword) {
       qb.andWhere(
-        '(user.first_name LIKE :keyword OR user.last_name LIKE :keyword)',
-        { keyword: `%${keyword}%` },
+        "(LOWER(CONCAT(user.first_name, ' ', user.last_name)) LIKE :keyword OR user.username LIKE :keyword)",
+        { keyword: `%${keyword.toLowerCase()}%` },
       );
     }
 
@@ -104,7 +108,7 @@ export class ProfileService {
 
     const [profiles, total] = await qb.getManyAndCount();
 
-    const data = profiles.map((page) => this.serializeGetProfiles(page));
+    const data = profiles.map((profile) => this.serializeGetProfiles(profile));
 
     return {
       data,
@@ -118,7 +122,7 @@ export class ProfileService {
     };
   }
 
-  async getProfileById(uuid: string, lang: string) {
+  async getProfileByUsername(username: string, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -126,9 +130,21 @@ export class ProfileService {
       },
     );
 
+    const user = await this.userRepository.findOne({ where: { username } });
+    if (!user)
+      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+
     const profile = await this.profileRepository.findOne({
-      where: { uuid },
-      relations: ['user'],
+      where: { user: { id: user.id } },
+      relations: [
+        'user',
+        'profilePicture',
+        'coverPicture',
+        'about',
+        'address',
+        'education',
+        'jobs',
+      ],
     });
     if (!profile)
       throw new HttpException(
@@ -136,7 +152,22 @@ export class ProfileService {
         HttpStatus.NOT_FOUND,
       );
 
-    return { data: this.serializeProfile(profile) };
+    // Modify the profile object to include only the last profile picture and cover picture
+    const header: IProfileHeader = {
+      profilePicture: profile.profilePicture[0] || null,
+      coverPicture: profile.coverPicture[0] || null,
+    };
+
+    const settings: IProfileSettings = {
+      posts_status: profile.posts_status,
+      friends_status: profile.friends_status,
+      pages_status: profile.pages_status,
+      groups_status: profile.groups_status,
+    };
+
+    const profileWithExtra: IProfile = { ...profile, header, settings };
+
+    return { data: this.serializeProfile(profileWithExtra) };
   }
 
   async updateProfile(body: UpdateProfileDto, user: User, lang: string) {

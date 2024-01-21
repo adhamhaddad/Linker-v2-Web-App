@@ -1,4 +1,4 @@
-export class IPhone {
+export interface IPhone {
   id: number;
   uuid: string;
   phone: string;

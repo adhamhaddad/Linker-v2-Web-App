@@ -1,5 +1,12 @@
 import { Expose } from 'class-transformer';
-import { IsDateString, IsNotEmpty, IsString, Matches } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateJobDto {
   @IsString()
@@ -24,9 +31,17 @@ export class CreateJobDto {
   @IsString()
   @IsNotEmpty()
   @IsDateString()
+  @IsOptional()
   @Matches(/^\d{4}-\d{2}-\d{2}$/, {
     message: 'End date must be in YYYY-MM-DD format',
   })
   @Expose({ name: 'endDate' })
   end_date: Date;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  @MaxLength(2000)
+  @Expose({ name: 'description' })
+  description: string;
 }

@@ -1,20 +1,20 @@
 export enum MultiRelationType {
-  SINGLE = 'SINGLE',
-  IN_RELATION = 'IN_RELATION',
-  ENGAGED = 'ENGAGED',
-  MARRIED = 'MARRIED',
-  FRIEND = 'FRIEND',
-  FAMILY = 'FAMILY',
-  COLLEAGUE = 'COLLEAGUE',
+  SINGLE = 'single',
+  IN_RELATION = 'in relation',
+  ENGAGED = 'engaged',
+  MARRIED = 'married',
+  FRIEND = 'friend',
+  FAMILY = 'family',
+  COLLEAGUE = 'colleague',
 }
 export enum SingleRelationshipType {
-  SINGLE = 'SINGLE',
-  IN_RELATION = 'IN_RELATION',
-  ENGAGED = 'ENGAGED',
-  MARRIED = 'MARRIED',
+  SINGLE = 'single',
+  IN_RELATION = 'in relation',
+  ENGAGED = 'engaged',
+  MARRIED = 'married',
 }
 
-export class IRelationship {
+export interface IRelationship {
   id: number;
   uuid: string;
   relation: MultiRelationType | SingleRelationshipType;

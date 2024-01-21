@@ -29,6 +29,11 @@ export class Jobs1700504273636 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'profile_id',
+            type: 'integer',
+            isNullable: false,
+          },
+          {
             name: 'provider',
             type: 'varchar',
             length: '200',
@@ -51,6 +56,12 @@ export class Jobs1700504273636 implements MigrationInterface {
             isNullable: true,
           },
           {
+            name: 'description',
+            type: 'varchar',
+            length: '2000',
+            isNullable: true,
+          },
+          {
             name: 'created_at',
             type: 'date',
             isNullable: true,
@@ -70,6 +81,17 @@ export class Jobs1700504273636 implements MigrationInterface {
         columnNames: ['user_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
+        onDelete: 'CASCADE',
+        onUpdate: 'NO ACTION',
+      }),
+    );
+
+    await queryRunner.createForeignKey(
+      'jobs',
+      new TableForeignKey({
+        columnNames: ['profile_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'profiles',
         onDelete: 'CASCADE',
         onUpdate: 'NO ACTION',
       }),

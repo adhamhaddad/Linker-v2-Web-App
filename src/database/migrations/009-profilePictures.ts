@@ -29,6 +29,11 @@ export class ProfilePictures1700529169643 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'profile_id',
+            type: 'integer',
+            isNullable: false,
+          },
+          {
             name: 'image_url',
             type: 'varchar',
             length: '200',
@@ -54,6 +59,17 @@ export class ProfilePictures1700529169643 implements MigrationInterface {
         columnNames: ['user_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
+        onDelete: 'CASCADE',
+        onUpdate: 'NO ACTION',
+      }),
+    );
+
+    await queryRunner.createForeignKey(
+      'profile_pictures',
+      new TableForeignKey({
+        columnNames: ['profile_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'profiles',
         onDelete: 'CASCADE',
         onUpdate: 'NO ACTION',
       }),

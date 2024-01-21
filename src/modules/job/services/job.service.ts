@@ -28,8 +28,16 @@ export class JobService {
       },
     );
 
+    const { profile } = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ['profile'],
+    });
+    if (!profile)
+      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+
     const jobCreated = this.jobRepository.create({
-      user: { id: user.id },
+      user,
+      profile,
       ...createJobDto,
     });
     const job = await this.jobRepository.save(jobCreated);

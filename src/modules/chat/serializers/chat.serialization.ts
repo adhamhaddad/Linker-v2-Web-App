@@ -29,7 +29,7 @@ export class ChatSerialization {
 
   @Type(() => MessageSerialization)
   @Expose({ name: 'messages' })
-  messages: MessageSerialization[]
+  messages: MessageSerialization[];
 
   @Expose({ name: 'createdAt' })
   createdAt: Date;

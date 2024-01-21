@@ -1,9 +1,12 @@
 import { Exclude, Expose } from 'class-transformer';
 import { Gender } from 'src/constants';
 
-export class UserSerialization {
-  @Expose({ name: 'uuid' })
+export class AuthSerialization {
+  @Expose({ name: 'id' })
   id: number;
+
+  @Expose({ name: 'uuid' })
+  uuid: number;
 
   @Expose({ name: 'profile_url' })
   profileUrl: string;

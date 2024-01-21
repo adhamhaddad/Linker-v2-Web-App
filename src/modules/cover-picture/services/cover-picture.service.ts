@@ -1,27 +1,27 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProfilePicture } from '../entities/profile-picture.entity';
+import { CoverPicture } from '../entities/cover-picture.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/modules/auth/entities/user.entity';
 import * as fs from 'fs-extra';
 import { join } from 'path';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { I18nService } from 'nestjs-i18n';
-import { ProfilePictureSerialization } from '../serializers/profile.serialization';
+import { CoverPictureSerialization } from '../serializers/cover.serialization';
 import { plainToClass } from 'class-transformer';
 import { v4 as uuidV4 } from 'uuid';
 
 @Injectable()
-export class ProfilePictureService {
+export class CoverPictureService {
   constructor(
-    @InjectRepository(ProfilePicture)
-    private readonly profilePictureRepository: Repository<ProfilePicture>,
+    @InjectRepository(CoverPicture)
+    private readonly coverPictureRepository: Repository<CoverPicture>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly i18nService: I18nService,
   ) {}
 
-  async uploadProfilePicture(file: any, user: User, lang: string) {
+  async uploadCoverPicture(file: any, user: User, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -38,7 +38,7 @@ export class ProfilePictureService {
 
     // Process the uploaded file, e.g., save it to the database or move it to a specific folder
     const imageUuid = uuidV4();
-    const imageUrl = `uploads/profile-pictures/${imageUuid}-${file.originalname}`;
+    const imageUrl = `uploads/cover-pictures/${imageUuid}-${file.originalname}`;
 
     const uploads = join(
       __dirname,
@@ -47,33 +47,31 @@ export class ProfilePictureService {
       '..',
       '..',
       'uploads',
-      'profile-pictures',
+      'cover-pictures',
       `${imageUuid}-${file.originalname}`,
     );
 
     await fs.move(file.path, uploads);
 
-    const profileCreated = this.profilePictureRepository.create({
+    const coverCreated = this.coverPictureRepository.create({
       user,
       profile,
       image_url: imageUrl,
     });
-    const profilePicture = await this.profilePictureRepository.save(
-      profileCreated,
-    );
-    if (!profilePicture)
+    const coverPicture = await this.coverPictureRepository.save(coverCreated);
+    if (!coverPicture)
       throw new HttpException(
-        errorMessage.failedToCreateProfilePicture,
+        errorMessage.failedToCreateCoverPicture,
         HttpStatus.BAD_REQUEST,
       );
 
     return {
-      message: errorMessage.profilePictureCreatedSuccessfully,
-      data: this.serializeProfilePicture(profilePicture),
+      message: errorMessage.coverPictureCreatedSuccessfully,
+      data: this.serializeCoverPicture(coverPicture),
     };
   }
 
-  async getProfilePictureByUserId(uuid: string, lang: string) {
+  async getCoverPictureByUserId(uuid: string, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -85,18 +83,18 @@ export class ProfilePictureService {
     if (!user)
       throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
 
-    const profilePicture = await this.profilePictureRepository.findOne({
+    const profilePicture = await this.coverPictureRepository.findOne({
       where: { user: { id: user.id } },
       order: { created_at: 'DESC' },
     });
 
     return {
       message: '',
-      data: this.serializeProfilePicture(profilePicture) || null,
+      data: this.serializeCoverPicture(profilePicture) || null,
     };
   }
 
-  async getProfilePictureById(uuid: string, lang: string) {
+  async getCoverPictureById(uuid: string, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -104,22 +102,22 @@ export class ProfilePictureService {
       },
     );
 
-    const profilePicture = await this.profilePictureRepository.findOne({
+    const coverPicture = await this.coverPictureRepository.findOne({
       where: { uuid },
     });
-    if (!profilePicture)
+    if (!coverPicture)
       throw new HttpException(
-        errorMessage.profilePictureNotFound,
+        errorMessage.coverPictureNotFound,
         HttpStatus.NOT_FOUND,
       );
 
     return {
       message: '',
-      data: this.serializeProfilePicture(profilePicture),
+      data: this.serializeCoverPicture(coverPicture),
     };
   }
 
-  async deleteProfilePicture(uuid: string, user: User, lang: string) {
+  async deleteCoverPicture(uuid: string, user: User, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -127,30 +125,30 @@ export class ProfilePictureService {
       },
     );
 
-    const profilePicture = await this.profilePictureRepository.findOne({
+    const coverPicture = await this.coverPictureRepository.findOne({
       where: { uuid, user: { id: user.id } },
     });
-    if (!profilePicture)
+    if (!coverPicture)
       throw new HttpException(
-        errorMessage.profilePictureNotFound,
+        errorMessage.coverPictureNotFound,
         HttpStatus.NOT_FOUND,
       );
 
-    const { affected } = await this.profilePictureRepository.delete({ uuid });
+    const { affected } = await this.coverPictureRepository.delete({ uuid });
     if (!affected)
       throw new HttpException(
-        errorMessage.failedToDeleteProfilePicture,
+        errorMessage.failedToDeleteCoverPicture,
         HttpStatus.BAD_REQUEST,
       );
 
     return {
-      message: errorMessage.profilePictureDeletedSuccessfully,
-      data: this.serializeProfilePicture(profilePicture),
+      message: errorMessage.coverPictureDeletedSuccessfully,
+      data: this.serializeCoverPicture(coverPicture),
     };
   }
 
-  serializeProfilePicture(picture) {
-    return plainToClass(ProfilePictureSerialization, picture, {
+  serializeCoverPicture(picture) {
+    return plainToClass(CoverPictureSerialization, picture, {
       excludeExtraneousValues: true,
       enableCircularCheck: true,
       strategy: 'excludeAll',

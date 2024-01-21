@@ -1,8 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as compression from 'compression';
 import helmet from 'helmet';
+import * as express from 'express';
+import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
+import { join } from 'path';
 import {
   HttpException,
   HttpStatus,
@@ -103,6 +105,14 @@ async function bootstrap() {
 
   //global response interceptor
   app.useGlobalInterceptors(new ResponseInterceptor());
+
+  // Serve static files from the upload/profile-pictures folder
+  const apiPrefix = configService.getOrThrow('app.apiPrefix', { infer: true });
+  const profile = join(__dirname, '..', 'uploads', 'profile-pictures');
+  const cover = join(__dirname, '..', 'uploads', 'cover-pictures');
+
+  app.use(`/${apiPrefix}/uploads/profile-pictures`, express.static(profile));
+  app.use(`/${apiPrefix}/uploads/cover-pictures`, express.static(cover));
 
   await app.listen(configService.getOrThrow('app.port', { infer: true }));
 }

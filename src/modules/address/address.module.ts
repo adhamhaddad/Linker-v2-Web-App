@@ -6,9 +6,10 @@ import { Address } from './entities/address.entity';
 import { JwtStrategy } from '../auth/strategies/jwt.strategy';
 import { Utils } from 'src/utils/utils';
 import { RedisService } from '../redis/redis.service';
+import { User } from '../auth/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Address])],
+  imports: [TypeOrmModule.forFeature([Address, User])],
   providers: [AddressService, JwtStrategy, Utils, RedisService],
   controllers: [AddressController],
 })

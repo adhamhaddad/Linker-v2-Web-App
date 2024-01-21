@@ -5,15 +5,15 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Generated,
-  ManyToOne,
   JoinColumn,
+  ManyToOne,
 } from 'typeorm';
-import { IEducation } from '../interfaces/education.interface';
+import { ICoverPicture } from '../interfaces/cover.interface';
 import { User } from 'src/modules/auth/entities/user.entity';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
 
-@Entity({ name: 'education' })
-export class Education implements IEducation {
+@Entity({ name: 'cover_pictures' })
+export class CoverPicture implements ICoverPicture {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -21,23 +21,8 @@ export class Education implements IEducation {
   @Generated('uuid')
   uuid: string;
 
-  @Column({ type: 'varchar', length: 200, nullable: false })
-  name: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  title: string;
-
   @Column({ type: 'varchar', length: 100, nullable: false })
-  degree: string;
-
-  @Column({ type: 'date', nullable: false })
-  start_date: Date;
-
-  @Column({ type: 'date', nullable: true })
-  end_date: Date;
-
-  @Column({ type: 'varchar', length: 2000, nullable: true })
-  description: string;
+  image_url: string;
 
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
