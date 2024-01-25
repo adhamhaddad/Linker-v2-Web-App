@@ -133,8 +133,21 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  async authMe(@User() user: any, @Lang() lang: string) {
+  async authMe(
+    @Res({ passthrough: true }) response: Response,
+    @User() user: any,
+    @Lang() lang: string,
+  ) {
     const { message, data, token } = await this.authService.authMe(user, lang);
+    const expiresIn = 3 * 60 * 60 * 1000;
+    const expirationDate = new Date(Date.now() + expiresIn);
+
+    response.cookie('access_token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      expires: expirationDate,
+    });
     return { message, data: { user: data, token } };
   }
 }

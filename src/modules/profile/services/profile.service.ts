@@ -13,14 +13,14 @@ import { FilterProfileDTO } from '../dto/filter-profile.dto';
 import { IProfile } from '../interfaces/profile.interface';
 import { IProfileHeader } from '../interfaces/profile-header.interface';
 import { IProfileSettings } from '../interfaces/profile-settings.interface';
+import { FriendRequestService } from 'src/modules/friends/services/friend-request.service';
 
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    // private readonly friendRequestService: FriendRequestService,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -122,7 +122,7 @@ export class ProfileService {
     };
   }
 
-  async getProfileByUsername(username: string, lang: string) {
+  async getProfileByUsername(username: string, user: User, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -130,12 +130,8 @@ export class ProfileService {
       },
     );
 
-    const user = await this.userRepository.findOne({ where: { username } });
-    if (!user)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
-
     const profile = await this.profileRepository.findOne({
-      where: { user: { id: user.id } },
+      where: { user: { username } },
       relations: [
         'user',
         'profilePicture',
@@ -165,7 +161,30 @@ export class ProfileService {
       groups_status: profile.groups_status,
     };
 
-    const profileWithExtra: IProfile = { ...profile, header, settings };
+    const profileUser = profile.user;
+
+    // const connection = {
+    //   isConnected: await this.friendRequestService.areUsersFriends(
+    //     profileUser,
+    //     user,
+    //   ),
+    //   isRequested: await this.friendRequestService.isFriendRequestSent(
+    //     profileUser,
+    //     user,
+    //   ),
+    // };
+
+    const connection = {
+      isConnected: false,
+      isRequested: false,
+    };
+
+    const profileWithExtra: IProfile = {
+      ...profile,
+      header,
+      settings,
+      connection,
+    };
 
     return { data: this.serializeProfile(profileWithExtra) };
   }

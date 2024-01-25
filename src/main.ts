@@ -23,7 +23,7 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService) as ConfigService<AllConfigType>;
 
-  const whitelist = ['http://localhost:3000', undefined];
+  const whitelist = ['http://localhost:3000', 'http://192.168.1.6:3000', 'http://192.168.1.5:3000', 'http://192.168.1.2:3000', undefined];
 
   const corsOptions = {
     origin: function (origin, callback) {
