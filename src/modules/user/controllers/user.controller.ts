@@ -3,6 +3,7 @@ import { UserService } from '../services/user.service';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 import { Lang } from 'src/decorators/lang.decorator';
 import { FilterUsersDTO } from '../dto/filter-users.dto';
+import { User } from 'src/decorators/user.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -16,9 +17,8 @@ export class UserController {
   }
 
   @Get()
-  async getUsers(@Query() query: FilterUsersDTO) {
-    console.log(query.filter);
-    const { data, total, meta } = await this.userService.getUsers(query);
+  async getUsers(@Query() query: FilterUsersDTO, @User() user: any) {
+    const { data, total, meta } = await this.userService.getUsers(query, user);
     return { data, total, meta };
   }
 }

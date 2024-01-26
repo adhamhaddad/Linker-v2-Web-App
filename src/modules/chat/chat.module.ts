@@ -40,5 +40,15 @@ import { RedisService } from '../redis/redis.service';
     ChatArchiveController,
     MessageController,
   ],
+  exports: [
+    MongooseModule.forFeature([
+      { name: 'Chat', schema: ChatSchema },
+      { name: 'Conversation', schema: ConversationSchema },
+      { name: 'Message', schema: MessageSchema },
+    ]),
+    ChatService,
+    ConversationService,
+    MessageService,
+  ],
 })
 export class ChatModule {}

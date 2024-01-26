@@ -1,41 +1,21 @@
 import { Expose, Type } from 'class-transformer';
-import { ProfileStatus } from '../interfaces/profile.interface';
 import { GetUserSerialization } from 'src/modules/user/serializers/get-user.serialization';
-import { ProfilePictureSerialization } from 'src/modules/profile-picture/serializers/profile.serialization';
 import { AboutSerialization } from 'src/modules/about/serializers/about.serialization';
 import { AddressSerialization } from 'src/modules/address/serializers/address.serialization';
 import { EducationSerialization } from 'src/modules/education/serializers/education.serialization';
 import { JobSerialization } from 'src/modules/job/serializers/job.serialization';
-import { CoverPictureSerialization } from 'src/modules/cover-picture/serializers/cover.serialization';
 import { RelationshipSerialization } from 'src/modules/relationships/serializers/relationship.serialization';
-
-export class ProfileHeaderSerialization {
-  @Type(() => ProfilePictureSerialization)
-  @Expose({ name: 'profilePicture' })
-  profileImage: ProfilePictureSerialization | null;
-
-  @Type(() => CoverPictureSerialization)
-  @Expose({ name: 'coverPicture' })
-  coverImage: CoverPictureSerialization | null;
-}
-
-export class ProfileSettingsSerialization {
-  @Expose({ name: 'posts_status' })
-  postsStatus: ProfileStatus;
-
-  @Expose({ name: 'friends_status' })
-  friendsStatus: ProfileStatus;
-
-  @Expose({ name: 'pages_status' })
-  pagesStatus: ProfileStatus;
-
-  @Expose({ name: 'groups_status' })
-  groupsStatus: ProfileStatus;
-}
+import { ProfileConnectionSerialization } from './profile-connection.serialization';
+import { ProfileHeaderSerialization } from './profile-header.serialization';
+import { ProfileSettingsSerialization } from './profile-settings.serialization';
 
 export class ProfileSerialization {
   @Expose({ name: 'uuid' })
   id: string;
+
+  @Type(() => ProfileConnectionSerialization)
+  @Expose({ name: 'connection' })
+  connection: ProfileConnectionSerialization;
 
   @Type(() => ProfileHeaderSerialization)
   @Expose({ name: 'header' })

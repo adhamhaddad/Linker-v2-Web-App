@@ -6,6 +6,7 @@ import {
   IsString,
   Matches,
   MaxLength,
+  Validate,
 } from 'class-validator';
 
 export class CreateJobDto {
@@ -36,11 +37,20 @@ export class CreateJobDto {
     message: 'End date must be in YYYY-MM-DD format',
   })
   @Expose({ name: 'endDate' })
+  @Validate(
+    (endDate: Date, { object }) => {
+      // Custom validation function to check if end date is not before start date
+      if (endDate && object && object.start_date) {
+        return endDate >= object.start_date;
+      }
+      return true;
+    },
+    { message: 'End date must be after or equal to the start date' },
+  )
   end_date: Date;
 
-  @IsString()
-  @IsNotEmpty()
   @IsOptional()
+  @IsString()
   @MaxLength(2000)
   @Expose({ name: 'description' })
   description: string;

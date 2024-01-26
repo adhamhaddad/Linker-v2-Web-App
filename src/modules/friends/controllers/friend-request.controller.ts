@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { FriendRequestService } from '../services/friend-request.service';
@@ -12,6 +13,7 @@ import { User } from 'src/decorators/user.decorator';
 import { Lang } from 'src/decorators/lang.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 import { UpdateRequestStatusDto } from '../dto/update-request-status.dto';
+import { FilterFriendRequestDTO } from '../dto/requests-filter.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('friend-requests')
@@ -50,21 +52,12 @@ export class FriendRequestController {
   }
 
   @Get()
-  async getFriendRequests(@User() user, @Lang() lang: string) {
-    const { message, data } = await this.friendRequestService.getFriendRequests(
-      user,
-      lang,
-    );
-    return { message, data };
-  }
-
-  @Get('sent')
-  async getFriendRequestsSent(@User() user, @Lang() lang: string) {
-    const { message, data } = await this.friendRequestService.getFriendRequests(
-      user,
-      lang,
-      true,
-    );
-    return { message, data };
+  async getFriendRequests(
+    @Query() query: FilterFriendRequestDTO,
+    @User() user: any,
+  ) {
+    const { data, total, meta } =
+      await this.friendRequestService.getFriendRequests(query, user);
+    return { data, total, meta };
   }
 }

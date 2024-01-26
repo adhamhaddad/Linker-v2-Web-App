@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { OrderByCondition, Repository } from 'typeorm';
+import { OrderByCondition, Repository, SelectQueryBuilder } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { User } from 'src/modules/auth/entities/user.entity';
 import { IUser } from 'src/modules/auth/interfaces/user.interface';
@@ -9,6 +9,7 @@ import { plainToClass } from 'class-transformer';
 import { FilterUsersDTO } from '../dto/filter-users.dto';
 import { UserProfileSerialization } from '../serializers/get-user-profile.serialization';
 import { UserSerialization } from '../serializers/user.serialization';
+import { ProfilePicture } from 'src/modules/profile-picture/entities/profile-picture.entity';
 
 @Injectable()
 export class UserService {
@@ -33,11 +34,13 @@ export class UserService {
     return { data: this.serializeUserProfile(user), message: '' };
   }
 
-  async getUsers(query: FilterUsersDTO) {
+  async getUsers(query: FilterUsersDTO, user: User) {
     const selector: Partial<IUser> = {};
     const keyword = query.filter?.keyword;
-    console.log(keyword);
-    let order: OrderByCondition = { 'user.created_at': 'DESC' };
+    let order: OrderByCondition = {
+      'user.created_at': 'DESC',
+      'profile.created_at': 'DESC',
+    };
 
     query.paginate = query.paginate || 15;
     query.page = query.page || 1;
@@ -54,7 +57,9 @@ export class UserService {
     }
 
     // Create Query Builder
-    const qb = this.userRepository.createQueryBuilder('user');
+    const qb = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profilePicture', 'profile');
 
     // Apply filters
     if (Object.keys(selector).length > 0) {
@@ -66,6 +71,7 @@ export class UserService {
         "(LOWER(CONCAT(user.first_name, ' ', user.last_name)) LIKE :keyword OR user.username LIKE :keyword)",
         { keyword: `%${keyword.toLowerCase()}%` },
       );
+      qb.andWhere('user.id != :userId', { userId: user.id });
     }
 
     // Apply ordering, pagination

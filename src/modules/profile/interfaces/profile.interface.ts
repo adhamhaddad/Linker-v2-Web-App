@@ -18,4 +18,5 @@ export interface IProfile {
   updated_at: Date;
   header?: IProfileHeader;
   settings?: IProfileSettings;
+  connection?: any;
 }
