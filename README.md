@@ -1,4 +1,4 @@
-<img style="width: 100%; height: 620px;" src="./assets/logo.png" />
+<img style="width: 100%" src="./assets/logo.png" />
 
 <h1 style="text-align: center; font-size: 40px; margin-top: 20px">Linker</h1>
 
