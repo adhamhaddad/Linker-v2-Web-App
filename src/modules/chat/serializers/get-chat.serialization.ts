@@ -1,9 +1,10 @@
 import { Expose, Type } from 'class-transformer';
 import { ChatType } from '../interfaces/chat.interface';
+import { GroupDetailsSerialization } from './group-details.serialization';
 import { ConversationSerialization } from './conversation.serialization';
-import { ParticipantSerialization } from './participant.serialization';
+import { ChatParticipantSerialization } from './chat-participant.serialization';
 
-export class ChatSerialization {
+export class GetChatSerialization {
   @Expose({ name: '_id' })
   id: string;
 
@@ -14,9 +15,9 @@ export class ChatSerialization {
   // @Expose({ name: 'groupDetails' })
   // groupDetails: GroupDetailsSerialization;
 
-  @Type(() => ParticipantSerialization)
+  @Type(() => ChatParticipantSerialization)
   @Expose({ name: 'participants' })
-  participants: ParticipantSerialization[];
+  participant: ChatParticipantSerialization[];
 
   @Type(() => ConversationSerialization)
   @Expose({ name: 'conversation' })

@@ -5,9 +5,9 @@ import { ProfilePictureSerialization } from 'src/modules/profile-picture/seriali
 export class ProfileHeaderSerialization {
   @Type(() => ProfilePictureSerialization)
   @Expose({ name: 'profilePicture' })
-  profileImage: ProfilePictureSerialization | null;
+  profilePictures: ProfilePictureSerialization;
 
   @Type(() => CoverPictureSerialization)
   @Expose({ name: 'coverPicture' })
-  coverImage: CoverPictureSerialization | null;
+  profileCovers: CoverPictureSerialization;
 }

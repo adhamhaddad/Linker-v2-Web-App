@@ -39,6 +39,9 @@ export class Education implements IEducation {
   @Column({ type: 'varchar', length: 2000, nullable: true })
   description: string;
 
+  @Column({ type: 'varchar', length: 1000, nullable: true })
+  activities: string;
+
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;

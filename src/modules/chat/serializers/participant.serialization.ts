@@ -9,7 +9,4 @@ export class ParticipantSerialization {
 
   @Expose({ name: 'isMuted' })
   isMuted: boolean;
-
-  @Expose({ name: 'wallpaper' })
-  wallpaper: string;
 }

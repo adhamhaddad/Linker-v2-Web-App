@@ -15,14 +15,20 @@ import { CoverPictureService } from '../services/cover-picture.service';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('users')
+@Controller('users/profiles')
 export class CoverPictureController {
   constructor(private readonly coverPictureService: CoverPictureService) {}
 
-  @Post('cover-pictures')
+  @Post(':id/cover-pictures')
   @UseInterceptors(FileInterceptor('imageUrl'))
-  async uploadPhoto(@UploadedFile() file, @User() user, @Lang() lang: string) {
+  async uploadPhoto(
+    @Param('id') uuid: string,
+    @UploadedFile() file,
+    @User() user,
+    @Lang() lang: string,
+  ) {
     const { message, data } = await this.coverPictureService.uploadCoverPicture(
+      uuid,
       file,
       user,
       lang,
@@ -31,13 +37,12 @@ export class CoverPictureController {
   }
 
   @Get(':id/cover-pictures')
-  async getCoverPictureByUserId(
-    @Param('id') uuid: string,
-    @Lang() lang: string,
-  ) {
-    const { message, data } =
-      await this.coverPictureService.getCoverPictureByUserId(uuid, lang);
-    return { message, data };
+  async getProfileCovers(@Param('id') uuid: string, @Lang() lang: string) {
+    const { data, total } = await this.coverPictureService.getProfileCovers(
+      uuid,
+      lang,
+    );
+    return { data, total };
   }
 
   @Get('cover-pictures/:id')
@@ -48,7 +53,7 @@ export class CoverPictureController {
   }
 
   @Delete('cover-pictures/:id')
-  async deletePhoto(
+  async deleteCoverPicture(
     @Param('id') uuid: string,
     @User() user,
     @Lang() lang: string,

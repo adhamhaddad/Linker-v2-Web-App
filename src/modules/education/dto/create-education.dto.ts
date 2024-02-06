@@ -55,4 +55,10 @@ export class CreateEducationDto {
   @MaxLength(2000)
   @Expose({ name: 'description' })
   description: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000)
+  @Expose({ name: 'activities' })
+  activities: string;
 }

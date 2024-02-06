@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Education } from '../entities/education.entity';
-import { Repository } from 'typeorm';
+import { OrderByCondition, Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { CreateEducationDto } from '../dto/create-education.dto';
 import { User } from 'src/modules/auth/entities/user.entity';
@@ -9,18 +9,20 @@ import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { UpdateEducationDto } from '../dto/update-education.dto';
 import { EducationSerialization } from '../serializers/education.serialization';
 import { plainToClass } from 'class-transformer';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Injectable()
 export class EducationService {
   constructor(
     @InjectRepository(Education)
     private readonly educationRepository: Repository<Education>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
     private readonly i18nService: I18nService,
   ) {}
 
   async createEducation(
+    uuid: string,
     createEducationDto: CreateEducationDto,
     user: User,
     lang: string,
@@ -32,12 +34,14 @@ export class EducationService {
       },
     );
 
-    const { profile } = await this.userRepository.findOne({
-      where: { id: user.id },
-      relations: ['profile'],
+    const profile = await this.profileRepository.findOne({
+      where: { uuid, user: { id: user.id } },
     });
     if (!profile)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        errorMessage.profileNotFound,
+        HttpStatus.NOT_FOUND,
+      );
 
     const educationCreated = this.educationRepository.create({
       user,
@@ -57,6 +61,46 @@ export class EducationService {
     };
   }
 
+  async getProfileEducation(username: string, lang: string) {
+    const errorMessage: ErrorMessages = this.i18nService.translate(
+      'error-messages',
+      {
+        lang,
+      },
+    );
+    let order: OrderByCondition = { 'education.start_date': 'DESC' };
+
+    // Get Profile
+    const profile = await this.profileRepository.findOne({
+      where: { user: { username } },
+    });
+    if (!profile)
+      throw new HttpException(
+        errorMessage.profileNotFound,
+        HttpStatus.NOT_FOUND,
+      );
+
+    // Create Query Builder
+    const qb = this.educationRepository
+      .createQueryBuilder('education')
+      .leftJoinAndSelect('education.profile', 'profile')
+      .where('profile.uuid = :profileId', { profileId: profile.uuid });
+
+    // Apply ordering, pagination
+    qb.orderBy(order);
+
+    const [education, total] = await qb.getManyAndCount();
+
+    const data = education.map((education) =>
+      this.serializeEducation(education),
+    );
+
+    return {
+      data,
+      total,
+    };
+  }
+
   async getEducationById(uuid: string, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
@@ -67,36 +111,6 @@ export class EducationService {
 
     const education = await this.educationRepository.findOne({
       where: { uuid },
-    });
-    if (!education)
-      throw new HttpException(
-        errorMessage.educationNotFound,
-        HttpStatus.NOT_FOUND,
-      );
-
-    return {
-      message: '',
-      data: this.serializeEducation(education),
-    };
-  }
-
-  async getEducationByUserId(uuid: string, lang: string) {
-    const errorMessage: ErrorMessages = this.i18nService.translate(
-      'error-messages',
-      {
-        lang,
-      },
-    );
-
-    // Get user
-    const user = await this.userRepository.findOne({
-      where: { uuid },
-    });
-    if (!user)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
-
-    const education = await this.educationRepository.find({
-      where: { user: { id: user.id } },
     });
     if (!education)
       throw new HttpException(

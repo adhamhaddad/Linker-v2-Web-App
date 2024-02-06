@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoverPicture } from '../entities/cover-picture.entity';
-import { Repository } from 'typeorm';
+import { OrderByCondition, Repository } from 'typeorm';
 import { User } from 'src/modules/auth/entities/user.entity';
 import * as fs from 'fs-extra';
 import { join } from 'path';
@@ -10,18 +10,19 @@ import { I18nService } from 'nestjs-i18n';
 import { CoverPictureSerialization } from '../serializers/cover.serialization';
 import { plainToClass } from 'class-transformer';
 import { v4 as uuidV4 } from 'uuid';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Injectable()
 export class CoverPictureService {
   constructor(
     @InjectRepository(CoverPicture)
     private readonly coverPictureRepository: Repository<CoverPicture>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
     private readonly i18nService: I18nService,
   ) {}
 
-  async uploadCoverPicture(file: any, user: User, lang: string) {
+  async uploadCoverPicture(uuid: string, file: any, user: User, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -29,12 +30,14 @@ export class CoverPictureService {
       },
     );
 
-    const { profile } = await this.userRepository.findOne({
-      where: { id: user.id },
-      relations: ['profile'],
+    const profile = await this.profileRepository.findOne({
+      where: { uuid, user: { id: user.id } },
     });
     if (!profile)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        errorMessage.profileNotFound,
+        HttpStatus.NOT_FOUND,
+      );
 
     // Process the uploaded file, e.g., save it to the database or move it to a specific folder
     const imageUuid = uuidV4();
@@ -71,26 +74,38 @@ export class CoverPictureService {
     };
   }
 
-  async getCoverPictureByUserId(uuid: string, lang: string) {
+  async getProfileCovers(uuid: string, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
         lang,
       },
     );
+    let order: OrderByCondition = { 'cover.created_at': 'DESC' };
 
-    const user = await this.userRepository.findOne({ where: { uuid } });
-    if (!user)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+    const profile = await this.profileRepository.findOne({ where: { uuid } });
+    if (!profile)
+      throw new HttpException(
+        errorMessage.profileNotFound,
+        HttpStatus.NOT_FOUND,
+      );
 
-    const profilePicture = await this.coverPictureRepository.findOne({
-      where: { user: { id: user.id } },
-      order: { created_at: 'DESC' },
-    });
+    // Create Query Builder
+    const qb = this.coverPictureRepository
+      .createQueryBuilder('cover')
+      .leftJoinAndSelect('cover.profile', 'profile')
+      .where('profile.uuid = :profileId', { profileId: uuid });
+
+    // Apply ordering, pagination
+    qb.orderBy(order);
+
+    const [covers, total] = await qb.getManyAndCount();
+
+    const data = covers.map((cover) => this.serializeCoverPicture(cover));
 
     return {
-      message: '',
-      data: this.serializeCoverPicture(profilePicture) || null,
+      data,
+      total,
     };
   }
 

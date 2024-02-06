@@ -31,6 +31,7 @@ import { PostModule } from './modules/post/post.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { SettingModule } from './modules/settings/setting.module';
+import { SocketModule } from './modules/socket/socket.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { SettingModule } from './modules/settings/setting.module';
     }),
     MulterConfig,
     ScheduleModule.forRoot(),
+    SocketModule,
     RedisModule,
     AuthModule,
     ActivityModule,

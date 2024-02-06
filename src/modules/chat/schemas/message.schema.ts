@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { IReplyTo } from '../interfaces/message-reply-to.interface';
 import { IForwardedFrom } from '../interfaces/message-forwarded-from.interface';
+import { IMessageStatus } from '../interfaces/message-status.interface';
 
 @Schema({ timestamps: true })
 export class Message extends Document {
@@ -11,20 +12,28 @@ export class Message extends Document {
   @Prop({ type: String, ref: 'Conversation', required: true, index: 1 })
   conversationId: String;
 
-  @Prop({ type: Number, required: true })
-  userId: number;
+  @Prop({ type: String, required: true })
+  senderId: string;
 
   @Prop({ minlength: 1, maxlength: 3000, trim: true })
   message: string;
 
-  @Prop({ required: true, default: false })
-  isRead: boolean;
+  @Prop({
+    type: {
+      isSent: { type: Boolean, default: true },
+      isDelivered: { type: Boolean, default: false },
+      isSeen: { type: Boolean, default: false },
+    },
+    required: false,
+    default: { isSent: true, isDelivered: false, isSeen: false },
+  })
+  status: IMessageStatus;
 
   @Prop({
     type: {
       chatId: { type: String, required: true },
       messageId: { type: String, required: true },
-      userId: { type: Number, required: true },
+      userId: { type: String, required: true },
     },
     required: false,
     default: null,
@@ -34,7 +43,7 @@ export class Message extends Document {
   @Prop({
     type: {
       messageId: { type: String, required: true },
-      userId: { type: Number, required: true },
+      userId: { type: String, required: true },
     },
     required: false,
     default: null,
@@ -60,19 +69,19 @@ export class Message extends Document {
   @Prop({
     type: [
       {
-        _id: { type: Number, required: true },
+        _id: { type: String, required: true },
         reactIcon: { type: String, required: true },
       },
     ],
     required: false,
   })
   reactions: {
-    _id: number;
+    _id: string;
     reactIcon: string;
   }[];
 
-  @Prop({ type: [{ _id: { type: Number, required: true } }] })
-  deletedFrom: [{ _id: number }];
+  @Prop({ type: [{ _id: { type: String, required: true } }] })
+  deletedFrom: [{ _id: string }];
 
   @Prop({ default: null })
   deletedAt: Date;

@@ -9,7 +9,4 @@ export class ProfilePictureSerialization {
 
   @Expose({ name: 'created_at' })
   createdAt: Date;
-
-  @Expose({ name: 'updated_at' })
-  updatedAt: Date;
 }

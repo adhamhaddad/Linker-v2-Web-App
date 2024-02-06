@@ -6,7 +6,7 @@ export class CreateChatDto {
   @IsNumber()
   @IsNotEmpty()
   @Expose({ name: 'userId' })
-  userId: number;
+  userId: string;
 
   @IsString()
   @IsNotEmpty()

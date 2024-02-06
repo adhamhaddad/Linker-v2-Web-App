@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 
-export class Attachments {
+export class AttachmentsSerialization {
   @Expose({ name: 'imageUrl' })
   imageUrl: string[] | [];
 

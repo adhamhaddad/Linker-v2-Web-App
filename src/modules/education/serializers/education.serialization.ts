@@ -19,6 +19,12 @@ export class EducationSerialization {
   @Expose({ name: 'end_date' })
   endDate: Date;
 
+  @Expose({ name: 'description' })
+  description: string;
+
+  @Expose({ name: 'activities' })
+  activities: string;
+
   @Expose({ name: 'created_at' })
   createdAt: Date;
 

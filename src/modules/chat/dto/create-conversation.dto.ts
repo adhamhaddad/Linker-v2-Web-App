@@ -9,5 +9,5 @@ export class CreateConversationDto {
 
   @IsArray()
   @IsNotEmpty()
-  participants: { _id: number }[];
+  participants: { _id: string }[];
 }

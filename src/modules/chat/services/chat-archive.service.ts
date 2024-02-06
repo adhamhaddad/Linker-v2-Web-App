@@ -25,7 +25,7 @@ export class ChatArchiveService {
     );
 
     const archivedChat = await this.chatModel.findOneAndUpdate(
-      { _id, 'participants._id': user.id },
+      { _id, 'participants._id': user.uuid },
       { $set: { 'participants.$.isArchived': true } },
       { new: true },
     );
@@ -51,7 +51,7 @@ export class ChatArchiveService {
     );
 
     const archivedChat = await this.chatModel.findOneAndUpdate(
-      { _id, 'participants._id': user.id },
+      { _id, 'participants._id': user.uuid },
       { $set: { 'participants.$.isArchived': false } },
       { new: true },
     );

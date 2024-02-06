@@ -21,7 +21,7 @@ export class Group extends Document {
   name: string;
 
   @Prop({ required: true })
-  creatorId: number;
+  creatorId: string;
 
   @Prop({
     enum: ['public', 'private'],

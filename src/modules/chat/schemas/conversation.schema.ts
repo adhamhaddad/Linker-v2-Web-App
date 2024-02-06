@@ -9,8 +9,8 @@ export class Conversation extends Document {
   @Prop({ type: String, ref: 'Chat', index: true })
   chat: string;
 
-  @Prop({ type: [{ _id: { type: Number, required: true } }] })
-  participants: [{ _id: number }];
+  @Prop({ type: [{ _id: { type: String, required: true } }] })
+  participants: [{ _id: string }];
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);

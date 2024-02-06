@@ -8,7 +8,11 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
-import { IJob } from '../interfaces/job.interface';
+import {
+  EmploymentType,
+  IJob,
+  LocationType,
+} from '../interfaces/job.interface';
 import { User } from 'src/modules/auth/entities/user.entity';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
 
@@ -26,6 +30,15 @@ export class Job implements IJob {
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   title: string;
+
+  @Column({ type: 'enum', enum: EmploymentType, nullable: false })
+  employment_type: EmploymentType;
+
+  @Column({ type: 'varchar', length: 100, nullable: false })
+  location: string;
+
+  @Column({ type: 'enum', enum: LocationType, nullable: false })
+  location_type: LocationType;
 
   @Column({ type: 'date', nullable: false })
   start_date: Date;
