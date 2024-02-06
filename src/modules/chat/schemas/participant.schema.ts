@@ -3,26 +3,14 @@ import { Document } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Participant extends Document {
-  @Prop({ type: Number, required: true })
-  _id: number;
+  @Prop({ type: String, required: true })
+  _id: string;
 
-  @Prop({
-    default: false,
-    required: true,
-  })
+  @Prop({ type: Boolean, default: false, required: true })
   isArchived: boolean;
 
-  @Prop({
-    default: false,
-    required: true,
-  })
+  @Prop({ type: Boolean, default: false, required: true })
   isMuted: boolean;
-
-  @Prop({
-    default: null,
-    required: false,
-  })
-  wallpaper: string;
 }
 
 export const ParticipantSchema = SchemaFactory.createForClass(Participant);

@@ -1,4 +1,4 @@
-export class IFriend {
+export interface IFriend {
   id: number;
   uuid: string;
   created_at: Date;

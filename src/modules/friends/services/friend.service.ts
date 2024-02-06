@@ -1,13 +1,16 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Friend } from '../entities/friend.entity';
-import { Repository } from 'typeorm';
+import { OrderByCondition, Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { plainToClass } from 'class-transformer';
 import { FriendSerialization } from '../serializers/friend.serialization';
 import { User } from 'src/modules/auth/entities/user.entity';
 import { UserSerialization } from 'src/modules/auth/serializers/user.serialization';
+import { IFriend } from '../interfaces/friend.interface';
+import { FilterFriendDTO } from '../dto/friends-filter.dto';
+import { UserFriendsSerialization } from '../serializers/get-user-friends.serialization';
 
 @Injectable()
 export class FriendService {
@@ -17,36 +20,75 @@ export class FriendService {
     private readonly i18nService: I18nService,
   ) {}
 
-  async getFriends(uuid: string, lang: string) {
-    const errorMessage: ErrorMessages = this.i18nService.translate(
-      'error-messages',
-      {
-        lang,
-      },
-    );
+  async getUserFriends(uuid: string) {
+    let order: OrderByCondition = {
+      'friend.created_at': 'DESC',
+    };
 
-    const friends = await this.friendsRepository
-      .createQueryBuilder('friend')
-      .leftJoinAndSelect('friend.user1', 'user1')
+    // Create Query Builder
+    const qb = this.friendsRepository.createQueryBuilder('friend');
+
+    qb.leftJoinAndSelect('friend.user1', 'user1')
       .leftJoinAndSelect('friend.user2', 'user2')
+      .where(
+        '((user1.uuid = :uuid AND user2.uuid != :uuid) OR (user2.uuid = :uuid AND user1.uuid != :uuid)) AND (user1.is_online = :online OR user2.is_online = :online)',
+        { uuid, online: 'online' },
+      );
+
+    // Apply ordering, pagination
+    qb.orderBy(order);
+
+    const friends = await qb.getMany();
+
+    const data = friends.map((friend) => this.serializeUserFriends(friend, uuid));
+
+    return { data };
+  }
+
+  async getFriends(uuid: string, query: FilterFriendDTO) {
+    const selector: Partial<IFriend> = {};
+    let order: OrderByCondition = {
+      'friend.created_at': 'DESC',
+      'profilePicture1.created_at': 'DESC',
+      'profilePicture2.created_at': 'DESC',
+    };
+    query.paginate = query.paginate || 15;
+    query.page = query.page || 1;
+    const skip = (query.page - 1) * query.paginate;
+
+    // Create Query Builder
+    const qb = this.friendsRepository.createQueryBuilder('friend');
+
+    // Apply filters
+    if (Object.keys(selector).length > 0) {
+      qb.where(selector);
+    }
+
+    qb.leftJoinAndSelect('friend.user1', 'user1')
+      .leftJoinAndSelect('friend.user2', 'user2')
+      .leftJoinAndSelect('user1.profilePicture', 'profilePicture1')
+      .leftJoinAndSelect('user2.profilePicture', 'profilePicture2')
       .where(
         '(user1.uuid = :uuid AND user2.uuid != :uuid) OR (user2.uuid = :uuid AND user1.uuid != :uuid)',
         { uuid },
-      )
-      .getMany();
-
-    if (friends.length === 0)
-      throw new HttpException(
-        errorMessage.noFriendsFound,
-        HttpStatus.NOT_FOUND,
       );
 
+    // Apply ordering, pagination
+    qb.orderBy(order).skip(skip).take(query.paginate);
+
+    const [friends, total] = await qb.getManyAndCount();
+
+    const data = friends.map((friend) => this.serializeFriend(friend, uuid));
+
     return {
-      message: 'Friends Received',
-      data: friends.map((friend) => this.serializeFriend(friend, uuid)),
-      total: friends.length,
+      message: total === 0 ? 'No friends found' : 'Friends Received',
+      data,
+      total,
       meta: {
-        total: friends.length,
+        total,
+        currentPage: query.page,
+        eachPage: query.paginate,
+        lastPage: Math.ceil(total / query.paginate),
       },
     };
   }
@@ -77,6 +119,20 @@ export class FriendService {
       message: errorMessage.friendDeletedSuccessfully,
       data: friend,
     };
+  }
+
+  serializeUserFriends(friend, uuid) {
+    const friendSerialization = plainToClass(UserFriendsSerialization, friend, {
+      excludeExtraneousValues: true,
+      enableCircularCheck: true,
+      strategy: 'excludeAll',
+    });
+
+    friendSerialization.user = UserFriendsSerialization.getOtherUser(
+      friend,
+      uuid,
+    );
+    return friendSerialization;
   }
 
   serializeFriend(friend, uuid) {

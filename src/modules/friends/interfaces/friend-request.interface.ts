@@ -1,6 +1,6 @@
 import { RequestStatus } from 'src/constants/request-status';
 
-export class IFriendRequest {
+export interface IFriendRequest {
   id: number;
   uuid: string;
   status: RequestStatus;

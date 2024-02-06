@@ -1,4 +1,4 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { GetUserSerialization } from 'src/modules/user/serializers/get-user.serialization';
 import { PostProviderTypes, PostStatus } from '../interfaces/post.interface';
 import { PostLikeSerialization } from './post-like.serialization';
@@ -13,7 +13,16 @@ export class PostSerialization {
 
   @Type(() => GetUserSerialization)
   @Expose({ name: 'creator' })
-  creator: GetUserSerialization;
+  user: GetUserSerialization;
+
+  @Transform(({ obj }) => {
+    return {
+      id: obj.creator.profile.uuid,
+      profileUrl: obj.creator.profile.profilePicture[0]?.image_url || null,
+    };
+  })
+  @Expose({ name: 'profile' })
+  profile: any;
 
   @Expose({ name: 'status' })
   status: PostStatus;

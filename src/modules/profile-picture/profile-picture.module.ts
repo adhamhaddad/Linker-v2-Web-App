@@ -8,13 +8,14 @@ import { User } from '../auth/entities/user.entity';
 import { JwtStrategy } from '../auth/strategies/jwt.strategy';
 import { Utils } from 'src/utils/utils';
 import { RedisService } from '../redis/redis.service';
+import { Profile } from '../profile/entities/profile.entity';
 
 @Module({
   imports: [
     MulterModule.register({
-      dest: './uploads',
+      dest: './uploads/pending-pictures',
     }),
-    TypeOrmModule.forFeature([ProfilePicture, User]),
+    TypeOrmModule.forFeature([ProfilePicture, User, Profile]),
   ],
   providers: [ProfilePictureService, JwtStrategy, Utils, RedisService],
   controllers: [ProfilePictureController],

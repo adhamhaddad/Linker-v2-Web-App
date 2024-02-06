@@ -24,14 +24,8 @@ export class Chat extends Document {
   @Prop({ type: String, ref: 'Conversation', default: null })
   conversation: string;
 
-  @Prop({
-    default: 'default.jpg',
-    required: true,
-  })
-  wallpaper: string;
-
-  @Prop({ type: [{ _id: { type: Number, required: true } }] })
-  deletedFrom: [{ _id: number }];
+  @Prop({ type: [{ _id: { type: String, required: true } }] })
+  deletedFrom: [{ _id: string }];
 }
 
 export const ChatSchema = SchemaFactory.createForClass(Chat);

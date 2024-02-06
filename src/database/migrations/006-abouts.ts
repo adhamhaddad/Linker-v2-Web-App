@@ -29,6 +29,11 @@ export class Abouts1700434933587 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'profile_id',
+            type: 'integer',
+            isNullable: false,
+          },
+          {
             name: 'about',
             type: 'text',
             isNullable: false,
@@ -53,6 +58,17 @@ export class Abouts1700434933587 implements MigrationInterface {
         columnNames: ['user_id'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
+        onDelete: 'CASCADE',
+        onUpdate: 'NO ACTION',
+      }),
+    );
+
+    await queryRunner.createForeignKey(
+      'abouts',
+      new TableForeignKey({
+        columnNames: ['profile_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'profiles',
         onDelete: 'CASCADE',
         onUpdate: 'NO ACTION',
       }),

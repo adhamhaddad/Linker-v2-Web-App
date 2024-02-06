@@ -7,9 +7,16 @@ import {
   Generated,
   JoinColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { ProfileStatus, IProfile } from '../interfaces/profile.interface';
 import { User } from 'src/modules/auth/entities/user.entity';
+import { ProfilePicture } from 'src/modules/profile-picture/entities/profile-picture.entity';
+import { About } from 'src/modules/about/entities/about.entity';
+import { CoverPicture } from 'src/modules/cover-picture/entities/cover-picture.entity';
+import { Address } from 'src/modules/address/entities/address.entity';
+import { Education } from 'src/modules/education/entities/education.entity';
+import { Job } from 'src/modules/job/entities/job.entity';
 
 @Entity({ name: 'profiles' })
 export class Profile implements IProfile {
@@ -55,6 +62,24 @@ export class Profile implements IProfile {
     nullable: false,
   })
   groups_status: ProfileStatus;
+
+  @OneToMany(() => CoverPicture, (picture) => picture.profile)
+  coverPicture: CoverPicture;
+
+  @OneToMany(() => ProfilePicture, (picture) => picture.profile)
+  profilePicture: ProfilePicture;
+
+  @OneToOne(() => About, (about) => about.profile)
+  about: About;
+
+  @OneToOne(() => Address, (address) => address.profile)
+  address: Address;
+
+  @OneToMany(() => Education, (education) => education.profile)
+  education: Education;
+
+  @OneToMany(() => Job, (job) => job.profile)
+  jobs: Job;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   created_at: Date;

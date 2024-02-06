@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendRequest } from '../entities/friend-request.entity';
-import { Repository } from 'typeorm';
+import { OrderByCondition, Repository } from 'typeorm';
 import { Friend } from '../entities/friend.entity';
 import { User } from 'src/modules/auth/entities/user.entity';
 import { I18nService } from 'nestjs-i18n';
@@ -17,6 +17,9 @@ import {
 import { UpdateFriendRequestSerialization } from '../serializers/update-friend-request.serialization';
 import { ChatService } from 'src/modules/chat/services/chat.service';
 import { ChatType } from 'src/modules/chat/interfaces/chat.interface';
+import { IFriendRequest } from '../interfaces/friend-request.interface';
+import { FilterFriendRequestDTO } from '../dto/requests-filter.dto';
+import { GetFriendRequestSerialization } from '../serializers/get-friend-request.serialization';
 
 @Injectable()
 export class FriendRequestService {
@@ -32,7 +35,7 @@ export class FriendRequestService {
   ) {}
 
   // Helper function to check if users are already friends
-  private async areUsersFriends(user1: User, user2: User): Promise<boolean> {
+  async areUsersFriends(user1: User, user2: User): Promise<boolean> {
     const friend = await this.friendRepository.findOne({
       where: [
         { user1: { id: user1.id }, user2: { id: user2.id } },
@@ -44,7 +47,7 @@ export class FriendRequestService {
   }
 
   // Helper function to check if a friend request is already sent
-  private async isFriendRequestSent(
+  async isFriendRequestSent(
     requester: User,
     recipient: User,
   ): Promise<boolean> {
@@ -167,7 +170,7 @@ export class FriendRequestService {
 
       await this.chatService.createChat(
         {
-          userId: friend.user1.id,
+          userId: friend.user1.uuid,
           type: ChatType.CHAT,
         },
         user,
@@ -186,39 +189,57 @@ export class FriendRequestService {
     };
   }
 
-  async getFriendRequests(user: User, lang: string, sent = false) {
-    const errorMessage: ErrorMessages = this.i18nService.translate(
-      'error-messages',
-      {
-        lang,
-      },
+  async getFriendRequests(query: FilterFriendRequestDTO, user: User) {
+    const selector: Partial<IFriendRequest> = { status: RequestStatus.PENDING };
+    let order: OrderByCondition = {
+      'request.created_at': 'DESC',
+      'profilePicture.created_at': 'DESC',
+    };
+    const requestType = query.filter?.type || null;
+    query.paginate = query.paginate || 15;
+    query.page = query.page || 1;
+    const skip = (query.page - 1) * query.paginate;
+
+    // Create Query Builder
+    const qb = this.friendRequestRepository.createQueryBuilder('request');
+
+    // Apply filters
+    if (Object.keys(selector).length > 0) {
+      qb.where(selector);
+    }
+
+    if (requestType) {
+      qb.leftJoinAndSelect('request.recipient', 'recipient')
+        .leftJoinAndSelect('recipient.profilePicture', 'profilePicture')
+        .andWhere('request.requester.id = :requesterId', {
+          requesterId: user.id,
+        });
+    } else {
+      qb.leftJoinAndSelect('request.requester', 'requester')
+        .leftJoinAndSelect('requester.profilePicture', 'profilePicture')
+        .andWhere('request.recipient.id = :recipientId', {
+          recipientId: user.id,
+        });
+    }
+
+    // Apply ordering, pagination
+    qb.orderBy(order).skip(skip).take(query.paginate);
+
+    const [requests, total] = await qb.getManyAndCount();
+
+    const data = requests.map((request) =>
+      this.serializeGetFriendRequests(request),
     );
 
-    const selectFields = sent ? ['recipient'] : ['requester'];
-    const whereClause = sent
-      ? {
-          requester: { id: user.id },
-          status: RequestStatus.PENDING,
-        }
-      : {
-          recipient: { id: user.id },
-          status: RequestStatus.PENDING,
-        };
-
-    const friendRequests = await this.friendRequestRepository.find({
-      where: whereClause,
-      relations: selectFields,
-    });
-    if (!friendRequests)
-      throw new HttpException(
-        errorMessage.noFriendRequestsFound,
-        HttpStatus.NOT_FOUND,
-      );
-
     return {
-      message: '',
-      data: this.serializeFriendRequest(friendRequests),
-      total: friendRequests.length,
+      data,
+      total,
+      meta: {
+        total,
+        currentPage: query.page,
+        eachPage: query.paginate,
+        lastPage: Math.ceil(total / query.paginate),
+      },
     };
   }
 
@@ -231,6 +252,13 @@ export class FriendRequestService {
   }
   serializeFriendRequest(friendRequest) {
     return plainToClass(FriendRequestSerialization, friendRequest, {
+      excludeExtraneousValues: true,
+      enableCircularCheck: true,
+      strategy: 'excludeAll',
+    });
+  }
+  serializeGetFriendRequests(friendRequest) {
+    return plainToClass(GetFriendRequestSerialization, friendRequest, {
       excludeExtraneousValues: true,
       enableCircularCheck: true,
       strategy: 'excludeAll',

@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { IAddress } from '../interfaces/address.interface';
 import { User } from 'src/modules/auth/entities/user.entity';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Entity({ name: 'addresses' })
 export class Address implements IAddress {
@@ -32,6 +33,10 @@ export class Address implements IAddress {
   })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @OneToOne(() => Profile, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'profile_id' })
+  profile: Profile;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   created_at: Date;

@@ -21,6 +21,7 @@ import { EducationModule } from './modules/education/education.module';
 import { JobModule } from './modules/job/job.module';
 import { MulterConfig } from './config/multer.config';
 import { ProfilePictureModule } from './modules/profile-picture/profile-picture.module';
+import { CoverPictureModule } from './modules/cover-picture/cover-picture.module';
 import { FriendsModule } from './modules/friends/friends.module';
 import { RelationshipsModule } from './modules/relationships/relationships.module';
 import { VisitorModule } from './modules/visitor/visitor.module';
@@ -30,6 +31,7 @@ import { PostModule } from './modules/post/post.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { SettingModule } from './modules/settings/setting.module';
+import { SocketModule } from './modules/socket/socket.module';
 
 @Module({
   imports: [
@@ -44,7 +46,6 @@ import { SettingModule } from './modules/settings/setting.module';
     MongooseModule.forRootAsync({
       useClass: MongoConfigService,
     }),
-    //Localization
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       fallbacks: {
@@ -63,6 +64,7 @@ import { SettingModule } from './modules/settings/setting.module';
     }),
     MulterConfig,
     ScheduleModule.forRoot(),
+    SocketModule,
     RedisModule,
     AuthModule,
     ActivityModule,
@@ -74,6 +76,7 @@ import { SettingModule } from './modules/settings/setting.module';
     EducationModule,
     JobModule,
     ProfilePictureModule,
+    CoverPictureModule,
     FriendsModule,
     RelationshipsModule,
     VisitorModule,

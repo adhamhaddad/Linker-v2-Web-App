@@ -6,6 +6,6 @@ export enum GroupStatus {
 export interface IGroupDetails {
   icon: string | null;
   name: string;
-  creatorId: number;
+  creatorId: string;
   status: GroupStatus;
 }

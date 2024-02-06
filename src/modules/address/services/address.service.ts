@@ -15,6 +15,8 @@ export class AddressService {
   constructor(
     @InjectRepository(Address)
     private readonly addressRepository: Repository<Address>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -39,8 +41,16 @@ export class AddressService {
         HttpStatus.NOT_ACCEPTABLE,
       );
 
+    const { profile } = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ['profile'],
+    });
+    if (!profile)
+      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+
     const addressCreated = this.addressRepository.create({
       user: user,
+      profile: profile,
       ...createAddressDto,
     });
     const address = await this.addressRepository.save(addressCreated);

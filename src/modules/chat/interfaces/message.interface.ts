@@ -1,13 +1,17 @@
 import { Types } from 'mongoose';
 import { IForwardedFrom } from './message-forwarded-from.interface';
 import { IReplyTo } from './message-reply-to.interface';
+import { IMessageStatus } from './message-status.interface';
+import { IParticipant } from './chat-participant.interface';
 
 export interface IMessage {
   _id: string;
+  chatId: string;
   conversationId: string;
-  userId: number;
+  senderId: string;
+  participants: IParticipant[];
   message: string;
-  isRead: boolean;
+  status: IMessageStatus;
   forwardedFrom: IForwardedFrom;
   replyTo: IReplyTo;
   attachments: {
@@ -16,8 +20,8 @@ export interface IMessage {
     fileUrl: string[];
     audioUrl: string[];
   };
-  reactions: Types.DocumentArray<{ _id: number; reactIcon: string }>;
-  deletedFrom: Types.DocumentArray<{ _id: number }>;
+  reactions: Types.DocumentArray<{ _id: string; reactIcon: string }>;
+  deletedFrom: Types.DocumentArray<{ _id: string }>;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;

@@ -15,9 +15,18 @@ import { MessageController } from './controllers/message.controller';
 import { JwtStrategy } from '../auth/strategies/jwt.strategy';
 import { Utils } from 'src/utils/utils';
 import { RedisService } from '../redis/redis.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Profile } from '../profile/entities/profile.entity';
+import { SocketGateway } from '../socket/socket.gateway';
+import { User } from '../auth/entities/user.entity';
+import { UserService } from '../user/services/user.service';
+import { FriendsModule } from '../friends/friends.module';
+import { FriendService } from '../friends/services/friend.service';
+import { Friend } from '../friends/entities/friend.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Profile, User, Friend]),
     MongooseModule.forFeature([
       { name: 'Chat', schema: ChatSchema },
       { name: 'Conversation', schema: ConversationSchema },
@@ -33,12 +42,25 @@ import { RedisService } from '../redis/redis.service';
     JwtStrategy,
     Utils,
     RedisService,
+    SocketGateway,
+    UserService,
+    FriendService,
   ],
   controllers: [
     ChatController,
     ChatGroupController,
     ChatArchiveController,
     MessageController,
+  ],
+  exports: [
+    MongooseModule.forFeature([
+      { name: 'Chat', schema: ChatSchema },
+      { name: 'Conversation', schema: ConversationSchema },
+      { name: 'Message', schema: MessageSchema },
+    ]),
+    ChatService,
+    ConversationService,
+    MessageService,
   ],
 })
 export class ChatModule {}

@@ -196,19 +196,18 @@ export class PostService {
   }
 
   async getPosts(query: FilterPostDTO, user: User, lang: string) {
-    const errorMessage: ErrorMessages = this.i18nService.translate(
-      'error-messages',
-      {
-        lang,
-      },
-    );
     const { providerType, providerId, status, filter, sort, paginate, page } =
       query;
 
     const selector: Partial<IPost> = status ? { status: status } : {};
     const keyword = filter?.keyword;
 
-    let order: OrderByCondition = { 'post.created_at': 'DESC' };
+    let order: OrderByCondition = {
+      'post.created_at': 'DESC',
+      'profilePicture.created_at': 'DESC',
+      'likes.created_at': 'DESC',
+      'comments.created_at': 'DESC',
+    };
 
     query.paginate = query.paginate || 15;
     query.page = query.page || 1;
@@ -228,6 +227,8 @@ export class PostService {
     const qb = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.creator', 'creator')
+      .leftJoinAndSelect('creator.profile', 'profile')
+      .leftJoinAndSelect('profile.profilePicture', 'profilePicture')
       .leftJoinAndSelect('post.likes', 'likes')
       .leftJoinAndSelect('likes.user', 'likeUser')
       .leftJoinAndSelect('post.comments', 'comments')

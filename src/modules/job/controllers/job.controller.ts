@@ -16,24 +16,36 @@ import { Lang } from 'src/decorators/lang.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('users')
+@Controller('users/profiles')
 export class JobController {
   constructor(private readonly jobService: JobService) {}
 
-  @Post('jobs')
+  @Post(':id/jobs')
   async createJob(
+    @Param('id') uuid: string,
     @Body() body: CreateJobDto,
     @User() user,
     @Lang() lang: string,
   ) {
-    const { message, data } = await this.jobService.createJob(body, user, lang);
+    const { message, data } = await this.jobService.createJob(
+      uuid,
+      body,
+      user,
+      lang,
+    );
     return { message, data };
   }
 
-  @Get(':id/jobs')
-  async getJobsByUserId(@Param('id') uuid: string, @Lang() lang: string) {
-    const { message, data } = await this.jobService.getJobsByUserId(uuid, lang);
-    return { message, data };
+  @Get(':username/jobs')
+  async getProfileJobs(
+    @Param('username') username: string,
+    @Lang() lang: string,
+  ) {
+    const { data, total } = await this.jobService.getProfileJobs(
+      username,
+      lang,
+    );
+    return { data, total };
   }
 
   @Get('jobs/:id')

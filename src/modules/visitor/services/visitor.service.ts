@@ -90,7 +90,7 @@ export class VisitorService {
     };
   }
 
-  async getVisits(user: User, lang: string) {
+  async getVisits(uuid: string, user: User, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {

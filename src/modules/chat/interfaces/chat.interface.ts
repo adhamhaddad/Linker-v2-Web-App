@@ -14,7 +14,7 @@ export interface IChat extends Document {
   groupDetails: IGroupDetails | null;
   participants: Types.DocumentArray<IParticipant>;
   conversation: IConversation;
-  deletedFrom: Array<{ _id: number }>;
+  deletedFrom: Array<{ _id: string }>;
   createdAt: Date;
   updatedAt: Date;
 }

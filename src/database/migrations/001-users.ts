@@ -65,6 +65,12 @@ export class Users1700346440034 implements MigrationInterface {
             isNullable: true,
           },
           {
+            name: 'is_online',
+            type: 'enum',
+            enum: ['online', 'offline'],
+            isNullable: true,
+          },
+          {
             name: 'created_at',
             type: 'date',
             isNullable: true,

@@ -30,12 +30,12 @@ export class ChatGroupService {
     // TODO: Get all users from participants.
 
     const groupCreated = {
-      participants: [{ _id: user.id }],
+      participants: [{ _id: user.uuid }],
       type: body.type,
       groupDetails: {
         icon: body.icon,
         name: body.name,
-        creatorId: user.id,
+        creatorId: user.uuid,
         status: body.status,
       },
     };
@@ -76,7 +76,7 @@ export class ChatGroupService {
     }
 
     // Apply filters
-    const filters: any = { userId: user.id };
+    const filters: any = { userId: user.uuid };
 
     if (keyword) {
       filters['chat.message'] = new RegExp(keyword, 'i');
@@ -115,7 +115,7 @@ export class ChatGroupService {
     );
 
     const chat = await this.chatModel
-      .findOne({ uuid, user_id: user.id })
+      .findOne({ uuid, user_id: user.uuid })
       .populate('conversations');
 
     if (!chat)
@@ -140,7 +140,7 @@ export class ChatGroupService {
     );
 
     const chat = await this.chatModel.findOneAndUpdate(
-      { uuid, userId: user.id },
+      { uuid, userId: user.uuid },
       {
         groupDetails: {
           icon: body.icon,
@@ -172,7 +172,7 @@ export class ChatGroupService {
     );
 
     const chat = await this.chatModel.findOneAndUpdate(
-      { uuid, userId: user.id },
+      { uuid, userId: user.uuid },
       { deletedAt: Date.now() },
       { new: true },
     );

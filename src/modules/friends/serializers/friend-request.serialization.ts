@@ -10,12 +10,8 @@ export class FriendRequestSerialization {
   status: RequestStatus;
 
   @Type(() => GetUserSerialization)
-  @Expose({ name: 'requester' })
-  requester: GetUserSerialization;
-
-  @Type(() => GetUserSerialization)
   @Expose({ name: 'recipient' })
-  recipient: GetUserSerialization;
+  user: GetUserSerialization;
 
   @Expose({ name: 'created_at' })
   createdAt: Date;

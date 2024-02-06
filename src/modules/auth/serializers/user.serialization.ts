@@ -3,7 +3,10 @@ import { Gender } from 'src/constants';
 
 export class UserSerialization {
   @Expose({ name: 'uuid' })
-  id: string;
+  id: number;
+
+  @Expose({ name: 'profile_url' })
+  profileUrl: string;
 
   @Expose({ name: 'first_name' })
   firstName: string;

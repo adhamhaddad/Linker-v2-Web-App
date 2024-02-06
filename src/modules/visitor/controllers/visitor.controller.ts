@@ -5,11 +5,11 @@ import { Lang } from 'src/decorators/lang.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('users/visitors')
+@Controller('users/profiles')
 export class VisitorController {
   constructor(private readonly visitorService: VisitorService) {}
 
-  @Post(':id')
+  @Post(':id/visitors')
   async createVisit(
     @Param('id') uuid: string,
     @User() user: any,
@@ -23,9 +23,14 @@ export class VisitorController {
     return { message, data };
   }
 
-  @Get()
-  async getVisits(@User() user: any, @Lang() lang: string) {
+  @Get(':id/visitors')
+  async getVisits(
+    @Param('id') uuid: string,
+    @User() user: any,
+    @Lang() lang: string,
+  ) {
     const { message, data, total, meta } = await this.visitorService.getVisits(
+      uuid,
       user,
       lang,
     );

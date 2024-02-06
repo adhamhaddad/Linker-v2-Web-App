@@ -1,4 +1,4 @@
-export class IVisitor {
+export interface IVisitor {
   id: number;
   uuid: string;
   created_at: Date;

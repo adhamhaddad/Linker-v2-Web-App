@@ -29,6 +29,8 @@ import { RegistrationDto } from '../dto/registeration.dto';
 import { PasswordResetDto } from '../dto/password-reset.dto';
 import { ProfileService } from 'src/modules/profile/services/profile.service';
 import { SettingService } from 'src/modules/settings/services/setting.service';
+import { IUser } from '../interfaces/user.interface';
+import { AuthSerialization } from '../serializers/auth.serialization';
 
 @Injectable()
 export class AuthService {
@@ -214,10 +216,13 @@ export class AuthService {
     const { username, otp } = body;
     const user = await this.userRepository.findOne({
       where: { email: username },
+      relations: ['profilePicture'],
     });
 
     if (!user)
       throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+
+    const profile_url = user.profilePicture[0]?.image_url || null;
 
     const { email } = user;
     const key = `${email}-login`;
@@ -249,10 +254,12 @@ export class AuthService {
       user_id: user.id,
     });
 
+    const userWithExtra: IUser = { ...user, profile_url };
+
     return {
       message: errorMessage.loginSuccessfully,
       token,
-      data: this.serializeUser(user),
+      data: this.serializeUser(userWithExtra),
     };
   }
 
@@ -401,15 +408,19 @@ export class AuthService {
 
     const userData = await this.userRepository.findOne({
       where: { id: user.id },
+      relations: ['profilePicture'],
     });
     if (!userData)
       throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
 
     const token = await this.jwtService.signAsync({ user });
 
+    const profile_url = userData.profilePicture[0]?.image_url || null;
+    const userWithExtra: IUser = { ...userData, profile_url };
+
     return {
       message: 'Token generated Successfully',
-      data: this.serializeUser(userData),
+      data: this.serializeUser(userWithExtra),
       token,
     };
   }
@@ -445,7 +456,7 @@ export class AuthService {
   }
 
   serializeUser(user) {
-    return plainToClass(UserSerialization, user, {
+    return plainToClass(AuthSerialization, user, {
       excludeExtraneousValues: true,
       enableCircularCheck: true,
       strategy: 'excludeAll',

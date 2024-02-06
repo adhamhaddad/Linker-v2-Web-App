@@ -81,7 +81,7 @@ export class RelationshipRequestService {
   }
 
   async sendRelationshipRequest(
-    createRelationshipDto: CreateRelationshipDto,
+    createRelationshipDto: any,
     user: User,
     lang: string,
   ) {
@@ -92,6 +92,7 @@ export class RelationshipRequestService {
       },
     );
 
+    console.log(createRelationshipDto)
     // Check if the recipientUuid is the same as the user's UUID
     if (createRelationshipDto.recipient_id === user.uuid) {
       throw new HttpException(

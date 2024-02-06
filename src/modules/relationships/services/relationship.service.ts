@@ -37,8 +37,11 @@ export class RelationshipService {
       },
     );
 
+    console.log(createRelationshipDto);
+
     // Multi Relation if true
     if (createRelationshipDto.recipient_id) {
+      console.log('It is a multi relation');
       // Send relationship request
       const { message, data } =
         await this.relationshipRequestService.sendRelationshipRequest(

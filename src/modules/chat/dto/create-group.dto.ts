@@ -12,7 +12,7 @@ import { GroupStatus } from '../interfaces/group-details.interface';
 export class CreateGroupChatDto {
   @IsArray()
   @IsNotEmpty()
-  participants: [{ userId: number }];
+  participants: [{ userId: string }];
 
   @IsString()
   @IsNotEmpty()

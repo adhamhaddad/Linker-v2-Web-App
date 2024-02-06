@@ -25,9 +25,17 @@ export class ProfileController {
     return { data, total, meta };
   }
 
-  @Get(':id')
-  async getProfileById(@Param('id') uuid: string, @Lang() lang: string) {
-    const { data } = await this.profileService.getProfileById(uuid, lang);
+  @Get(':username')
+  async getProfileByUsername(
+    @Param('username') username: string,
+    @User() user: any,
+    @Lang() lang: string,
+  ) {
+    const { data } = await this.profileService.getProfileByUsername(
+      username,
+      user,
+      lang,
+    );
     return { data };
   }
 

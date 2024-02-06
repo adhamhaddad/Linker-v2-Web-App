@@ -11,12 +11,16 @@ import { ProfileSerialization } from '../serializers/profile.serialization';
 import { GetProfilesSerialization } from '../serializers/get-profiles.serialization';
 import { FilterProfileDTO } from '../dto/filter-profile.dto';
 import { IProfile } from '../interfaces/profile.interface';
+import { IProfileHeader } from '../interfaces/profile-header.interface';
+import { IProfileSettings } from '../interfaces/profile-settings.interface';
+import { FriendRequestService } from 'src/modules/friends/services/friend-request.service';
 
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+    // private readonly friendRequestService: FriendRequestService,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -93,10 +97,24 @@ export class ProfileService {
     }
 
     if (keyword) {
-      qb.andWhere(
-        '(user.first_name LIKE :keyword OR user.last_name LIKE :keyword)',
-        { keyword: `%${keyword}%` },
-      );
+      const [firstName, ...lastNameParts] = keyword
+        .toLowerCase()
+        .trim()
+        .split(' ');
+
+      let lastNameCondition = '';
+      if (lastNameParts.length > 0) {
+        const lastName = lastNameParts.join(' ');
+        lastNameCondition = `AND LOWER(user.last_name) LIKE :lastName`;
+        qb.andWhere(
+          `(LOWER(user.first_name) = :firstName ${lastNameCondition})`,
+          { firstName, lastName: `${lastName}%` },
+        );
+      } else {
+        qb.andWhere(`(LOWER(user.first_name) LIKE :firstName)`, {
+          firstName: `${firstName}%`,
+        });
+      }
     }
 
     // Apply ordering, pagination
@@ -104,7 +122,7 @@ export class ProfileService {
 
     const [profiles, total] = await qb.getManyAndCount();
 
-    const data = profiles.map((page) => this.serializeGetProfiles(page));
+    const data = profiles.map((profile) => this.serializeGetProfiles(profile));
 
     return {
       data,
@@ -118,25 +136,75 @@ export class ProfileService {
     };
   }
 
-  async getProfileById(uuid: string, lang: string) {
+  async getProfileByUsername(username: string, user: User, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
         lang,
       },
     );
+    let order: OrderByCondition = {
+      'profilePicture.created_at': 'DESC',
+      'coverPicture.created_at': 'DESC',
+      'education.start_date': 'DESC',
+      'jobs.start_date': 'DESC',
+    };
 
-    const profile = await this.profileRepository.findOne({
-      where: { uuid },
-      relations: ['user'],
-    });
+    // Create Query Builder
+    const qb = this.profileRepository
+      .createQueryBuilder('profile')
+      .leftJoinAndSelect('profile.user', 'user')
+      .leftJoinAndSelect('profile.profilePicture', 'profilePicture')
+      .leftJoinAndSelect('profile.coverPicture', 'coverPicture')
+      .leftJoinAndSelect('profile.about', 'about')
+      .leftJoinAndSelect('profile.address', 'address')
+      .leftJoinAndSelect('profile.education', 'education')
+      .leftJoinAndSelect('profile.jobs', 'jobs')
+      .where('user.username = :username', { username });
+
+    // Apply ordering, pagination
+    qb.orderBy(order).take(1);
+
+    const profile = await qb.getOneOrFail();
+
     if (!profile)
       throw new HttpException(
         errorMessage.profileNotFound,
         HttpStatus.NOT_FOUND,
       );
 
-    return { data: this.serializeProfile(profile) };
+    const settings: IProfileSettings = {
+      posts_status: profile.posts_status,
+      friends_status: profile.friends_status,
+      pages_status: profile.pages_status,
+      groups_status: profile.groups_status,
+    };
+
+    // const connection = {
+    //   isConnected: await this.friendRequestService.areUsersFriends(
+    //     profileUser,
+    //     user,
+    //   ),
+    //   isRequested: await this.friendRequestService.isFriendRequestSent(
+    //     profileUser,
+    //     user,
+    //   ),
+    // };
+
+    const connection = {
+      isConnected: false,
+      isRequested: false,
+    };
+
+    const profileWithExtra: IProfile = {
+      ...profile,
+      settings,
+      connection,
+    };
+
+    const data = this.serializeProfile(profileWithExtra);
+
+    return { data };
   }
 
   async updateProfile(body: UpdateProfileDto, user: User, lang: string) {

@@ -8,12 +8,16 @@ import { IChat } from '../interfaces/chat.interface';
 import { CreateChatDto } from '../dto/create-chat.dto';
 import { UpdateChatDto } from '../dto/update-chat.dto';
 import { ChatSerialization } from '../serializers/chat.serialization';
+import { GetChatSerialization } from '../serializers/get-chat.serialization';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { ConversationService } from './conversation.service';
 import { DeleteChatDto, DeleteChatType } from '../dto/delete-chat.dto';
 import { IMessage } from '../interfaces/message.interface';
 import { v4 as uuidV4 } from 'uuid';
 import { FilterChatDTO } from '../dto/filter-chats.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ChatService {
@@ -22,11 +26,13 @@ export class ChatService {
     private readonly chatModel: Model<IChat>,
     @InjectModel('Message')
     private readonly messageModel: Model<IMessage>,
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
     private readonly conversationService: ConversationService,
     private readonly i18nService: I18nService,
   ) {}
 
-  async checkChatExist(user_id1: number, user_id2: number) {
+  async checkChatExist(user_id1: string, user_id2: string) {
     const chat = await this.chatModel.findOne({
       participants: { $all: [{ _id: user_id1 }, { _id: user_id2 }] },
     });
@@ -42,7 +48,7 @@ export class ChatService {
       },
     );
 
-    const isChatExist = await this.checkChatExist(user.id, body.userId);
+    const isChatExist = await this.checkChatExist(user.uuid, body.userId);
     if (isChatExist)
       return {
         message: errorMessage.chatAlreadyExist,
@@ -52,7 +58,7 @@ export class ChatService {
     // Initial chat created with friendship creation
     const chatCreated = {
       _id: uuidV4(),
-      participants: [{ _id: user.id }, { _id: body.userId }],
+      participants: [{ _id: user.uuid }, { _id: body.userId }],
       type: body.type,
     };
 
@@ -71,7 +77,7 @@ export class ChatService {
 
     return {
       message: errorMessage.chatCreatedSuccessfully,
-      data: this.serializeChats(chat),
+      data: this.serializeChat(chat),
     };
   }
 
@@ -84,13 +90,13 @@ export class ChatService {
     const skip = (query.page - 1) * query.paginate;
 
     // Sort
-    let sort: any = { 'messages.createdAt': -1 };
+    let sort: any = { 'lastMessage.createdAt': -1 };
 
     if (query.sort) {
       const orderDirection = query.sort.startsWith('-') ? -1 : 1;
       const orderKey = query.sort.replace(/^-/, '');
 
-      const chatFieldsMap = { createdAt: 'messages.createdAt' };
+      const chatFieldsMap = { createdAt: 'lastMessage.createdAt' };
 
       if (chatFieldsMap[orderKey]) {
         sort = { [chatFieldsMap[orderKey]]: orderDirection };
@@ -101,11 +107,11 @@ export class ChatService {
     const filters: any = {
       participants: {
         $elemMatch: {
-          _id: user.id,
+          _id: user.uuid,
           isArchived: archived,
         },
       },
-      deletedFrom: { $not: { $elemMatch: { _id: user.id } } },
+      deletedFrom: { $not: { $elemMatch: { _id: user.uuid } } },
     };
 
     if (keyword) {
@@ -131,55 +137,37 @@ export class ChatService {
         },
         {
           $addFields: {
-            messages: {
+            lastMessage: {
               $cond: {
                 if: { $eq: [{ $size: '$messages' }, 0] },
-                then: [],
+                then: null,
                 else: {
-                  $slice: [
-                    {
-                      $filter: {
-                        input: '$messages',
-                        as: 'message',
-                        cond: {
-                          $and: [
-                            {
-                              $eq: [
-                                '$$message.conversationId',
-                                '$conversation',
-                              ],
-                            },
-                            {
-                              $not: {
-                                $in: [user.id, '$$message.deletedFrom._id'],
-                              },
-                            },
-                            {
-                              $eq: ['$$message.deletedAt', null],
-                            },
-                          ],
-                        },
-                      },
-                    },
-                    -1,
-                  ],
+                  $arrayElemAt: ['$messages', -1],
                 },
               },
             },
           },
         },
         {
-          $sort: { 'messages.createdAt': -1 },
+          $match: {
+            'lastMessage.deletedFrom._id': { $not: { $in: [user.uuid] } },
+            'lastMessage.deletedAt': null,
+          },
+        },
+        {
+          $sort: { 'lastMessage.createdAt': -1 },
         },
         {
           $project: {
             type: 1,
             groupDetails: 1,
             participants: 1,
-            conversation: 1,
-            wallpaper: 1,
+            conversation: {
+              id: '$conversation',
+              lastMessage: '$lastMessage',
+            },
             deletedFrom: 1,
-            messages: 1,
+            lastMessage: 1,
           },
         },
       ])
@@ -190,7 +178,37 @@ export class ChatService {
 
     const total = await this.chatModel.countDocuments(filters);
 
-    const data = chats.map((chat) => this.serializeChats(chat));
+    const { uuid } = user;
+    const dataPromises = chats.map(async (chat) => {
+      const participants = chat.participants.filter(
+        (user) => user._id !== uuid,
+      );
+
+      const participantId = participants[0]._id;
+      const profile = await this.profileRepository.findOne({
+        where: { user: { uuid: participantId } },
+        relations: ['profilePicture', 'user'],
+      });
+      const participant = {
+        profilePicture: profile.profilePicture,
+        user: profile.user,
+        status: profile.user.is_online,
+      };
+
+      // Count unseen messages for this chat
+      const unseenMessagesCount = await this.messageModel.countDocuments({
+        conversationId: chat.conversation.id,
+        'status.isSeen': false,
+        senderId: { $ne: user.uuid },
+        deletedFrom: { $not: { $elemMatch: { _id: user.uuid } } },
+        deletedAt: null,
+      });
+
+      chat.participants = participant;
+      chat.conversation.unseenMsgs = unseenMessagesCount;
+      return this.serializeChats(chat);
+    });
+    const data = await Promise.all(dataPromises);
 
     return {
       data,
@@ -212,19 +230,77 @@ export class ChatService {
       },
     );
 
+    // Sort
+    let sort: any = { 'messages.createdAt': -1 };
+
+    // Apply filters
+    const filters: any = {
+      _id,
+      deletedFrom: { $not: { $elemMatch: { _id: user.uuid } } },
+    };
+
+    // Find chats
     const chat = await this.chatModel
-      .findById(_id)
-      .populate('conversation')
-      .select({
-        deletedFrom: 0,
-        updatedAt: 0,
-        __v: 0,
-      });
+      .aggregate([
+        {
+          $match: filters,
+        },
+        {
+          $lookup: {
+            from: 'messages',
+            localField: 'conversation',
+            foreignField: 'conversationId',
+            as: 'messages',
+          },
+        },
+        {
+          $addFields: {
+            conversation: {
+              id: '$conversation',
+              messages: '$messages',
+            },
+          },
+        },
+        {
+          $project: {
+            type: 1,
+            groupDetails: 1,
+            participants: 1,
+            conversation: 1,
+            deletedFrom: 1,
+          },
+        },
+      ])
+      .exec();
 
     if (!chat)
       throw new HttpException(errorMessage.chatNotFound, HttpStatus.NOT_FOUND);
 
-    return { data: this.serializeChats(chat) };
+    const { uuid } = user;
+    const participants = chat[0].participants.filter(
+      (user) => user._id !== uuid,
+    );
+    const participantId = participants[0]._id;
+
+    const profile = await this.profileRepository.findOne({
+      where: { user: { uuid: participantId } },
+      relations: ['profilePicture', 'user'],
+    });
+
+    const participant = {
+      profilePicture: profile.profilePicture,
+      user: profile.user,
+      status: profile.user.is_online,
+    };
+
+    chat[0].participants = participant;
+    chat[0].conversation.unseenMsgs = 0;
+
+    const data = this.serializeChats(chat[0]);
+
+    return {
+      data,
+    };
   }
 
   async updateChat(_id: string, body: UpdateChatDto, user: User, lang: string) {
@@ -236,7 +312,7 @@ export class ChatService {
     );
 
     const chat = await this.chatModel.findOneAndUpdate(
-      { _id, participants: { $elemMatch: { _id: user.id } } },
+      { _id, participants: { $elemMatch: { _id: user.uuid } } },
       { participants: { isMuted: body.isMuted } },
       { new: true },
     );
@@ -274,9 +350,9 @@ export class ChatService {
       // Mark all messages as deleted for userId
       await this.messageModel.updateMany(
         { conversationId: chat.conversation._id },
-        { $addToSet: { deletedFrom: { _id: user.id } } },
+        { $addToSet: { deletedFrom: { _id: user.uuid } } },
       );
-      filter.$addToSet = { deletedFrom: { _id: user.id } };
+      filter.$addToSet = { deletedFrom: { _id: user.uuid } };
     } else {
       // Mark all message as deletedAt = Date.now()
       await this.messageModel.updateMany(
@@ -293,10 +369,9 @@ export class ChatService {
     const deletedChat = await this.chatModel.updateOne(
       {
         _id,
-        deletedFrom: { $not: { $elemMatch: { _id: user.id } } },
+        deletedFrom: { $not: { $elemMatch: { _id: user.uuid } } },
       },
       filter,
-      { new: true },
     );
     if (!deletedChat)
       throw new HttpException(
@@ -310,8 +385,16 @@ export class ChatService {
     };
   }
 
-  serializeChats(chat) {
+  serializeChat(chat) {
     return plainToClass(ChatSerialization, chat, {
+      excludeExtraneousValues: true,
+      enableCircularCheck: true,
+      strategy: 'excludeAll',
+    });
+  }
+
+  serializeChats(chat) {
+    return plainToClass(GetChatSerialization, chat, {
       excludeExtraneousValues: true,
       enableCircularCheck: true,
       strategy: 'excludeAll',

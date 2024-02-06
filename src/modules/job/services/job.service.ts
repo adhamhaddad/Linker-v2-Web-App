@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from '../entities/job.entity';
-import { Repository } from 'typeorm';
+import { OrderByCondition, Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { CreateJobDto } from '../dto/create-job.dto';
 import { UpdateJobDto } from '../dto/update-job.dto';
@@ -9,18 +9,19 @@ import { User } from 'src/modules/auth/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { JobSerialization } from '../serializers/job.serialization';
 import { plainToClass } from 'class-transformer';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Injectable()
 export class JobService {
   constructor(
     @InjectRepository(Job)
     private readonly jobRepository: Repository<Job>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
     private readonly i18nService: I18nService,
   ) {}
 
-  async createJob(createJobDto: CreateJobDto, user: User, lang: string) {
+  async createJob(uuid, body: CreateJobDto, user: User, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -28,9 +29,19 @@ export class JobService {
       },
     );
 
+    const profile = await this.profileRepository.findOne({
+      where: { uuid, user: { id: user.id } },
+    });
+    if (!profile)
+      throw new HttpException(
+        errorMessage.profileNotFound,
+        HttpStatus.NOT_FOUND,
+      );
+
     const jobCreated = this.jobRepository.create({
-      user: { id: user.id },
-      ...createJobDto,
+      user,
+      profile,
+      ...body,
     });
     const job = await this.jobRepository.save(jobCreated);
     if (!job)
@@ -45,6 +56,45 @@ export class JobService {
     };
   }
 
+  async getProfileJobs(username: string, lang: string) {
+    const errorMessage: ErrorMessages = this.i18nService.translate(
+      'error-messages',
+      {
+        lang,
+      },
+    );
+
+    let order: OrderByCondition = { 'jobs.start_date': 'DESC' };
+
+    // Get Profile
+    const profile = await this.profileRepository.findOne({
+      where: { user: { username } },
+    });
+    if (!profile)
+      throw new HttpException(
+        errorMessage.profileNotFound,
+        HttpStatus.NOT_FOUND,
+      );
+
+    // Create Query Builder
+    const qb = this.jobRepository
+      .createQueryBuilder('jobs')
+      .leftJoinAndSelect('jobs.profile', 'profile')
+      .where('profile.uuid = :profileId', { profileId: profile.uuid });
+
+    // Apply ordering, pagination
+    qb.orderBy(order);
+
+    const [jobs, total] = await qb.getManyAndCount();
+
+    const data = jobs.map((job) => this.serializeJob(job));
+
+    return {
+      data,
+      total,
+    };
+  }
+
   async getJobById(uuid: string, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
@@ -55,33 +105,6 @@ export class JobService {
 
     const job = await this.jobRepository.findOne({
       where: { uuid },
-    });
-    if (!job)
-      throw new HttpException(errorMessage.jobNotFound, HttpStatus.NOT_FOUND);
-
-    return {
-      message: '',
-      data: this.serializeJob(job),
-    };
-  }
-
-  async getJobsByUserId(uuid: string, lang: string) {
-    const errorMessage: ErrorMessages = this.i18nService.translate(
-      'error-messages',
-      {
-        lang,
-      },
-    );
-
-    // Get user
-    const user = await this.userRepository.findOne({
-      where: { uuid },
-    });
-    if (!user)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
-
-    const job = await this.jobRepository.find({
-      where: { user: { id: user.id } },
     });
     if (!job)
       throw new HttpException(errorMessage.jobNotFound, HttpStatus.NOT_FOUND);

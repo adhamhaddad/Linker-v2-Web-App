@@ -6,9 +6,11 @@ import { About } from './entities/about.entity';
 import { Utils } from 'src/utils/utils';
 import { JwtStrategy } from '../auth/strategies/jwt.strategy';
 import { RedisService } from '../redis/redis.service';
+import { User } from '../auth/entities/user.entity';
+import { Profile } from '../profile/entities/profile.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([About])],
+  imports: [TypeOrmModule.forFeature([About, User, Profile])],
   providers: [AboutService, JwtStrategy, Utils, RedisService],
   controllers: [AboutController],
 })

@@ -9,6 +9,8 @@ import { ConversationSerialization } from '../serializers/conversation.serializa
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { Types } from 'mongoose';
 import { v4 as uuidV4 } from 'uuid';
+import { User } from 'src/modules/auth/entities/user.entity';
+import { IMessage } from '../interfaces/message.interface';
 
 @Injectable()
 export class ConversationService {
@@ -17,6 +19,8 @@ export class ConversationService {
     private readonly conversationModel: Model<IConversation>,
     @InjectModel('Chat')
     private readonly chatModel: Model<IConversation>,
+    @InjectModel('Message')
+    private readonly messageModel: Model<IMessage>,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -56,6 +60,36 @@ export class ConversationService {
     return {
       message: errorMessage.conversationCreatedSuccessfully,
       data: this.serializeConversations(conversation),
+    };
+  }
+
+  async ReadConversationMessages(_id: string, user: User, lang: string) {
+    const errorMessage: ErrorMessages = this.i18nService.translate(
+      'error-messages',
+      {
+        lang,
+      },
+    );
+
+    const conversation = await this.conversationModel.findById({ _id });
+    if (!conversation)
+      throw new HttpException(
+        errorMessage.conversationNotFound,
+        HttpStatus.NOT_FOUND,
+      );
+
+    const updateMessages = await this.messageModel.updateMany(
+      {
+        conversationId: _id,
+        senderId: { $ne: user.uuid },
+        'status.isSeen': false,
+      },
+      { 'status.isSeen': true },
+    );
+
+    const data = this.serializeConversations(updateMessages);
+    return {
+      data,
     };
   }
 
