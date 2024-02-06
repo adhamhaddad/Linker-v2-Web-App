@@ -62,6 +62,12 @@ export class Education1700500045519 implements MigrationInterface {
             isNullable: true,
           },
           {
+            name: 'activities',
+            type: 'varchar',
+            length: '1000',
+            isNullable: true,
+          },
+          {
             name: 'created_at',
             type: 'date',
             isNullable: true,

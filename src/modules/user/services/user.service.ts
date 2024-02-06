@@ -10,6 +10,7 @@ import { FilterUsersDTO } from '../dto/filter-users.dto';
 import { UserProfileSerialization } from '../serializers/get-user-profile.serialization';
 import { UserSerialization } from '../serializers/user.serialization';
 import { ProfilePicture } from 'src/modules/profile-picture/entities/profile-picture.entity';
+import { UpdateUserStatus } from '../dto/update-user-status.dto';
 
 @Injectable()
 export class UserService {
@@ -18,6 +19,22 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     private readonly i18nService: I18nService,
   ) {}
+
+  async updateOnlineStatus(uuid: string, status: UpdateUserStatus) {
+    const { affected } = await this.userRepository.update(
+      {
+        uuid,
+      },
+      { is_online: status.is_online },
+    );
+    if (!affected)
+      throw new HttpException(
+        'Failed to update online status',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    return { message: 'Status updated successfully', status: status.is_online };
+  }
 
   async findOne(id: string, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(

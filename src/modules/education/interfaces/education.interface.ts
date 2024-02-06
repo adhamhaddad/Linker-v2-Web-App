@@ -7,6 +7,7 @@ export interface IEducation {
   start_date: Date;
   end_date: Date | null;
   description: string | null;
+  activities: string | null;
   created_at: Date;
   updated_at: Date;
 }

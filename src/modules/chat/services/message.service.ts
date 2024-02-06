@@ -37,7 +37,7 @@ export class MessageService {
     );
 
     const conversation = await this.conversationModel
-      .findOne({ _id, participants: { $elemMatch: { _id: user.id } } })
+      .findOne({ _id, participants: { $elemMatch: { _id: user.uuid } } })
       .populate('chat')
       .exec();
 
@@ -78,7 +78,7 @@ export class MessageService {
     const messageCreated = {
       _id: uuidV4(),
       conversationId: conversation._id,
-      userId: user.id,
+      senderId: user.uuid,
       message: body.message,
       attachments: body.attachments,
     };
@@ -91,9 +91,13 @@ export class MessageService {
         HttpStatus.BAD_REQUEST,
       );
 
+    message.chatId = conversation.chat._id;
+    message.participants = conversation.chat.participants;
+    const data = this.serializeMessages(message);
+
     return {
       message: errorMessage.messageCreatedSuccessfully,
-      data: this.serializeMessages(message),
+      data,
     };
   }
 
@@ -129,7 +133,7 @@ export class MessageService {
     const filters: any = { conversationId: conversation._id };
 
     // Condition to exclude messages where userId is in any deletedFrom array objects
-    filters.deletedFrom = { $not: { $elemMatch: { _id: user.id } } };
+    filters.deletedFrom = { $not: { $elemMatch: { _id: user.uuid } } };
     filters.deletedAt = null;
 
     if (keyword) {
@@ -174,7 +178,7 @@ export class MessageService {
     );
 
     const message = await this.messageModel.findOneAndUpdate(
-      { _id, userId: user.id },
+      { _id, senderId: user.uuid },
       { message: body.message },
       { new: true },
     );
@@ -206,18 +210,18 @@ export class MessageService {
 
     const condition: any = {
       _id,
-      deletedFrom: { $not: { $elemMatch: { _id: user.id } } },
+      deletedFrom: { $not: { $elemMatch: { _id: user.uuid } } },
       deletedAt: null,
     };
     const filter: any = {};
 
     if (query.deleteFrom === DeleteMessageType.ME) {
       // Mark messages as deleted for userId
-      filter.$addToSet = { deletedFrom: { _id: user.id } };
+      filter.$addToSet = { deletedFrom: { _id: user.uuid } };
     } else {
       // Mark all message as deletedAt = Date.now()
-      // Remove message for everyone if the message userId = user.id
-      // condition.userId = user.id;
+      // Remove message for everyone if the message senderId = user.uuid
+      // condition.senderId = user.uuid;
       filter.$set = { deletedAt: Date.now() };
     }
 

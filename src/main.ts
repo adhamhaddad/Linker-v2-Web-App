@@ -17,13 +17,21 @@ import { AllConfigType } from './config/config.type';
 import { CustomExceptionFilter } from './filters/custom-exception-filter.filter';
 import { ResponseInterceptor } from './utils/interceptor/response.interceptor';
 import { ValidationError } from 'class-validator/types/validation/ValidationError';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService) as ConfigService<AllConfigType>;
 
-  const whitelist = ['http://localhost:3000', 'http://192.168.1.6:3000', 'http://192.168.1.5:3000', 'http://192.168.1.2:3000', undefined];
+  const whitelist = [
+    'http://localhost:3000',
+    'http://192.168.1.6:3000',
+    'http://192.168.1.5:3000',
+    'http://192.168.1.2:3000',
+    undefined,
+  ];
 
   const corsOptions = {
     origin: function (origin, callback) {
@@ -113,6 +121,19 @@ async function bootstrap() {
 
   app.use(`/${apiPrefix}/uploads/profile-pictures`, express.static(profile));
   app.use(`/${apiPrefix}/uploads/cover-pictures`, express.static(cover));
+
+  // Swagger
+  const config = new DocumentBuilder()
+    .setTitle('Linker-v2 API')
+    .setDescription('Linker API description')
+    .setVersion('2.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
+
+  // Socket
+  // app.useWebSocketAdapter(new IoAdapter(app));
 
   await app.listen(configService.getOrThrow('app.port', { infer: true }));
 }

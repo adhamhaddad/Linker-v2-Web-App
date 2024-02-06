@@ -14,24 +14,29 @@ import { Gender } from 'src/constants';
 import { Match } from 'src/decorators/match.decorator';
 import { BeforeDateValidator } from '../validators/dateRange.validator';
 import { Expose } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class RegistrationDto {
   @IsString()
   @Expose({ name: 'firstName' })
+  @ApiProperty()
   first_name: string;
 
   @IsString()
   @Expose({ name: 'lastName' })
+  @ApiProperty()
   last_name: string;
 
   @IsString()
   @Expose({ name: 'username' })
+  @ApiProperty()
   username: string;
 
   @IsNotEmpty()
   @IsString()
   @IsEmail()
   @Expose({ name: 'email' })
+  @ApiProperty()
   email: string;
 
   @IsString()
@@ -41,6 +46,7 @@ export class RegistrationDto {
     message: 'Password must contain alphabet,numbers and special characters',
   })
   @Expose({ name: 'password' })
+  @ApiProperty()
   password: string;
 
   @IsString()
@@ -48,6 +54,7 @@ export class RegistrationDto {
   @MaxLength(20)
   @Match('password')
   @Expose({ name: 'confirmPassword' })
+  @ApiProperty()
   confirm_password: string;
 
   @IsString()
@@ -58,11 +65,13 @@ export class RegistrationDto {
   })
   @Validate(BeforeDateValidator, ['2007-01-01'])
   @Expose({ name: 'birthDate' })
+  @ApiProperty()
   birth_date: Date;
 
   @IsString()
   @IsOptional()
   @IsEnum(Gender)
+  @ApiProperty()
   gender: Gender;
 
   @IsString()

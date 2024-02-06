@@ -17,11 +17,15 @@ import { CreateMessageDto } from '../dto/create-message.dto';
 import { UpdateMessageDto } from '../dto/update-message.dto';
 import { FilterMessageDTO } from '../dto/filter-messages.dto';
 import { DeleteMessageDto } from '../dto/delete-message.dto';
+import { SocketGateway } from 'src/modules/socket/socket.gateway';
 
 @UseGuards(JwtAuthGuard)
 @Controller('chats/conversations')
 export class MessageController {
-  constructor(private readonly messageService: MessageService) {}
+  constructor(
+    private readonly messageService: MessageService,
+    private readonly socketGateway: SocketGateway,
+  ) {}
 
   @Post(':id/messages')
   async createMessage(
@@ -36,6 +40,7 @@ export class MessageController {
       user,
       lang,
     );
+    await this.socketGateway.handleNewMessage(data);
     return { message, data };
   }
 

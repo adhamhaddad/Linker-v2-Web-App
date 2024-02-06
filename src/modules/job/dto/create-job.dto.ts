@@ -1,6 +1,7 @@
 import { Expose } from 'class-transformer';
 import {
   IsDateString,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -8,6 +9,7 @@ import {
   MaxLength,
   Validate,
 } from 'class-validator';
+import { EmploymentType, LocationType } from '../interfaces/job.interface';
 
 export class CreateJobDto {
   @IsString()
@@ -19,6 +21,23 @@ export class CreateJobDto {
   @IsNotEmpty()
   @Expose({ name: 'title' })
   title: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(EmploymentType)
+  @Expose({ name: 'employmentType' })
+  employment_type: EmploymentType;
+
+  @IsString()
+  @IsNotEmpty()
+  @Expose({ name: 'location' })
+  location: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(LocationType)
+  @Expose({ name: 'locationType' })
+  location_type: LocationType;
 
   @IsString()
   @IsNotEmpty()

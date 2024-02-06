@@ -16,17 +16,19 @@ import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 import { UpdateEducationDto } from '../dto/update-education.dto';
 
 @UseGuards(JwtAuthGuard)
-@Controller('users')
+@Controller('users/profiles')
 export class EducationController {
   constructor(private readonly educationService: EducationService) {}
 
-  @Post('education')
+  @Post(':id/education')
   async createEducation(
+    @Param('id') uuid: string,
     @Body() body: CreateEducationDto,
     @User() user,
     @Lang() lang: string,
   ) {
     const { message, data } = await this.educationService.createEducation(
+      uuid,
       body,
       user,
       lang,
@@ -34,13 +36,16 @@ export class EducationController {
     return { message, data };
   }
 
-  @Get(':id/education')
-  async getEducationByUserId(@Param('id') uuid: string, @Lang() lang: string) {
-    const { message, data } = await this.educationService.getEducationByUserId(
-      uuid,
+  @Get(':username/education')
+  async getProfileEducation(
+    @Param('username') username: string,
+    @Lang() lang: string,
+  ) {
+    const { data, total } = await this.educationService.getProfileEducation(
+      username,
       lang,
     );
-    return { message, data };
+    return { data, total };
   }
 
   @Get('education/:id')

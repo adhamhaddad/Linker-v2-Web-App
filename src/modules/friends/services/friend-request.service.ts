@@ -19,6 +19,7 @@ import { ChatService } from 'src/modules/chat/services/chat.service';
 import { ChatType } from 'src/modules/chat/interfaces/chat.interface';
 import { IFriendRequest } from '../interfaces/friend-request.interface';
 import { FilterFriendRequestDTO } from '../dto/requests-filter.dto';
+import { GetFriendRequestSerialization } from '../serializers/get-friend-request.serialization';
 
 @Injectable()
 export class FriendRequestService {
@@ -169,7 +170,7 @@ export class FriendRequestService {
 
       await this.chatService.createChat(
         {
-          userId: friend.user1.id,
+          userId: friend.user1.uuid,
           type: ChatType.CHAT,
         },
         user,
@@ -227,7 +228,7 @@ export class FriendRequestService {
     const [requests, total] = await qb.getManyAndCount();
 
     const data = requests.map((request) =>
-      this.serializeFriendRequest(request),
+      this.serializeGetFriendRequests(request),
     );
 
     return {
@@ -251,6 +252,13 @@ export class FriendRequestService {
   }
   serializeFriendRequest(friendRequest) {
     return plainToClass(FriendRequestSerialization, friendRequest, {
+      excludeExtraneousValues: true,
+      enableCircularCheck: true,
+      strategy: 'excludeAll',
+    });
+  }
+  serializeGetFriendRequests(friendRequest) {
+    return plainToClass(GetFriendRequestSerialization, friendRequest, {
       excludeExtraneousValues: true,
       enableCircularCheck: true,
       strategy: 'excludeAll',

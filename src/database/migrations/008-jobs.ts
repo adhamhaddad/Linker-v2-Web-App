@@ -46,6 +46,31 @@ export class Jobs1700504273636 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'employment_type',
+            type: 'enum',
+            enum: [
+              'full-time',
+              'part-time',
+              'self-employed',
+              'freelance',
+              'contract',
+              'internship',
+            ],
+            isNullable: false,
+          },
+          {
+            name: 'location',
+            type: 'varchar',
+            length: '255',
+            isNullable: false,
+          },
+          {
+            name: 'location_type',
+            type: 'enum',
+            enum: ['on-site', 'hybrid', 'remote'],
+            isNullable: false,
+          },
+          {
             name: 'start_date',
             type: 'varchar',
             isNullable: false,

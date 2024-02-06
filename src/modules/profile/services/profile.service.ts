@@ -97,10 +97,24 @@ export class ProfileService {
     }
 
     if (keyword) {
-      qb.andWhere(
-        "(LOWER(CONCAT(user.first_name, ' ', user.last_name)) LIKE :keyword OR user.username LIKE :keyword)",
-        { keyword: `%${keyword.toLowerCase()}%` },
-      );
+      const [firstName, ...lastNameParts] = keyword
+        .toLowerCase()
+        .trim()
+        .split(' ');
+
+      let lastNameCondition = '';
+      if (lastNameParts.length > 0) {
+        const lastName = lastNameParts.join(' ');
+        lastNameCondition = `AND LOWER(user.last_name) LIKE :lastName`;
+        qb.andWhere(
+          `(LOWER(user.first_name) = :firstName ${lastNameCondition})`,
+          { firstName, lastName: `${lastName}%` },
+        );
+      } else {
+        qb.andWhere(`(LOWER(user.first_name) LIKE :firstName)`, {
+          firstName: `${firstName}%`,
+        });
+      }
     }
 
     // Apply ordering, pagination
@@ -129,30 +143,35 @@ export class ProfileService {
         lang,
       },
     );
+    let order: OrderByCondition = {
+      'profilePicture.created_at': 'DESC',
+      'coverPicture.created_at': 'DESC',
+      'education.start_date': 'DESC',
+      'jobs.start_date': 'DESC',
+    };
 
-    const profile = await this.profileRepository.findOne({
-      where: { user: { username } },
-      relations: [
-        'user',
-        'profilePicture',
-        'coverPicture',
-        'about',
-        'address',
-        'education',
-        'jobs',
-      ],
-    });
+    // Create Query Builder
+    const qb = this.profileRepository
+      .createQueryBuilder('profile')
+      .leftJoinAndSelect('profile.user', 'user')
+      .leftJoinAndSelect('profile.profilePicture', 'profilePicture')
+      .leftJoinAndSelect('profile.coverPicture', 'coverPicture')
+      .leftJoinAndSelect('profile.about', 'about')
+      .leftJoinAndSelect('profile.address', 'address')
+      .leftJoinAndSelect('profile.education', 'education')
+      .leftJoinAndSelect('profile.jobs', 'jobs')
+      .where('user.username = :username', { username });
+
+    // Apply ordering, pagination
+    qb.orderBy(order).take(1);
+
+    const profile = await qb.getOneOrFail();
+
     if (!profile)
       throw new HttpException(
         errorMessage.profileNotFound,
         HttpStatus.NOT_FOUND,
       );
-
-    // Modify the profile object to include only the last profile picture and cover picture
-    const header: IProfileHeader = {
-      profilePicture: profile.profilePicture[0] || null,
-      coverPicture: profile.coverPicture[0] || null,
-    };
 
     const settings: IProfileSettings = {
       posts_status: profile.posts_status,
@@ -160,8 +179,6 @@ export class ProfileService {
       pages_status: profile.pages_status,
       groups_status: profile.groups_status,
     };
-
-    const profileUser = profile.user;
 
     // const connection = {
     //   isConnected: await this.friendRequestService.areUsersFriends(
@@ -181,12 +198,13 @@ export class ProfileService {
 
     const profileWithExtra: IProfile = {
       ...profile,
-      header,
       settings,
       connection,
     };
 
-    return { data: this.serializeProfile(profileWithExtra) };
+    const data = this.serializeProfile(profileWithExtra);
+
+    return { data };
   }
 
   async updateProfile(body: UpdateProfileDto, user: User, lang: string) {

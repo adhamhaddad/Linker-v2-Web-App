@@ -10,7 +10,7 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { IUser } from '../interfaces/user.interface';
+import { IUser, OnlineStatus } from '../interfaces/user.interface';
 import { Gender } from 'src/constants';
 import { Address } from 'src/modules/address/entities/address.entity';
 import { About } from 'src/modules/about/entities/about.entity';
@@ -66,6 +66,14 @@ export class User implements IUser {
 
   @Column({ type: 'timestamp', nullable: true, default: null })
   email_verified_at: Date;
+
+  @Column({
+    type: 'enum',
+    enum: OnlineStatus,
+    nullable: false,
+    default: 'offline',
+  })
+  is_online: OnlineStatus;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   created_at: Date;

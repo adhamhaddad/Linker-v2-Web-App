@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProfilePicture } from '../entities/profile-picture.entity';
-import { Repository } from 'typeorm';
+import { OrderByCondition, Repository } from 'typeorm';
 import { User } from 'src/modules/auth/entities/user.entity';
 import * as fs from 'fs-extra';
 import { join } from 'path';
@@ -10,18 +10,24 @@ import { I18nService } from 'nestjs-i18n';
 import { ProfilePictureSerialization } from '../serializers/profile.serialization';
 import { plainToClass } from 'class-transformer';
 import { v4 as uuidV4 } from 'uuid';
+import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Injectable()
 export class ProfilePictureService {
   constructor(
     @InjectRepository(ProfilePicture)
     private readonly profilePictureRepository: Repository<ProfilePicture>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
     private readonly i18nService: I18nService,
   ) {}
 
-  async uploadProfilePicture(file: any, user: User, lang: string) {
+  async uploadProfilePicture(
+    uuid: string,
+    file: any,
+    user: User,
+    lang: string,
+  ) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -29,12 +35,14 @@ export class ProfilePictureService {
       },
     );
 
-    const { profile } = await this.userRepository.findOne({
-      where: { id: user.id },
-      relations: ['profile'],
+    const profile = await this.profileRepository.findOne({
+      where: { uuid, user: { id: user.id } },
     });
     if (!profile)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        errorMessage.profileNotFound,
+        HttpStatus.NOT_FOUND,
+      );
 
     // Process the uploaded file, e.g., save it to the database or move it to a specific folder
     const imageUuid = uuidV4();
@@ -73,26 +81,40 @@ export class ProfilePictureService {
     };
   }
 
-  async getProfilePictureByUserId(uuid: string, lang: string) {
+  async getProfilePictures(uuid: string, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
         lang,
       },
     );
+    let order: OrderByCondition = { 'profile.created_at': 'DESC' };
 
-    const user = await this.userRepository.findOne({ where: { uuid } });
-    if (!user)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+    const profile = await this.profileRepository.findOne({ where: { uuid } });
+    if (!profile)
+      throw new HttpException(
+        errorMessage.profileNotFound,
+        HttpStatus.NOT_FOUND,
+      );
 
-    const profilePicture = await this.profilePictureRepository.findOne({
-      where: { user: { id: user.id } },
-      order: { created_at: 'DESC' },
-    });
+    // Create Query Builder
+    const qb = this.profilePictureRepository
+      .createQueryBuilder('picture')
+      .leftJoinAndSelect('picture.profile', 'profile')
+      .where('profile.uuid = :profileId', { profileId: uuid });
+
+    // Apply ordering, pagination
+    qb.orderBy(order);
+
+    const [pictures, total] = await qb.getManyAndCount();
+
+    const data = pictures.map((picture) =>
+      this.serializeProfilePicture(picture),
+    );
 
     return {
-      message: '',
-      data: this.serializeProfilePicture(profilePicture) || null,
+      data,
+      total,
     };
   }
 
