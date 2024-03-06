@@ -3,7 +3,7 @@ import { PageService } from './services/page.service';
 import { PageController } from './controllers/page.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Page } from './entities/page.entity';
-import { User } from '../auth/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { PageAdmin } from './entities/page-admin.entity';
 import { JwtStrategy } from '../auth/strategies/jwt.strategy';
 import { Utils } from 'src/utils/utils';
@@ -33,10 +33,10 @@ import { GroupMemberService } from '../group/services/group-member.service';
       PageFollower,
       PagePostRequest,
       User,
-      Profile,
-      Post,
-      Group,
-      GroupMember,
+      // Profile,
+      // Post,
+      // Group,
+      // GroupMember,
     ]),
   ],
   providers: [
@@ -44,10 +44,10 @@ import { GroupMemberService } from '../group/services/group-member.service';
     PageAdminService,
     PageFollowerService,
     PagePostRequestService,
-    ProfileService,
-    PostService,
-    GroupService,
-    GroupMemberService,
+    // ProfileService,
+    // PostService,
+    // GroupService,
+    // GroupMemberService,
     JwtStrategy,
     Utils,
     RedisService,

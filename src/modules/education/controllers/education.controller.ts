@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { EducationService } from '../services/education.service';
@@ -14,6 +15,7 @@ import { User } from 'src/decorators/user.decorator';
 import { Lang } from 'src/decorators/lang.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 import { UpdateEducationDto } from '../dto/update-education.dto';
+import { FilterEducationDTO } from '../dto/filter-education.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users/profiles')
@@ -36,16 +38,18 @@ export class EducationController {
     return { message, data };
   }
 
-  @Get(':username/education')
-  async getProfileEducation(
-    @Param('username') username: string,
+  @Get(':id/education')
+  async getEducation(
+    @Param('id') uuid: string,
+    @Query() query: FilterEducationDTO,
     @Lang() lang: string,
   ) {
-    const { data, total } = await this.educationService.getProfileEducation(
-      username,
+    const { data, total, meta } = await this.educationService.getEducation(
+      uuid,
+      query,
       lang,
     );
-    return { data, total };
+    return { data, total, meta };
   }
 
   @Get('education/:id')

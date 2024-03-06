@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RelationshipRequest } from '../entities/relationship-request.entity';
 import { Repository } from 'typeorm';
 import { Relationship } from '../entities/relationship.entity';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { I18nService } from 'nestjs-i18n';
 import { Friend } from 'src/modules/friends/entities/friend.entity';
 import { RequestStatus } from 'src/constants/request-status';

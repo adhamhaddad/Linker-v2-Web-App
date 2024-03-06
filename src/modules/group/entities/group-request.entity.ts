@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { RequestStatus } from 'src/constants/request-status';
 import { IGroupRequest } from '../interfaces/group-request.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { Group } from './group.entity';
 
 @Entity({ name: 'group_requests' })

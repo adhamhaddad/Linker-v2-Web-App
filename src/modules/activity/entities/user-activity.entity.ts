@@ -8,7 +8,7 @@ import {
   ManyToOne,
   Generated,
 } from 'typeorm';
-import { User } from '../../auth/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 import { UserActivityTypeMessages } from 'src/constants/user-activity-type';
 import { IActivity } from '../interfaces/activity.interface';
 

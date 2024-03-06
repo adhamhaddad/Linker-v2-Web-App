@@ -8,7 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from '../user/services/user.service';
-import { OnlineStatus } from '../auth/interfaces/user.interface';
+import { OnlineStatus } from '../user/interfaces/user.interface';
 import { FriendService } from '../friends/services/friend.service';
 
 @WebSocketGateway({
@@ -46,6 +46,10 @@ export class SocketGateway
       const { status } = await this.userService.updateOnlineStatus(userUuid, {
         is_online: OnlineStatus.ONLINE,
       });
+      // Check for pending messages
+      // Update any message that status.isDelivered is false to true
+      const messages = [];
+
       // Emit event to inform specific user's friends about the online status change
       const { data } = await this.friendService.getUserFriends(userUuid);
       data.forEach((friend) => {
@@ -128,6 +132,75 @@ export class SocketGateway
       }
     });
   }
+
+  async handleUpdatedMessage(message: any) {
+    const { chatId, conversationId, participants } = message;
+
+    participants.forEach((participant) => {
+      const { id: participantId } = participant;
+
+      const friendSocket = this.findSocketByUserId(participantId);
+
+      if (friendSocket) {
+        friendSocket.emit('updatedMessage', {
+          chatUuid: chatId,
+          conversationUuid: conversationId,
+          message: message,
+        });
+      }
+    });
+  }
+
+  async handleDeletedMessage(message: any) {
+    const { conversationId, participants } = message;
+
+    participants.forEach((participant) => {
+      const { id: participantId } = participant;
+
+      const friendSocket = this.findSocketByUserId(participantId);
+
+      if (friendSocket) {
+        friendSocket.emit('deletedMessage', {
+          conversationUuid: conversationId,
+          message: message,
+        });
+      }
+    });
+  }
+
+  async handleDeleteConversation(conversation: any) {
+    const { id, participants } = conversation;
+
+    participants.forEach((participant) => {
+      const { id: participantId } = participant;
+
+      const friendSocket = this.findSocketByUserId(participantId);
+
+      if (friendSocket) {
+        friendSocket.emit('deletedConversation', {
+          conversationUuid: id,
+        });
+      }
+    });
+  }
+
+  async handleDeleteChat(chat: any) {
+    const { id, participants } = chat;
+
+    participants.forEach((participant) => {
+      const { id: participantId } = participant;
+
+      const friendSocket = this.findSocketByUserId(participantId);
+
+      if (friendSocket) {
+        friendSocket.emit('deletedChat', {
+          chatUuid: id,
+        });
+      }
+    });
+  }
+
+  async handleMessageStatus(message: any) {}
 
   private getUserIdFromSocket(client: Socket): string | null {
     // Extract user ID from socket's handshake query parameters

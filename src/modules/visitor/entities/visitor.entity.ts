@@ -9,7 +9,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { IVisitor } from '../interfaces/visitor.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 
 @Entity({ name: 'visitors' })
 export class Visitor implements IVisitor {

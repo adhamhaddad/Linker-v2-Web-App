@@ -9,7 +9,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { ICoverPicture } from '../interfaces/cover.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Entity({ name: 'cover_pictures' })

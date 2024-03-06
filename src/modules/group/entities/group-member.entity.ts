@@ -12,7 +12,7 @@ import {
   GroupUserRole,
   IGroupMember,
 } from '../interfaces/group-member.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { Group } from './group.entity';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
 

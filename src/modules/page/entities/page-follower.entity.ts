@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { IPageFollower } from '../interfaces/page-follower.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { Page } from './page.entity';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
 

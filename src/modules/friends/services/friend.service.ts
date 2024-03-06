@@ -6,7 +6,7 @@ import { I18nService } from 'nestjs-i18n';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { plainToClass } from 'class-transformer';
 import { FriendSerialization } from '../serializers/friend.serialization';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { UserSerialization } from 'src/modules/auth/serializers/user.serialization';
 import { IFriend } from '../interfaces/friend.interface';
 import { FilterFriendDTO } from '../dto/friends-filter.dto';
@@ -19,6 +19,18 @@ export class FriendService {
     private readonly friendsRepository: Repository<Friend>,
     private readonly i18nService: I18nService,
   ) {}
+
+  // Helper function to check if users are already friends
+  async areUsersFriends(user1: User, user2: User): Promise<boolean> {
+    const friend = await this.friendsRepository.findOne({
+      where: [
+        { user1: { id: user1.id }, user2: { id: user2.id } },
+        { user1: { id: user2.id }, user2: { id: user1.id } },
+      ],
+    });
+
+    return !!friend;
+  }
 
   async getUserFriends(uuid: string) {
     let order: OrderByCondition = {
@@ -40,7 +52,9 @@ export class FriendService {
 
     const friends = await qb.getMany();
 
-    const data = friends.map((friend) => this.serializeUserFriends(friend, uuid));
+    const data = friends.map((friend) =>
+      this.serializeUserFriends(friend, uuid),
+    );
 
     return { data };
   }

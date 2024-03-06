@@ -14,7 +14,7 @@ import {
   MultiRelationType,
   SingleRelationshipType,
 } from '../interfaces/relationship.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { RelationshipRequest } from './relationship-request.entity';
 
 @Entity({ name: 'relationships' })

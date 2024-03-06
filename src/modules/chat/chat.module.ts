@@ -18,11 +18,12 @@ import { RedisService } from '../redis/redis.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Profile } from '../profile/entities/profile.entity';
 import { SocketGateway } from '../socket/socket.gateway';
-import { User } from '../auth/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/services/user.service';
 import { FriendsModule } from '../friends/friends.module';
 import { FriendService } from '../friends/services/friend.service';
 import { Friend } from '../friends/entities/friend.entity';
+import { ConversationController } from './controllers/chat-conversation.controller';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { Friend } from '../friends/entities/friend.entity';
     ChatController,
     ChatGroupController,
     ChatArchiveController,
+    ConversationController,
     MessageController,
   ],
   exports: [

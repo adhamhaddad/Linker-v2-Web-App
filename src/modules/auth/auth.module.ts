@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './controllers/auth.controller';
-import { User } from './entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Utils } from 'src/utils/utils';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
@@ -26,7 +26,6 @@ import { SettingService } from '../settings/services/setting.service';
   ],
   providers: [
     AuthService,
-    User,
     ProfileService,
     SettingService,
     ActivityService,
@@ -34,11 +33,5 @@ import { SettingService } from '../settings/services/setting.service';
     Utils,
   ],
   controllers: [AuthController, OtpController],
-  exports: [
-    User,
-    TypeOrmModule.forFeature([User, UserActivity]),
-    AuthService,
-    Utils,
-  ],
 })
 export class AuthModule {}

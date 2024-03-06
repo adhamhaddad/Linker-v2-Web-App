@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Setting } from '../entities/setting.entity';
 import { Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { plainToClass } from 'class-transformer';
 import { SettingSerialization } from '../serializers/setting.serialization';

@@ -4,7 +4,7 @@ import { PostCommentReplyLike } from '../entities/post-comment-reply-like.entity
 import { PostCommentReply } from '../entities/post-comment-reply.entity';
 import { Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { plainToClass } from 'class-transformer';
 import { PostLikeSerialization } from '../serializers/post-like.serialization';

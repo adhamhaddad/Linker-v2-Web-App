@@ -9,7 +9,7 @@ import { FriendRequest } from './entities/friend-request.entity';
 import { JwtStrategy } from '../auth/strategies/jwt.strategy';
 import { Utils } from 'src/utils/utils';
 import { RedisService } from '../redis/redis.service';
-import { User } from '../auth/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { ChatModule } from '../chat/chat.module';
 
 @Module({
@@ -25,6 +25,5 @@ import { ChatModule } from '../chat/chat.module';
     RedisService,
   ],
   controllers: [FriendController, FriendRequestController],
-  exports: [FriendService, FriendRequestService],
 })
 export class FriendsModule {}

@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { IFriend } from '../interfaces/friend.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 
 @Entity({ name: 'friends' })
 export class Friend implements IFriend {

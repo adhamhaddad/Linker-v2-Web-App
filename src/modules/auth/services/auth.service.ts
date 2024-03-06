@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
@@ -29,7 +29,7 @@ import { RegistrationDto } from '../dto/registeration.dto';
 import { PasswordResetDto } from '../dto/password-reset.dto';
 import { ProfileService } from 'src/modules/profile/services/profile.service';
 import { SettingService } from 'src/modules/settings/services/setting.service';
-import { IUser } from '../interfaces/user.interface';
+import { IUser } from '../../user/interfaces/user.interface';
 import { AuthSerialization } from '../serializers/auth.serialization';
 
 @Injectable()
@@ -216,12 +216,13 @@ export class AuthService {
     const { username, otp } = body;
     const user = await this.userRepository.findOne({
       where: { email: username },
-      relations: ['profilePicture'],
+      relations: ['profile', 'profilePicture'],
     });
 
     if (!user)
       throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
 
+    const profile_id = user.profile.uuid;
     const profile_url = user.profilePicture[0]?.image_url || null;
 
     const { email } = user;
@@ -254,7 +255,11 @@ export class AuthService {
       user_id: user.id,
     });
 
-    const userWithExtra: IUser = { ...user, profile_url };
+    const userWithExtra: IUser = {
+      ...user,
+      profile_id,
+      profile_url,
+    };
 
     return {
       message: errorMessage.loginSuccessfully,
@@ -408,15 +413,17 @@ export class AuthService {
 
     const userData = await this.userRepository.findOne({
       where: { id: user.id },
-      relations: ['profilePicture'],
+      relations: ['profile', 'profilePicture'],
     });
     if (!userData)
       throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
 
     const token = await this.jwtService.signAsync({ user });
 
+    const profile_id = userData.profile.uuid;
     const profile_url = userData.profilePicture[0]?.image_url || null;
-    const userWithExtra: IUser = { ...userData, profile_url };
+
+    const userWithExtra: IUser = { ...userData, profile_id, profile_url };
 
     return {
       message: 'Token generated Successfully',

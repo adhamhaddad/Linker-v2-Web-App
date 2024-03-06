@@ -4,7 +4,7 @@ import { OrderByCondition, Repository } from 'typeorm';
 import { Group } from '../entities/group.entity';
 import { I18nService } from 'nestjs-i18n';
 import { CreateGroupDto } from '../dto/create-group.dto';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { UpdateGroupDto } from '../dto/update-group.dto';
 import { plainToClass } from 'class-transformer';

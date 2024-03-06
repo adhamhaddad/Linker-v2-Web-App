@@ -4,7 +4,7 @@ import { Address } from '../entities/address.entity';
 import { Repository } from 'typeorm';
 import { CreateAddressDto } from '../dto/create-address.dto';
 import { UpdateAddressDto } from '../dto/update-address.dto';
-import { User } from '../../auth/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 import { plainToClass } from 'class-transformer';
 import { AddressSerialization } from '../serializers/address.serialization';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';

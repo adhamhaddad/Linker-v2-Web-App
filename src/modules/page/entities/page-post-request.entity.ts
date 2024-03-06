@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { RequestStatus } from 'src/constants/request-status';
 import { IPagePostRequest } from '../interfaces/page-post-request.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { Page } from './page.entity';
 import { Post } from 'src/modules/post/entities/post.entity';
 

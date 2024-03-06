@@ -11,7 +11,7 @@ import { PostCommentReplyLike } from './entities/post-comment-reply-like.entity'
 import { PostCommentLikeService } from './services/post-comment-like.service';
 import { PostCommentReplyService } from './services/post-comment-reply.service';
 import { PostCommentReplyLikeService } from './services/post-comment-reply-like.service';
-import { User } from '../auth/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Profile } from '../profile/entities/profile.entity';
 import { PostCommentService } from './services/post-comment.service';
 import { PostLikeService } from './services/post-like.service';
@@ -42,9 +42,9 @@ import { PostCommentReplyLikeController } from './controllers/post-comment-reply
       PostCommentLike,
       PostCommentReply,
       PostCommentReplyLike,
+      Page,
       User,
       Profile,
-      Page,
       PageAdmin,
       Group,
       GroupMember,

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, OrderByCondition, Repository } from 'typeorm';
 import { PageAdmin } from '../entities/page-admin.entity';
 import { I18nService } from 'nestjs-i18n';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { plainToClass } from 'class-transformer';
 import { IPageAdmin, PageAdminRole } from '../interfaces/page-admin.interface';

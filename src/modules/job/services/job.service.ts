@@ -5,11 +5,12 @@ import { OrderByCondition, Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { CreateJobDto } from '../dto/create-job.dto';
 import { UpdateJobDto } from '../dto/update-job.dto';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { JobSerialization } from '../serializers/job.serialization';
 import { plainToClass } from 'class-transformer';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
+import { FilterJobsDTO } from '../dto/filter-jobs.dto';
 
 @Injectable()
 export class JobService {
@@ -56,7 +57,7 @@ export class JobService {
     };
   }
 
-  async getProfileJobs(username: string, lang: string) {
+  async getJobs(uuid: string, query: FilterJobsDTO, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -66,9 +67,13 @@ export class JobService {
 
     let order: OrderByCondition = { 'jobs.start_date': 'DESC' };
 
+    query.paginate = query.paginate || 15;
+    query.page = query.page || 1;
+    const skip = (query.page - 1) * query.paginate;
+
     // Get Profile
     const profile = await this.profileRepository.findOne({
-      where: { user: { username } },
+      where: { uuid },
     });
     if (!profile)
       throw new HttpException(
@@ -80,10 +85,10 @@ export class JobService {
     const qb = this.jobRepository
       .createQueryBuilder('jobs')
       .leftJoinAndSelect('jobs.profile', 'profile')
-      .where('profile.uuid = :profileId', { profileId: profile.uuid });
+      .where('profile.uuid = :profileId', { profileId: uuid });
 
     // Apply ordering, pagination
-    qb.orderBy(order);
+    qb.orderBy(order).skip(skip).take(query.paginate);
 
     const [jobs, total] = await qb.getManyAndCount();
 
@@ -92,6 +97,12 @@ export class JobService {
     return {
       data,
       total,
+      meta: {
+        total,
+        currentPage: query.page,
+        eachPage: query.paginate,
+        lastPage: Math.ceil(total / query.paginate),
+      },
     };
   }
 
@@ -128,25 +139,21 @@ export class JobService {
       },
     );
 
-    const job = await this.jobRepository.find({
+    const job = await this.jobRepository.findOne({
       where: { uuid, user: { id: user.id } },
     });
     if (!job)
       throw new HttpException(errorMessage.jobNotFound, HttpStatus.NOT_FOUND);
 
-    const { affected } = await this.jobRepository.update(
-      { uuid },
-      updateJobDto,
-    );
-    if (!affected)
+    const updatedJob = await this.jobRepository.save({
+      ...job,
+      ...updateJobDto,
+    });
+    if (!updatedJob)
       throw new HttpException(
         errorMessage.failedToUpdateJob,
         HttpStatus.BAD_REQUEST,
       );
-
-    const updatedJob = await this.jobRepository.find({
-      where: { uuid },
-    });
 
     return {
       message: errorMessage.jobUpdatedSuccessfully,

@@ -13,7 +13,7 @@ import {
   SettingLangType,
   SettingThemeType,
 } from '../interfaces/setting.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 
 @Entity({ name: 'settings' })
 export class Setting implements ISetting {

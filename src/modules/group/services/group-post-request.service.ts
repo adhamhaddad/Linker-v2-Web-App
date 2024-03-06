@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { OrderByCondition, Repository } from 'typeorm';
 import { GroupPostRequest } from '../entities/group-post-request.entity';
 import { I18nService } from 'nestjs-i18n';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { plainToClass } from 'class-transformer';
 import { Group } from '../entities/group.entity';
@@ -29,9 +29,9 @@ export class GroupPostRequestService {
     private readonly groupMemberService: GroupMemberService,
     @InjectRepository(Group)
     private readonly groupRepository: Repository<Group>,
-    @InjectRepository(Post)
-    private readonly postRepository: Repository<Post>,
-    private readonly postService: PostService,
+    // @InjectRepository(Post)
+    // private readonly postRepository: Repository<Post>,
+    // private readonly postService: PostService,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -73,20 +73,20 @@ export class GroupPostRequestService {
     if (!group)
       throw new HttpException(errorMessage.groupNotFound, HttpStatus.NOT_FOUND);
 
-    const post = await this.postRepository.findOne({
-      where: { uuid: postUuid },
-    });
-    if (!post)
-      throw new HttpException(errorMessage.postNotFound, HttpStatus.NOT_FOUND);
+    // const post = await this.postRepository.findOne({
+    //   where: { uuid: postUuid },
+    // });
+    // if (!post)
+    //   throw new HttpException(errorMessage.postNotFound, HttpStatus.NOT_FOUND);
 
     // Check if a post request is already sent
-    const isRequested = await this.isGroupPostRequestSent(group, user, post);
-    if (isRequested) {
-      throw new HttpException(
-        errorMessage.groupRequestAlreadySent,
-        HttpStatus.FOUND,
-      );
-    }
+    // const isRequested = await this.isGroupPostRequestSent(group, user, post);
+    // if (isRequested) {
+    //   throw new HttpException(
+    //     errorMessage.groupRequestAlreadySent,
+    //     HttpStatus.FOUND,
+    //   );
+    // }
 
     // Create post request
     const groupRequestCreated = this.groupPostRequestRepository.create({
@@ -221,15 +221,15 @@ export class GroupPostRequestService {
 
     if (status === UpdateRequestStatus.ACCEPTED) {
       // Publish Post
-      await this.postService.updatePost(
-        groupPostRequest.post.uuid,
-        {
-          status: PostStatus.PUBLIC,
-          created_at: new Date(),
-        },
-        user,
-        lang,
-      );
+      // await this.postService.updatePost(
+      //   groupPostRequest.post.uuid,
+      //   {
+      //     status: PostStatus.PUBLIC,
+      //     created_at: new Date(),
+      //   },
+      //   user,
+      //   lang,
+      // );
     }
 
     if (!updatedGroupRequest)

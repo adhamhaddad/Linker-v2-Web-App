@@ -19,4 +19,5 @@ export interface IProfile {
   header?: IProfileHeader;
   settings?: IProfileSettings;
   connection?: any;
+  isMe?: boolean;
 }

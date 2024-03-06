@@ -10,7 +10,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { PageStatusType, IPage } from '../interfaces/page.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { PageAdmin } from './page-admin.entity';
 import { PageFollower } from './page-follower.entity';
 

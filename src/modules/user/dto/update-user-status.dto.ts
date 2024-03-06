@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
-import { OnlineStatus } from 'src/modules/auth/interfaces/user.interface';
+import { OnlineStatus } from 'src/modules/user/interfaces/user.interface';
 
 export class UpdateUserStatus {
   @IsString()

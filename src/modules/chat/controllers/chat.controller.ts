@@ -16,11 +16,15 @@ import { Lang } from 'src/decorators/lang.decorator';
 import { UpdateChatDto } from '../dto/update-chat.dto';
 import { FilterChatDTO } from '../dto/filter-chats.dto';
 import { DeleteChatDto } from '../dto/delete-chat.dto';
+import { SocketGateway } from 'src/modules/socket/socket.gateway';
 
 @UseGuards(JwtAuthGuard)
 @Controller('chats')
 export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly socketGateway: SocketGateway,
+  ) {}
 
   @Get()
   async getChats(@Query() query: FilterChatDTO, @User() user: any) {
@@ -67,6 +71,8 @@ export class ChatController {
       user,
       lang,
     );
+    console.log(data);
+    await this.socketGateway.handleDeleteChat(data);
     return { message, data };
   }
 }

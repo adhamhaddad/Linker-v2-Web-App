@@ -9,7 +9,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { IProfilePicture } from '../interfaces/profile.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Entity({ name: 'profile_pictures' })

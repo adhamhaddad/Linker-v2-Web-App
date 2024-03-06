@@ -4,12 +4,13 @@ import { Education } from '../entities/education.entity';
 import { OrderByCondition, Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { CreateEducationDto } from '../dto/create-education.dto';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { UpdateEducationDto } from '../dto/update-education.dto';
 import { EducationSerialization } from '../serializers/education.serialization';
 import { plainToClass } from 'class-transformer';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
+import { FilterEducationDTO } from '../dto/filter-education.dto';
 
 @Injectable()
 export class EducationService {
@@ -61,7 +62,7 @@ export class EducationService {
     };
   }
 
-  async getProfileEducation(username: string, lang: string) {
+  async getEducation(uuid: string, query: FilterEducationDTO, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -70,9 +71,13 @@ export class EducationService {
     );
     let order: OrderByCondition = { 'education.start_date': 'DESC' };
 
+    query.paginate = query.paginate || 15;
+    query.page = query.page || 1;
+    const skip = (query.page - 1) * query.paginate;
+
     // Get Profile
     const profile = await this.profileRepository.findOne({
-      where: { user: { username } },
+      where: { uuid },
     });
     if (!profile)
       throw new HttpException(
@@ -84,10 +89,10 @@ export class EducationService {
     const qb = this.educationRepository
       .createQueryBuilder('education')
       .leftJoinAndSelect('education.profile', 'profile')
-      .where('profile.uuid = :profileId', { profileId: profile.uuid });
+      .where('profile.uuid = :profileId', { profileId: uuid });
 
     // Apply ordering, pagination
-    qb.orderBy(order);
+    qb.orderBy(order).skip(skip).take(query.paginate);
 
     const [education, total] = await qb.getManyAndCount();
 
@@ -98,6 +103,12 @@ export class EducationService {
     return {
       data,
       total,
+      meta: {
+        total,
+        currentPage: query.page,
+        eachPage: query.paginate,
+        lastPage: Math.ceil(total / query.paginate),
+      },
     };
   }
 
@@ -146,19 +157,15 @@ export class EducationService {
         HttpStatus.NOT_FOUND,
       );
 
-    const { affected } = await this.educationRepository.update(
-      { uuid },
-      updateEducationDto,
-    );
-    if (!affected)
+    const updatedEducation = await this.educationRepository.save({
+      ...education,
+      ...updateEducationDto,
+    });
+    if (!updatedEducation)
       throw new HttpException(
         errorMessage.failedToUpdateEducation,
         HttpStatus.BAD_REQUEST,
       );
-
-    const updatedEducation = await this.educationRepository.find({
-      where: { uuid },
-    });
 
     return {
       message: errorMessage.educationUpdatedSuccessfully,

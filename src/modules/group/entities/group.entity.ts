@@ -10,7 +10,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { GroupStatusType, IGroup } from '../interfaces/group.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { GroupRequest } from './group-request.entity';
 import { GroupMember } from './group-member.entity';
 

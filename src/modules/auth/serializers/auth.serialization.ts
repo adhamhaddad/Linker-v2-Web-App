@@ -8,6 +8,9 @@ export class AuthSerialization {
   @Expose({ name: 'uuid' })
   uuid: number;
 
+  @Expose({ name: 'profile_id' })
+  profileId: string;
+
   @Expose({ name: 'profile_url' })
   profileUrl: string;
 

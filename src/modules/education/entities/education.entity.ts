@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { IEducation } from '../interfaces/education.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
 
 @Entity({ name: 'education' })

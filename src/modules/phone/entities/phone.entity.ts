@@ -9,7 +9,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { IPhone } from '../interfaces/phone.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 
 @Entity({ name: 'phones' })
 export class Phone implements IPhone {

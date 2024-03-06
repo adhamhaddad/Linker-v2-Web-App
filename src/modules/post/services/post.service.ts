@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from '../entities/post.entity';
 import { DeepPartial, OrderByCondition, Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
@@ -42,7 +42,7 @@ export class PostService {
     private readonly i18nService: I18nService,
   ) {}
 
-  private async getProvider(uuid, type, lang) {
+  private async getProvider(uuid: string, type: string, lang: string) {
     if (type === PostProviderTypes.PROFILE) {
       return await this.profileService.checkProfile(uuid, lang);
     } else if (type === PostProviderTypes.PAGE) {

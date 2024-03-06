@@ -73,22 +73,26 @@ export class MessageController {
       user,
       lang,
     );
+    await this.socketGateway.handleUpdatedMessage(data);
     return { message, data };
   }
 
-  @Delete('messages/:id')
+  @Delete(':conversationId/messages/:id')
   async deleteMessage(
     @Param('id') _id: string,
+    @Param('conversationId') conversationUuid: string,
     @Query() query: DeleteMessageDto,
     @User() user: any,
     @Lang() lang: string,
   ) {
     const { message, data } = await this.messageService.deleteMessage(
       _id,
+      conversationUuid,
       query,
       user,
       lang,
     );
+    await this.socketGateway.handleDeletedMessage(data);
     return { message, data };
   }
 }
