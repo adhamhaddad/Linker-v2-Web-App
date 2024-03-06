@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderByCondition, Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { plainToClass } from 'class-transformer';
 import { PostCommentReply } from '../entities/post-comment-reply.entity';

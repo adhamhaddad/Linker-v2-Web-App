@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { I18nService } from 'nestjs-i18n';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { plainToClass } from 'class-transformer';
 import { CreateMessageDto } from '../dto/create-message.dto';
 import { FilterMessageDTO } from '../dto/filter-messages.dto';
@@ -14,6 +14,7 @@ import { UpdateMessageDto } from '../dto/update-message.dto';
 import { DeleteMessageDto, DeleteMessageType } from '../dto/delete-message.dto';
 import { IChat } from '../interfaces/chat.interface';
 import { v4 as uuidV4 } from 'uuid';
+import { UpdateMessageStatusDto } from '../dto/update-message-status.dto';
 
 @Injectable()
 export class MessageService {
@@ -195,8 +196,47 @@ export class MessageService {
     };
   }
 
+  async updateMessageStatus(
+    chatId: string,
+    body: UpdateMessageStatusDto,
+    user: User,
+    lang: string,
+  ) {
+    const errorMessage: ErrorMessages = this.i18nService.translate(
+      'error-messages',
+      {
+        lang,
+      },
+    );
+
+    const chat = await this.chatModel.findOne({ _id: chatId });
+    if (!chat)
+      throw new HttpException(errorMessage.chatNotFound, HttpStatus.NOT_FOUND);
+
+    const updateQuery = {
+      conversationId: chat.conversation,
+      senderId: { $ne: user.uuid },
+    };
+    const updateFields = {};
+
+    if (body.status === 'isSeen') {
+      updateFields['status.isDelivered'] = true;
+      updateFields[`status.${body.status}`] = true;
+    } else {
+      updateFields['status.isDelivered'] = true;
+    }
+
+    await this.messageModel.updateMany(updateQuery, updateFields);
+  }
+
+  async deleteAllMessages(_id: string, user: User, lang: string) {
+    
+    
+  }
+
   async deleteMessage(
     _id: string,
+    conversationUuid: string,
     query: DeleteMessageDto,
     user: User,
     lang: string,
@@ -221,7 +261,18 @@ export class MessageService {
     } else {
       // Mark all message as deletedAt = Date.now()
       // Remove message for everyone if the message senderId = user.uuid
-      // condition.senderId = user.uuid;
+      const conversation = await this.checkConversation(
+        conversationUuid,
+        user,
+        lang,
+      );
+      const participants = conversation.participants.map(
+        (participant) => participant._id,
+      );
+
+      filter.$addToSet = {
+        deletedFrom: participants.map((id) => ({ _id: id })),
+      };
       filter.$set = { deletedAt: Date.now() };
     }
 
@@ -237,9 +288,12 @@ export class MessageService {
         HttpStatus.NOT_FOUND,
       );
 
+    message.participants = message.deletedFrom;
+    const data = this.serializeMessages(message);
+
     return {
       message: errorMessage.messageDeletedSuccessfully,
-      data: this.serializeMessages(message),
+      data,
     };
   }
 

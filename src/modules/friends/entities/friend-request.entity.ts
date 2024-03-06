@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { RequestStatus } from 'src/constants/request-status';
 import { IFriendRequest } from '../interfaces/friend-request.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 
 @Entity({ name: 'friend_requests' })
 export class FriendRequest implements IFriendRequest {

@@ -22,4 +22,5 @@ export interface IUser {
   updated_at: Date | null;
   deleted_at: Date | null;
   profile_url?: string;
+  profile_id?: string;
 }

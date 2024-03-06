@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { IPostComment } from '../interfaces/post-comment.interface';
 import { Post } from './post.entity';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { PostCommentReply } from './post-comment-reply.entity';
 import { PostCommentLike } from './post-comment-like.entity';
 

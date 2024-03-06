@@ -4,7 +4,7 @@ import { OrderByCondition, Repository } from 'typeorm';
 import { Page } from '../entities/page.entity';
 import { I18nService } from 'nestjs-i18n';
 import { CreatePageDto } from '../dto/create-page.dto';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { UpdatePageDto } from '../dto/update-page.dto';
 import { plainToClass } from 'class-transformer';

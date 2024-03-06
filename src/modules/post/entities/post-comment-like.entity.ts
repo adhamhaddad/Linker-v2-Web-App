@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { IPostLike } from '../interfaces/post-like.interface';
 import { PostComment } from './post-comment.entity';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 
 @Entity({ name: 'post_comment_likes' })
 export class PostCommentLike implements IPostLike {

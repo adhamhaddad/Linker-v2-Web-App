@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FriendRequest } from '../entities/friend-request.entity';
 import { OrderByCondition, Repository } from 'typeorm';
 import { Friend } from '../entities/friend.entity';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { I18nService } from 'nestjs-i18n';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { RequestStatus } from 'src/constants/request-status';
@@ -15,7 +15,6 @@ import {
   UpdateRequestStatus,
 } from '../dto/update-request-status.dto';
 import { UpdateFriendRequestSerialization } from '../serializers/update-friend-request.serialization';
-import { ChatService } from 'src/modules/chat/services/chat.service';
 import { ChatType } from 'src/modules/chat/interfaces/chat.interface';
 import { IFriendRequest } from '../interfaces/friend-request.interface';
 import { FilterFriendRequestDTO } from '../dto/requests-filter.dto';
@@ -27,16 +26,15 @@ export class FriendRequestService {
     @InjectRepository(FriendRequest)
     private readonly friendRequestRepository: Repository<FriendRequest>,
     @InjectRepository(Friend)
-    private readonly friendRepository: Repository<Friend>,
+    private readonly friendsRepository: Repository<Friend>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly chatService: ChatService,
     private readonly i18nService: I18nService,
   ) {}
 
   // Helper function to check if users are already friends
   async areUsersFriends(user1: User, user2: User): Promise<boolean> {
-    const friend = await this.friendRepository.findOne({
+    const friend = await this.friendsRepository.findOne({
       where: [
         { user1: { id: user1.id }, user2: { id: user2.id } },
         { user1: { id: user2.id }, user2: { id: user1.id } },
@@ -162,24 +160,16 @@ export class FriendRequestService {
     );
 
     if (status === UpdateRequestStatus.ACCEPTED) {
-      const friendCreated = this.friendRepository.create({
+      const friendCreated = this.friendsRepository.create({
         user1: friendRequest.requester,
         user2: friendRequest.recipient,
       });
-      const friend = await this.friendRepository.save(friendCreated);
 
-      await this.chatService.createChat(
-        {
-          userId: friend.user1.uuid,
-          type: ChatType.CHAT,
-        },
-        user,
-        lang,
-      );
-
+      const friend = await this.friendsRepository.save(friendCreated);
       return {
         message: errorMessage.friendRequestAcceptedSuccessfully,
         data: this.serializeUpdateFriendRequest(updatedRequest),
+        friend,
       };
     }
 

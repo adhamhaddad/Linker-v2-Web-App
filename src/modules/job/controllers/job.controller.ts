@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { JobService } from '../services/job.service';
@@ -14,6 +15,7 @@ import { CreateJobDto } from '../dto/create-job.dto';
 import { User } from 'src/decorators/user.decorator';
 import { Lang } from 'src/decorators/lang.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
+import { FilterJobsDTO } from '../dto/filter-jobs.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users/profiles')
@@ -36,16 +38,18 @@ export class JobController {
     return { message, data };
   }
 
-  @Get(':username/jobs')
-  async getProfileJobs(
-    @Param('username') username: string,
+  @Get(':id/jobs')
+  async getJobs(
+    @Param('id') uuid: string,
+    @Query() query: FilterJobsDTO,
     @Lang() lang: string,
   ) {
-    const { data, total } = await this.jobService.getProfileJobs(
-      username,
+    const { data, total, meta } = await this.jobService.getJobs(
+      uuid,
+      query,
       lang,
     );
-    return { data, total };
+    return { data, total, meta };
   }
 
   @Get('jobs/:id')

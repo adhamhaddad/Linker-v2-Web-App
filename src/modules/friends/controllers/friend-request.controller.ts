@@ -14,11 +14,16 @@ import { Lang } from 'src/decorators/lang.decorator';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 import { UpdateRequestStatusDto } from '../dto/update-request-status.dto';
 import { FilterFriendRequestDTO } from '../dto/requests-filter.dto';
+import { ChatService } from 'src/modules/chat/services/chat.service';
+import { ChatType } from 'src/modules/chat/interfaces/chat.interface';
 
 @UseGuards(JwtAuthGuard)
 @Controller('friend-requests')
 export class FriendRequestController {
-  constructor(private readonly friendRequestService: FriendRequestService) {}
+  constructor(
+    private readonly friendRequestService: FriendRequestService,
+    private readonly chatService: ChatService,
+  ) {}
 
   @Post(':id')
   async sendRequest(
@@ -41,13 +46,23 @@ export class FriendRequestController {
     @User() user,
     @Lang() lang: string,
   ) {
-    const { message, data } =
+    const { message, data, friend } =
       await this.friendRequestService.updateFriendRequest(
         uuid,
         body,
         user,
         lang,
       );
+    if (data) {
+      await this.chatService.createChat(
+        {
+          userId: friend.user1.uuid,
+          type: ChatType.CHAT,
+        },
+        user,
+        lang,
+      );
+    }
     return { message, data };
   }
 

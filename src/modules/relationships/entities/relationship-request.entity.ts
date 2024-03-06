@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { RequestStatus } from 'src/constants/request-status';
 import { IRelationshipRequest } from '../interfaces/relationship-request.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { Relationship } from './relationship.entity';
 
 @Entity({ name: 'relationship_requests' })

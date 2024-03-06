@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from '../entities/profile.entity';
 import { OrderByCondition, Repository } from 'typeorm';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { I18nService } from 'nestjs-i18n';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { plainToClass } from 'class-transformer';
@@ -14,12 +14,14 @@ import { IProfile } from '../interfaces/profile.interface';
 import { IProfileHeader } from '../interfaces/profile-header.interface';
 import { IProfileSettings } from '../interfaces/profile-settings.interface';
 import { FriendRequestService } from 'src/modules/friends/services/friend-request.service';
+import { FriendService } from 'src/modules/friends/services/friend.service';
 
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+    // private readonly friendsService: FriendService,
     // private readonly friendRequestService: FriendRequestService,
     private readonly i18nService: I18nService,
   ) {}
@@ -146,8 +148,6 @@ export class ProfileService {
     let order: OrderByCondition = {
       'profilePicture.created_at': 'DESC',
       'coverPicture.created_at': 'DESC',
-      'education.start_date': 'DESC',
-      'jobs.start_date': 'DESC',
     };
 
     // Create Query Builder
@@ -158,8 +158,6 @@ export class ProfileService {
       .leftJoinAndSelect('profile.coverPicture', 'coverPicture')
       .leftJoinAndSelect('profile.about', 'about')
       .leftJoinAndSelect('profile.address', 'address')
-      .leftJoinAndSelect('profile.education', 'education')
-      .leftJoinAndSelect('profile.jobs', 'jobs')
       .where('user.username = :username', { username });
 
     // Apply ordering, pagination
@@ -180,6 +178,8 @@ export class ProfileService {
       groups_status: profile.groups_status,
     };
 
+    const isMe = profile.user.uuid === user.uuid;
+
     // const connection = {
     //   isConnected: await this.friendRequestService.areUsersFriends(
     //     profileUser,
@@ -196,10 +196,22 @@ export class ProfileService {
       isRequested: false,
     };
 
+    if (!isMe) {
+      // connection.isConnected = await this.friendsService.areUsersFriends(
+      //   user,
+      //   profile.user,
+      // );
+      // connection.isRequested =
+      //   await this.friendRequestService.isFriendRequestSent(user, profile.user);
+    }
+
+    console.log(connection);
+
     const profileWithExtra: IProfile = {
       ...profile,
       settings,
       connection,
+      isMe,
     };
 
     const data = this.serializeProfile(profileWithExtra);

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderByCondition, Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { plainToClass } from 'class-transformer';
 import {
@@ -28,9 +28,9 @@ export class PagePostRequestService {
     private readonly pagePostRequestRepository: Repository<PagePostRequest>,
     @InjectRepository(Page)
     private readonly pageRepository: Repository<Page>,
-    @InjectRepository(Post)
-    private readonly postRepository: Repository<Post>,
-    private readonly postService: PostService,
+    // @InjectRepository(Post)
+    // private readonly postRepository: Repository<Post>,
+    // private readonly postService: PostService,
     private readonly pageAdminService: PageAdminService,
     private readonly i18nService: I18nService,
   ) {}
@@ -74,26 +74,26 @@ export class PagePostRequestService {
       throw new HttpException(errorMessage.pageNotFound, HttpStatus.NOT_FOUND);
 
     // Check post exist
-    const post = await this.postRepository.findOne({
-      where: { uuid: postUuid },
-    });
-    if (!post)
-      throw new HttpException(errorMessage.postNotFound, HttpStatus.NOT_FOUND);
+    // const post = await this.postRepository.findOne({
+    //   where: { uuid: postUuid },
+    // });
+    // if (!post)
+    //   throw new HttpException(errorMessage.postNotFound, HttpStatus.NOT_FOUND);
 
     // Check if a post request is already sent
-    const isRequested = await this.isPagePostRequestSent(page, user, post);
-    if (isRequested) {
-      throw new HttpException(
-        errorMessage.groupRequestAlreadySent,
-        HttpStatus.FOUND,
-      );
-    }
+    // const isRequested = await this.isPagePostRequestSent(page, user, post);
+    // if (isRequested) {
+    //   throw new HttpException(
+    //     errorMessage.groupRequestAlreadySent,
+    //     HttpStatus.FOUND,
+    //   );
+    // }
 
     // Create post request
     const pageRequestCreated = this.pagePostRequestRepository.create({
       requester: user,
       page: page,
-      post: post,
+      post: { uuid: postUuid },
     });
     const pagePostRequest = await this.pagePostRequestRepository.save(
       pageRequestCreated,
@@ -223,15 +223,15 @@ export class PagePostRequestService {
 
     if (status === UpdateRequestStatus.ACCEPTED) {
       // Publish Post
-      await this.postService.updatePost(
-        pagePostRequest.post.uuid,
-        {
-          status: PostStatus.PUBLIC,
-          created_at: new Date(),
-        },
-        user,
-        lang,
-      );
+      // await this.postService.updatePost(
+      //   pagePostRequest.post.uuid,
+      //   {
+      //     status: PostStatus.PUBLIC,
+      //     created_at: new Date(),
+      //   },
+      //   user,
+      //   lang,
+      // );
     }
 
     if (!updatedGroupRequest)

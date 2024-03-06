@@ -4,7 +4,7 @@ import { CoverPictureController } from './controllers/cover-picture.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CoverPicture } from './entities/cover-picture.entity';
-import { User } from '../auth/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { JwtStrategy } from '../auth/strategies/jwt.strategy';
 import { Utils } from 'src/utils/utils';
 import { RedisService } from '../redis/redis.service';

@@ -10,7 +10,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { ProfileStatus, IProfile } from '../interfaces/profile.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { ProfilePicture } from 'src/modules/profile-picture/entities/profile-picture.entity';
 import { About } from 'src/modules/about/entities/about.entity';
 import { CoverPicture } from 'src/modules/cover-picture/entities/cover-picture.entity';

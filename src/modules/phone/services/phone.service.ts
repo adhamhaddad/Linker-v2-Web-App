@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Phone } from '../entities/phone.entity';
 import { Repository } from 'typeorm';
 import { CreatePhoneDto } from '../dto/create-phone.dto';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { plainToClass } from 'class-transformer';
 import { PhoneSerialization } from '../serializers/phone.serialization';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';

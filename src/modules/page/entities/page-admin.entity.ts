@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { IPageAdmin, PageAdminRole } from '../interfaces/page-admin.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { Page } from './page.entity';
 
 @Entity({ name: 'page_admins' })

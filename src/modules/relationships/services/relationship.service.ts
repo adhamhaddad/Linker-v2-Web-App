@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateRelationshipDto } from '../dto/create-relationship.dto';
 import { I18nService } from 'nestjs-i18n';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { UpdateRelationshipDto } from '../dto/update-relationship.dto';
 import { RelationshipSerialization } from '../serializers/relationship.serialization';
 import { plainToClass } from 'class-transformer';

@@ -14,7 +14,7 @@ import {
   PostProviderTypes,
   PostStatus,
 } from '../interfaces/post.interface';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { PostLike } from './post-like.entity';
 import { PostComment } from './post-comment.entity';
 

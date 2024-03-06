@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProfilePicture } from '../entities/profile-picture.entity';
 import { OrderByCondition, Repository } from 'typeorm';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import * as fs from 'fs-extra';
 import { join } from 'path';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';

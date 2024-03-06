@@ -5,7 +5,7 @@ import { UserActivity } from '../entities/user-activity.entity';
 import { UserActivityDTO } from '../dto/activity.dto';
 import { ActivityListSerialization } from '../serializers/activity.serialization';
 import { plainToClass } from 'class-transformer';
-import { User } from '../../auth/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { I18nService } from 'nestjs-i18n';
 

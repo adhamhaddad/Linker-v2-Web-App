@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { I18nService } from 'nestjs-i18n';
-import { User } from 'src/modules/auth/entities/user.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import { plainToClass } from 'class-transformer';
 import { IChat } from '../interfaces/chat.interface';
 import { CreateChatDto } from '../dto/create-chat.dto';
@@ -18,6 +18,8 @@ import { FilterChatDTO } from '../dto/filter-chats.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from 'src/modules/profile/entities/profile.entity';
 import { Repository } from 'typeorm';
+import { MessageService } from './message.service';
+import { MessageStatusEnum } from '../dto/update-message-status.dto';
 
 @Injectable()
 export class ChatService {
@@ -29,6 +31,7 @@ export class ChatService {
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
     private readonly conversationService: ConversationService,
+    private readonly messageService: MessageService,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -111,7 +114,8 @@ export class ChatService {
           isArchived: archived,
         },
       },
-      deletedFrom: { $not: { $elemMatch: { _id: user.uuid } } },
+      'lastMessage.deletedFrom._id': { $ne: user.uuid },
+      'lastMessage.deletedAt': null,
     };
 
     if (keyword) {
@@ -130,33 +134,38 @@ export class ChatService {
         {
           $lookup: {
             from: 'messages',
-            localField: 'conversation',
-            foreignField: 'conversationId',
-            as: 'messages',
+            let: { conversationId: '$conversation' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ['$conversationId', '$$conversationId'] },
+                  deletedAt: null,
+                  'deletedFrom._id': { $nin: [user.uuid] }, // Filter out deleted messages
+                },
+              },
+              { $sort: { createdAt: -1 } }, // Sort messages by createdAt in descending order
+              { $limit: 1 }, // Limit to the last message
+            ],
+            as: 'lastMessage',
           },
+        },
+        {
+          $unwind: { path: '$lastMessage', preserveNullAndEmptyArrays: true }, // Unwind to handle null lastMessage
         },
         {
           $addFields: {
             lastMessage: {
               $cond: {
-                if: { $eq: [{ $size: '$messages' }, 0] },
+                if: { $eq: ['$lastMessage', 0] },
                 then: null,
-                else: {
-                  $arrayElemAt: ['$messages', -1],
-                },
+                else: '$lastMessage',
               },
             },
           },
         },
-        {
-          $match: {
-            'lastMessage.deletedFrom._id': { $not: { $in: [user.uuid] } },
-            'lastMessage.deletedAt': null,
-          },
-        },
-        {
-          $sort: { 'lastMessage.createdAt': -1 },
-        },
+        { $sort: sort },
+        { $skip: skip },
+        { $limit: query.paginate },
         {
           $project: {
             type: 1,
@@ -164,16 +173,12 @@ export class ChatService {
             participants: 1,
             conversation: {
               id: '$conversation',
-              lastMessage: '$lastMessage',
+              lastMessage: { $ifNull: ['$lastMessage', null] },
             },
             deletedFrom: 1,
-            lastMessage: 1,
           },
         },
       ])
-      .sort(sort)
-      .skip(skip)
-      .limit(query.paginate)
       .exec();
 
     const total = await this.chatModel.countDocuments(filters);
@@ -230,20 +235,22 @@ export class ChatService {
       },
     );
 
-    // Sort
-    let sort: any = { 'messages.createdAt': -1 };
-
-    // Apply filters
-    const filters: any = {
+    // Mark all message as seen
+    await this.messageService.updateMessageStatus(
       _id,
-      deletedFrom: { $not: { $elemMatch: { _id: user.uuid } } },
-    };
+      { status: MessageStatusEnum.IS_SEEN },
+      user,
+      lang,
+    );
 
-    // Find chats
+    // Sort
+    let sort: any = { 'message.createdAt': -1 };
+
+    // Find chat
     const chat = await this.chatModel
       .aggregate([
         {
-          $match: filters,
+          $match: { _id },
         },
         {
           $lookup: {
@@ -255,19 +262,30 @@ export class ChatService {
         },
         {
           $addFields: {
-            conversation: {
-              id: '$conversation',
-              messages: '$messages',
+            messages: {
+              $filter: {
+                input: '$messages',
+                as: 'message',
+                cond: {
+                  $and: [
+                    { $eq: ['$$message.deletedAt', null] },
+                    { $not: { $in: [user.uuid, '$$message.deletedFrom._id'] } },
+                  ],
+                },
+              },
             },
           },
         },
+        { $sort: sort },
         {
           $project: {
             type: 1,
             groupDetails: 1,
             participants: 1,
-            conversation: 1,
-            deletedFrom: 1,
+            conversation: {
+              id: '$conversation',
+              messages: '$messages',
+            },
           },
         },
       ])
