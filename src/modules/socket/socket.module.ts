@@ -1,22 +1,30 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { SocketGateway } from './socket.gateway';
-import { UserService } from '../user/services/user.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../user/entities/user.entity';
-import { UserModule } from '../user/user.module';
-import { ChatModule } from '../chat/chat.module';
-import { FriendsModule } from '../friends/friends.module';
-import { FriendService } from '../friends/services/friend.service';
-import { Friend } from '../friends/entities/friend.entity';
+import { ConnectionService } from './services/connection.service';
+import { RequestSocketService } from './services/request-ws.service';
+import { ChatSocketService } from './services/chat-ws.service';
+import { MessageSocketService } from './services/message-ws.service';
+import { PreOfferSocketService } from './services/offers-ws.service';
+import { UserModule } from '@modules/user/user.module';
+import { ProfileModule } from '@modules/profile/profile.module';
+import { FriendsModule } from '@modules/friends/friends.module';
+import { ChatModule } from '@modules/chat/chat.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Friend]),
-    UserModule,
-    ChatModule,
-    FriendsModule,
+    forwardRef(() => UserModule),
+    forwardRef(() => ProfileModule),
+    forwardRef(() => FriendsModule),
+    forwardRef(() => ChatModule),
   ],
-  providers: [SocketGateway, UserService, FriendService],
+  providers: [
+    SocketGateway,
+    ConnectionService,
+    RequestSocketService,
+    ChatSocketService,
+    MessageSocketService,
+    PreOfferSocketService,
+  ],
   exports: [SocketGateway],
 })
 export class SocketModule {}

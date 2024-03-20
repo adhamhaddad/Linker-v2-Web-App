@@ -8,14 +8,14 @@ import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { plainToClass } from 'class-transformer';
 import { VisitorSerialization } from '../serializers/visitors.serialization';
 import { RecipientSerialization } from '../serializers/recipients.serialization';
+import { UserService } from '@modules/user/services/user.service';
 
 @Injectable()
 export class VisitorService {
   constructor(
     @InjectRepository(Visitor)
     private readonly visitorRepository: Repository<Visitor>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly userService: UserService,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -36,9 +36,7 @@ export class VisitorService {
     }
 
     // Check the uuid of user
-    const recipient = await this.userRepository.findOne({ where: { uuid } });
-    if (!recipient)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+    const recipient = await this.userService.findOne(uuid, lang);
 
     // Get Last record using timestamp (created_at)
     const lastVisit = await this.visitorRepository.findOne({

@@ -15,51 +15,20 @@ import { DeleteMessageDto, DeleteMessageType } from '../dto/delete-message.dto';
 import { IChat } from '../interfaces/chat.interface';
 import { v4 as uuidV4 } from 'uuid';
 import { UpdateMessageStatusDto } from '../dto/update-message-status.dto';
+import { ConversationService } from './conversation.service';
+import { Chat } from '../schemas/chat.schema';
+import { Message } from '../schemas/message.schema';
 
 @Injectable()
 export class MessageService {
   constructor(
+    @InjectModel('Chat')
+    private readonly chatModel: Model<Chat>,
     @InjectModel('Message')
     private readonly messageModel: Model<IMessage>,
-    @InjectModel('Conversation')
-    private readonly conversationModel: Model<IConversation>,
-    @InjectModel('Chat')
-    private readonly chatModel: Model<IChat>,
+    private readonly conversationService: ConversationService,
     private readonly i18nService: I18nService,
   ) {}
-
-  // Helper function to check that the conversation exist
-  async checkConversation(_id: string, user: User, lang: string) {
-    const errorMessage: ErrorMessages = this.i18nService.translate(
-      'error-messages',
-      {
-        lang,
-      },
-    );
-
-    const conversation = await this.conversationModel
-      .findOne({ _id, participants: { $elemMatch: { _id: user.uuid } } })
-      .populate('chat')
-      .exec();
-
-    if (!conversation)
-      throw new HttpException(
-        errorMessage.conversationNotFound,
-        HttpStatus.NOT_FOUND,
-      );
-
-    const chat: Partial<IChat> = conversation.chat;
-    if (!chat)
-      throw new HttpException(errorMessage.chatNotFound, HttpStatus.NOT_FOUND);
-
-    if (chat.deletedFrom.length)
-      await this.chatModel.updateOne(
-        { _id: chat._id },
-        { $set: { deletedFrom: [] } },
-      );
-
-    return conversation;
-  }
 
   async createMessage(
     _id: string,
@@ -74,11 +43,16 @@ export class MessageService {
       },
     );
 
-    const conversation = await this.checkConversation(_id, user, lang);
+    const chat = await this.conversationService.checkConversationExist(
+      _id,
+      user,
+    );
+    if (!chat)
+      throw new HttpException(errorMessage.chatNotFound, HttpStatus.NOT_FOUND);
 
     const messageCreated = {
       _id: uuidV4(),
-      conversationId: conversation._id,
+      conversation: chat.conversation._id,
       senderId: user.uuid,
       message: body.message,
       attachments: body.attachments,
@@ -92,8 +66,8 @@ export class MessageService {
         HttpStatus.BAD_REQUEST,
       );
 
-    message.chatId = conversation.chat._id;
-    message.participants = conversation.chat.participants;
+    message.chatId = chat._id;
+    message.participants = chat.participants;
     const data = this.serializeMessages(message);
 
     return {
@@ -108,7 +82,19 @@ export class MessageService {
     user: User,
     lang: string,
   ) {
-    const conversation = await this.checkConversation(_id, user, lang);
+    const errorMessage: ErrorMessages = this.i18nService.translate(
+      'error-messages',
+      {
+        lang,
+      },
+    );
+
+    const chat = await this.conversationService.checkConversationExist(
+      _id,
+      user,
+    );
+    if (!chat)
+      throw new HttpException(errorMessage.chatNotFound, HttpStatus.NOT_FOUND);
 
     const keyword = query.filter?.keyword;
 
@@ -131,7 +117,7 @@ export class MessageService {
     }
 
     // Apply filters
-    const filters: any = { conversationId: conversation._id };
+    const filters: any = { conversation: chat.conversation._id };
 
     // Condition to exclude messages where userId is in any deletedFrom array objects
     filters.deletedFrom = { $not: { $elemMatch: { _id: user.uuid } } };
@@ -229,10 +215,7 @@ export class MessageService {
     await this.messageModel.updateMany(updateQuery, updateFields);
   }
 
-  async deleteAllMessages(_id: string, user: User, lang: string) {
-    
-    
-  }
+  async deleteAllMessages(_id: string, user: User, lang: string) {}
 
   async deleteMessage(
     _id: string,
@@ -261,12 +244,17 @@ export class MessageService {
     } else {
       // Mark all message as deletedAt = Date.now()
       // Remove message for everyone if the message senderId = user.uuid
-      const conversation = await this.checkConversation(
+      const chat = await this.conversationService.checkConversationExist(
         conversationUuid,
         user,
-        lang,
       );
-      const participants = conversation.participants.map(
+      if (!chat)
+        throw new HttpException(
+          errorMessage.chatNotFound,
+          HttpStatus.NOT_FOUND,
+        );
+
+      const participants = chat.participants.map(
         (participant) => participant._id,
       );
 

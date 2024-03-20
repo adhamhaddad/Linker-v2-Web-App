@@ -9,18 +9,20 @@ import { plainToClass } from 'class-transformer';
 import { AddressSerialization } from '../serializers/address.serialization';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { I18nService } from 'nestjs-i18n';
+import { Profile } from '@modules/profile/entities/profile.entity';
 
 @Injectable()
 export class AddressService {
   constructor(
     @InjectRepository(Address)
     private readonly addressRepository: Repository<Address>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Profile)
+    private readonly profileRepository: Repository<Profile>,
     private readonly i18nService: I18nService,
   ) {}
 
   async createAddress(
+    uuid: string,
     createAddressDto: CreateAddressDto,
     user: User,
     lang: string,
@@ -41,9 +43,8 @@ export class AddressService {
         HttpStatus.NOT_ACCEPTABLE,
       );
 
-    const { profile } = await this.userRepository.findOne({
+    const profile = await this.profileRepository.findOne({
       where: { id: user.id },
-      relations: ['profile'],
     });
     if (!profile)
       throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
@@ -119,6 +120,34 @@ export class AddressService {
       );
 
     return address;
+  }
+
+  async deleteAddress(uuid: string, user: User, lang: string) {
+    const errorMessage: ErrorMessages = this.i18nService.translate(
+      'error-messages',
+      {
+        lang,
+      },
+    );
+
+    const address = await this.addressRepository.findOne({ where: { uuid } });
+    if (!address)
+      throw new HttpException(
+        errorMessage.addressNotFound,
+        HttpStatus.NOT_FOUND,
+      );
+
+    const { affected } = await this.addressRepository.delete({ uuid });
+    if (!affected)
+      throw new HttpException(
+        errorMessage.failedToDeleteAddress,
+        HttpStatus.NOT_FOUND,
+      );
+
+    return {
+      message: errorMessage.addressDeletedSuccessfully,
+      data: this.serializeAddress(address),
+    };
   }
 
   serializeAddress(address) {

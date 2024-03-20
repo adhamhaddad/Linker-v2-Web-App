@@ -16,7 +16,7 @@ import { Lang } from 'src/decorators/lang.decorator';
 import { UpdateChatDto } from '../dto/update-chat.dto';
 import { FilterChatDTO } from '../dto/filter-chats.dto';
 import { DeleteChatDto } from '../dto/delete-chat.dto';
-import { SocketGateway } from 'src/modules/socket/socket.gateway';
+import { SocketGateway } from '@modules/socket/socket.gateway';
 
 @UseGuards(JwtAuthGuard)
 @Controller('chats')
@@ -71,7 +71,6 @@ export class ChatController {
       user,
       lang,
     );
-    console.log(data);
     await this.socketGateway.handleDeleteChat(data);
     return { message, data };
   }

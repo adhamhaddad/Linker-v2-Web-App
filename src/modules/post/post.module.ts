@@ -11,27 +11,16 @@ import { PostCommentReplyLike } from './entities/post-comment-reply-like.entity'
 import { PostCommentLikeService } from './services/post-comment-like.service';
 import { PostCommentReplyService } from './services/post-comment-reply.service';
 import { PostCommentReplyLikeService } from './services/post-comment-reply-like.service';
-import { User } from '../user/entities/user.entity';
-import { Profile } from '../profile/entities/profile.entity';
 import { PostCommentService } from './services/post-comment.service';
 import { PostLikeService } from './services/post-like.service';
 import { PostCommentController } from './controllers/post-comment.controller';
 import { PostLikeController } from './controllers/post-like.controller';
-import { JwtStrategy } from '../auth/strategies/jwt.strategy';
-import { Utils } from 'src/utils/utils';
-import { RedisService } from '../redis/redis.service';
-import { Page } from '../page/entities/page.entity';
-import { Group } from '../group/entities/group.entity';
-import { PageAdminService } from '../page/services/page-admin.service';
-import { PageAdmin } from '../page/entities/page-admin.entity';
-import { PageService } from '../page/services/page.service';
-import { GroupService } from '../group/services/group.service';
-import { ProfileService } from '../profile/services/profile.service';
-import { GroupMemberService } from '../group/services/group-member.service';
-import { GroupMember } from '../group/entities/group-member.entity';
 import { PostCommentLikeController } from './controllers/post-comment-like.controller';
 import { PostCommentReplyController } from './controllers/post-comment-reply.controller';
 import { PostCommentReplyLikeController } from './controllers/post-comment-reply-like.controller';
+import { ProfileModule } from '@modules/profile/profile.module';
+import { GroupModule } from '@modules/group/group.module';
+import { PageModule } from '@modules/page/page.module';
 
 @Module({
   imports: [
@@ -42,13 +31,10 @@ import { PostCommentReplyLikeController } from './controllers/post-comment-reply
       PostCommentLike,
       PostCommentReply,
       PostCommentReplyLike,
-      Page,
-      User,
-      Profile,
-      PageAdmin,
-      Group,
-      GroupMember,
     ]),
+    ProfileModule,
+    PageModule,
+    GroupModule,
   ],
   providers: [
     PostService,
@@ -57,14 +43,6 @@ import { PostCommentReplyLikeController } from './controllers/post-comment-reply
     PostCommentLikeService,
     PostCommentReplyService,
     PostCommentReplyLikeService,
-    ProfileService,
-    PageService,
-    PageAdminService,
-    GroupService,
-    GroupMemberService,
-    JwtStrategy,
-    Utils,
-    RedisService,
   ],
   controllers: [
     PostController,

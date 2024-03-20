@@ -5,6 +5,7 @@ import {
   Patch,
   UseGuards,
   Param,
+  Delete,
 } from '@nestjs/common';
 import { Lang } from 'src/decorators/lang.decorator';
 import { AddressService } from '../services/address.service';
@@ -14,17 +15,19 @@ import { UpdateAddressDto } from '../dto/update-address.dto';
 import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('users/addresses')
+@Controller('users/profiles')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
-  @Post()
+  @Post(':id/addresses')
   async createAddress(
+    @Param('id') uuid: string,
     @Body() body: CreateAddressDto,
     @User() user,
     @Lang() lang: string,
   ) {
     const { message, data } = await this.addressService.createAddress(
+      uuid,
       body,
       user,
       lang,
@@ -32,16 +35,30 @@ export class AddressController {
     return { message, data };
   }
 
-  @Patch(':id')
+  @Patch('addresses/:id')
   async updateAddress(
-    @Param('id') id: string,
+    @Param('id') uuid: string,
     @Body() body: UpdateAddressDto,
     @User() user,
     @Lang() lang: string,
   ) {
     const { message, data } = await this.addressService.updateAddress(
-      id,
+      uuid,
       body,
+      user,
+      lang,
+    );
+    return { message, data };
+  }
+
+  @Delete('addresses/:id')
+  async deleteAddress(
+    @Param('id') uuid: string,
+    @User() user,
+    @Lang() lang: string,
+  ) {
+    const { message, data } = await this.addressService.deleteAddress(
+      uuid,
       user,
       lang,
     );

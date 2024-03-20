@@ -14,7 +14,6 @@ import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { Utils } from 'src/utils/utils';
 import { PasswordHash } from 'src/utils/password-hash';
 import * as bcrypt from 'bcrypt';
-import { UserSerialization } from '../serializers/user.serialization';
 import { plainToClass } from 'class-transformer';
 import { VerifyOTPDto } from '../dto/verify-otp.dto';
 import { SendOTPDto } from '../dto/send-otp.dto';
@@ -39,10 +38,10 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     private readonly passwordHash: PasswordHash,
     private readonly jwtService: JwtService,
-    private readonly utils: Utils,
     private readonly profileService: ProfileService,
     private readonly settingService: SettingService,
     private readonly userActivityService: ActivityService,
+    private readonly utils: Utils,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -135,8 +134,8 @@ export class AuthService {
     else message = errorMessage.verificationFailed;
 
     // Initiate User profile and settings
-    const profile = await this.profileService.createProfile(user, lang);
-    const settings = await this.settingService.createSettings(user, lang);
+    await this.profileService.createProfile(user, lang);
+    await this.settingService.createSettings(user, lang);
 
     return {
       message,
@@ -144,7 +143,7 @@ export class AuthService {
     };
   }
 
-  async login(body: LoginDto, lang: string) {
+  async login(body: LoginDto, lang: string, headers?: Headers, ip?: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -152,16 +151,27 @@ export class AuthService {
       },
     );
 
+    const deviceInfo = headers['deviceInfoHeaders'];
+    const deviceUserAgent = deviceInfo
+      ? deviceInfo['Device-User-Agent']
+      : headers['user-agent'];
+    const deviceOs = deviceInfo ? deviceInfo['Device-OS'] : 'Other';
+    const deviceIp = deviceInfo ? deviceInfo['Device-IP'] : ip;
+    const deviceModel = deviceInfo ? deviceInfo['Device-Model'] : 'Other';
+
     const { username, password } = body;
 
-    const user = await this.getUser(username, lang);
+    const user = await this.userRepository.findOne({
+      where: { email: username },
+      relations: ['profile', 'profilePicture'],
+    });
     if (!user)
       throw new HttpException(
         errorMessage.invalidUsernameOrPassword,
         HttpStatus.BAD_REQUEST,
       );
 
-    const { salt } = user;
+    const { salt, two_step_verification } = user;
 
     const isPasswordMatch = await bcrypt.compare(
       password + salt,
@@ -174,21 +184,57 @@ export class AuthService {
       );
     }
 
-    await this.utils.redisSetValueDuration(
-      `${user.email}-loginOtpPasswordVerified`,
-      '1',
-      600,
-    );
-    const otp = await this.utils.sendOtpMessage(user.email, 'login');
-
-    if (otp) {
-      return {
-        message: errorMessage.otpForVerification,
-        data: { email: user.email, otp },
-      };
+    if (two_step_verification) {
+      await this.utils.redisSetValueDuration(
+        `${user.email}-loginOtpPasswordVerified`,
+        '1',
+        600,
+      );
+      const otp = await this.utils.sendOtpMessage(user.email, 'login');
+      if (otp) {
+        return {
+          message: errorMessage.otpForVerification,
+          data: {
+            twoStepVerification: two_step_verification,
+            email: user.email,
+            otp,
+          },
+        };
+      } else {
+        return { message: errorMessage.resendAfter60Seconds };
+      }
     }
 
-    return { message: errorMessage.resendAfter60Seconds };
+    const profile_id = user.profile.uuid;
+    const profile_url = user.profilePicture[0]?.image_url || null;
+    const userWithExtra: IUser = {
+      ...user,
+      profile_id,
+      profile_url,
+    };
+
+    const token = await this.jwtService.signAsync({ user });
+    const data = {
+      twoStepVerification: two_step_verification,
+      user: this.serializeUser(userWithExtra),
+      token,
+    };
+
+    //save login activity
+    await this.userActivityService.store({
+      login_ip_address: deviceIp || ip,
+      device_os: deviceOs || '',
+      device_model: deviceModel || '',
+      user_agent: deviceUserAgent,
+      type: UserActivityTypeMessages.LOGIN_SUCCESS,
+      user_id: user.id,
+    });
+
+    return {
+      message: errorMessage.loginSuccessfully,
+      token,
+      data,
+    };
   }
 
   async verifyLogin(

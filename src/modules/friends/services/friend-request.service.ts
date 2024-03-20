@@ -15,10 +15,12 @@ import {
   UpdateRequestStatus,
 } from '../dto/update-request-status.dto';
 import { UpdateFriendRequestSerialization } from '../serializers/update-friend-request.serialization';
-import { ChatType } from 'src/modules/chat/interfaces/chat.interface';
 import { IFriendRequest } from '../interfaces/friend-request.interface';
 import { FilterFriendRequestDTO } from '../dto/requests-filter.dto';
 import { GetFriendRequestSerialization } from '../serializers/get-friend-request.serialization';
+import { ChatService } from '@modules/chat/services/chat.service';
+import { ChatType } from '@modules/chat/interfaces/chat.interface';
+import { UserService } from '@modules/user/services/user.service';
 
 @Injectable()
 export class FriendRequestService {
@@ -27,8 +29,8 @@ export class FriendRequestService {
     private readonly friendRequestRepository: Repository<FriendRequest>,
     @InjectRepository(Friend)
     private readonly friendsRepository: Repository<Friend>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly userService: UserService,
+    private readonly chatService: ChatService,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -67,6 +69,30 @@ export class FriendRequestService {
     return !!friendRequest;
   }
 
+  // Helper function to check if a friend request is already sent
+  async isRequested(
+    requester: User,
+    recipient: User,
+  ): Promise<FriendRequest | boolean> {
+    const friendRequest = await this.friendRequestRepository.findOne({
+      where: [
+        {
+          requester: { id: requester.id },
+          recipient: { id: recipient.id },
+          status: RequestStatus.PENDING,
+        },
+        {
+          requester: { id: recipient.id },
+          recipient: { id: requester.id },
+          status: RequestStatus.PENDING,
+        },
+      ],
+      relations: ['requester'],
+    });
+
+    return friendRequest || false;
+  }
+
   async sendFriendRequest(recipientUuid: string, user: User, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
@@ -82,11 +108,8 @@ export class FriendRequestService {
       );
     }
 
-    const receiverUser = await this.userRepository.findOne({
-      where: { uuid: recipientUuid },
-    });
-    if (!receiverUser)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+    // Check user exist
+    const receiverUser = await this.userService.findOne(recipientUuid, lang);
 
     // Check if it's already a friend
     const isFriend = await this.areUsersFriends(user, receiverUser);
@@ -120,62 +143,6 @@ export class FriendRequestService {
     return {
       message: errorMessage.friendRequestSent,
       data: this.serializeFriendRequest(friendRequest),
-    };
-  }
-
-  async updateFriendRequest(
-    uuid: string,
-    updateRequestStatusDto: UpdateRequestStatusDto,
-    user: User,
-    lang: string,
-  ) {
-    const errorMessage: ErrorMessages = this.i18nService.translate(
-      'error-messages',
-      {
-        lang,
-      },
-    );
-
-    const { status } = updateRequestStatusDto;
-
-    const friendRequest = await this.friendRequestRepository.findOne({
-      where: { uuid },
-      relations: ['requester', 'recipient'],
-    });
-
-    if (!friendRequest)
-      throw new HttpException(
-        errorMessage.friendRequestNotFound,
-        HttpStatus.NOT_FOUND,
-      );
-    if (friendRequest.status !== 'pending')
-      throw new HttpException(
-        errorMessage.friendRequestAlreadyUpdated,
-        HttpStatus.BAD_REQUEST,
-      );
-
-    friendRequest.status = UpdateRequestStatus[status.toUpperCase()];
-    const updatedRequest = await this.friendRequestRepository.save(
-      friendRequest,
-    );
-
-    if (status === UpdateRequestStatus.ACCEPTED) {
-      const friendCreated = this.friendsRepository.create({
-        user1: friendRequest.requester,
-        user2: friendRequest.recipient,
-      });
-
-      const friend = await this.friendsRepository.save(friendCreated);
-      return {
-        message: errorMessage.friendRequestAcceptedSuccessfully,
-        data: this.serializeUpdateFriendRequest(updatedRequest),
-        friend,
-      };
-    }
-
-    return {
-      message: errorMessage.friendRequestUpdatedSuccessfully,
-      data: this.serializeUpdateFriendRequest(updatedRequest),
     };
   }
 
@@ -233,12 +200,92 @@ export class FriendRequestService {
     };
   }
 
-  serializeUpdateFriendRequest(updateFriendRequest) {
-    return plainToClass(UpdateFriendRequestSerialization, updateFriendRequest, {
-      excludeExtraneousValues: true,
-      enableCircularCheck: true,
-      strategy: 'excludeAll',
+  async updateFriendRequest(
+    uuid: string,
+    updateRequestStatusDto: UpdateRequestStatusDto,
+    user: User,
+    lang: string,
+  ) {
+    const errorMessage: ErrorMessages = this.i18nService.translate(
+      'error-messages',
+      {
+        lang,
+      },
+    );
+
+    const { status } = updateRequestStatusDto;
+
+    const friendRequest = await this.friendRequestRepository.findOne({
+      where: { uuid },
+      relations: ['requester', 'recipient'],
     });
+
+    if (!friendRequest)
+      throw new HttpException(
+        errorMessage.friendRequestNotFound,
+        HttpStatus.NOT_FOUND,
+      );
+    if (friendRequest.status !== 'pending')
+      throw new HttpException(
+        errorMessage.friendRequestAlreadyUpdated,
+        HttpStatus.BAD_REQUEST,
+      );
+
+    friendRequest.status = UpdateRequestStatus[status.toUpperCase()];
+    const updatedRequest = await this.friendRequestRepository.save(
+      friendRequest,
+    );
+
+    if (status === UpdateRequestStatus.ACCEPTED) {
+      const friendCreated = this.friendsRepository.create({
+        user1: friendRequest.requester,
+        user2: friendRequest.recipient,
+      });
+
+      const friend = await this.friendsRepository.save(friendCreated);
+      if (!friend)
+        throw new HttpException(
+          errorMessage.failedToUpdateRequest,
+          HttpStatus.BAD_REQUEST,
+        );
+
+      await this.chatService.createChat(
+        {
+          userUuid: friend.user1.uuid,
+          type: ChatType.CHAT,
+        },
+        user,
+        lang,
+      );
+
+      return {
+        message: errorMessage.friendRequestAcceptedSuccessfully,
+        data: this.serializeUpdateFriendRequest(updatedRequest, user.uuid),
+      };
+    }
+
+    return {
+      message: errorMessage.friendRequestUpdatedSuccessfully,
+      data: this.serializeUpdateFriendRequest(updatedRequest, user.uuid),
+    };
+  }
+
+  serializeUpdateFriendRequest(updateFriendRequest, uuid: string) {
+    const requestSerialization = plainToClass(
+      UpdateFriendRequestSerialization,
+      updateFriendRequest,
+      {
+        excludeExtraneousValues: true,
+        enableCircularCheck: true,
+        strategy: 'excludeAll',
+      },
+    );
+    requestSerialization.user = UpdateFriendRequestSerialization.getOtherUser(
+      updateFriendRequest,
+      uuid,
+    );
+
+    return requestSerialization;
   }
   serializeFriendRequest(friendRequest) {
     return plainToClass(FriendRequestSerialization, friendRequest, {
@@ -249,13 +296,6 @@ export class FriendRequestService {
   }
   serializeGetFriendRequests(friendRequest) {
     return plainToClass(GetFriendRequestSerialization, friendRequest, {
-      excludeExtraneousValues: true,
-      enableCircularCheck: true,
-      strategy: 'excludeAll',
-    });
-  }
-  serializeFriend(friend) {
-    return plainToClass(FriendSerialization, friend, {
       excludeExtraneousValues: true,
       enableCircularCheck: true,
       strategy: 'excludeAll',

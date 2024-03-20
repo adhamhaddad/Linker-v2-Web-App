@@ -10,9 +10,6 @@ import { ErrorMessages } from 'src/interfaces/error-messages.interface';
 import { plainToClass } from 'class-transformer';
 import { PostSerialization } from '../serializers/post.serialization';
 import { IPost, PostProviderTypes } from '../interfaces/post.interface';
-import { Profile } from 'src/modules/profile/entities/profile.entity';
-import { Page } from 'src/modules/page/entities/page.entity';
-import { Group } from 'src/modules/group/entities/group.entity';
 import { PageAdminService } from 'src/modules/page/services/page-admin.service';
 import { FilterPostDTO } from '../dto/filter-post.dto';
 import { ProfileService } from 'src/modules/profile/services/profile.service';
@@ -27,15 +24,9 @@ export class PostService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
-    @InjectRepository(Profile)
-    private readonly profileRepository: Repository<Profile>,
     private readonly profileService: ProfileService,
-    @InjectRepository(Page)
-    private readonly pageRepository: Repository<Page>,
     private readonly pageService: PageService,
     private readonly pageAdminService: PageAdminService,
-    @InjectRepository(Group)
-    private readonly groupRepository: Repository<Group>,
     private readonly groupService: GroupService,
     private readonly groupMemberService: GroupMemberService,
     // private readonly groupPostRequestService: GroupPostRequestService,
@@ -44,37 +35,13 @@ export class PostService {
 
   private async getProvider(uuid: string, type: string, lang: string) {
     if (type === PostProviderTypes.PROFILE) {
-      return await this.profileService.checkProfile(uuid, lang);
+      const profile = await this.profileService.checkProfile(uuid, lang);
+      return profile;
     } else if (type === PostProviderTypes.PAGE) {
       return await this.pageService.checkPage(uuid, lang);
     } else {
       return await this.groupService.checkGroup(uuid, lang);
     }
-  }
-
-  // ProviderId Profile Checks
-  private async checkProfileProvider(
-    providerUuid: string,
-    user: User,
-    lang: string,
-  ) {
-    const errorMessage: ErrorMessages = this.i18nService.translate(
-      'error-messages',
-      {
-        lang,
-      },
-    );
-
-    const profile = await this.profileRepository.findOne({
-      where: { uuid: providerUuid, user: { id: user.id } },
-    });
-    if (!profile)
-      throw new HttpException(
-        errorMessage.profileNotFound,
-        HttpStatus.NOT_FOUND,
-      );
-
-    return profile.id;
   }
 
   // ProviderId Page Checks
@@ -90,11 +57,8 @@ export class PostService {
       },
     );
 
-    const page = await this.pageRepository.findOne({
-      where: { uuid: providerUuid },
-    });
-    if (!page)
-      throw new HttpException(errorMessage.pageNotFound, HttpStatus.NOT_FOUND);
+    // Check page exist
+    const page = await this.pageService.checkPage(providerUuid, lang);
 
     const isAuthorized = await this.pageAdminService.isHasAuthority(
       providerUuid,
@@ -123,11 +87,8 @@ export class PostService {
       },
     );
 
-    const group = await this.groupRepository.findOne({
-      where: { uuid: providerUuid },
-    });
-    if (!group)
-      throw new HttpException(errorMessage.groupNotFound, HttpStatus.NOT_FOUND);
+    // Check group exist
+    const group = await this.groupService.checkGroup(providerUuid, lang);
 
     const isAuthorized = await this.groupMemberService.isHasAuthority(
       providerUuid,
@@ -150,7 +111,7 @@ export class PostService {
 
   async provider(providerType, providerUuid, user, lang) {
     if (providerType === PostProviderTypes.PROFILE) {
-      return await this.checkProfileProvider(providerUuid, user, lang);
+      // return await this.checkProfileProvider(providerUuid, user, lang);
     } else if (providerType === PostProviderTypes.PAGE) {
       return await this.checkPageProvider(providerUuid, user, lang);
     } else {

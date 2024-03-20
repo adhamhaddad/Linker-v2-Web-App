@@ -17,7 +17,8 @@ export interface IUser {
   password: string;
   salt: string;
   email_verified_at: Date | null;
-  is_online: OnlineStatus;
+  two_step_verification: boolean;
+  last_active: Date | null;
   created_at: Date | null;
   updated_at: Date | null;
   deleted_at: Date | null;

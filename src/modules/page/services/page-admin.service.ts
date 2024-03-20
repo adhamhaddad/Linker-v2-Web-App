@@ -13,16 +13,16 @@ import { FilterPageAdminDTO } from '../dto/filter-page-admin.dto';
 import { PageAdminSerialization } from '../serializers/page-admin.serialization';
 import { PagePermissions } from 'src/constants';
 import { Page } from '../entities/page.entity';
+import { UserService } from '@modules/user/services/user.service';
 
 @Injectable()
 export class PageAdminService {
   constructor(
     @InjectRepository(PageAdmin)
     private readonly pageAdminRepository: Repository<PageAdmin>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     @InjectRepository(Page)
     private readonly pageRepository: Repository<Page>,
+    private readonly userService: UserService,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -88,11 +88,7 @@ export class PageAdminService {
       throw new HttpException(errorMessage.pageNotFound, HttpStatus.NOT_FOUND);
 
     // Check user exist
-    const admin = await this.userRepository.findOne({
-      where: { uuid: userUuid },
-    });
-    if (!admin)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+    const admin = await this.userService.findOne(userUuid, lang);
 
     // Check if is already admin
     const isAdmin = await this.isHasAuthority(

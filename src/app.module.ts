@@ -64,8 +64,8 @@ import { SocketModule } from './modules/socket/socket.module';
     }),
     MulterConfig,
     ScheduleModule.forRoot(),
-    SocketModule,
     RedisModule,
+    SocketModule,
     AuthModule,
     ActivityModule,
     UserModule,
@@ -86,7 +86,6 @@ import { SocketModule } from './modules/socket/socket.module';
     ChatModule,
     SettingModule,
   ],
-  controllers: [],
   providers: [JwtService],
 })
 export class AppModule {

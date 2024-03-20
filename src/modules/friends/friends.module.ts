@@ -6,24 +6,19 @@ import { FriendRequestService } from './services/friend-request.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Friend } from './entities/friend.entity';
 import { FriendRequest } from './entities/friend-request.entity';
-import { JwtStrategy } from '../auth/strategies/jwt.strategy';
-import { Utils } from 'src/utils/utils';
-import { RedisService } from '../redis/redis.service';
-import { User } from '../user/entities/user.entity';
 import { ChatModule } from '../chat/chat.module';
+import { SocketModule } from '@modules/socket/socket.module';
+import { UserModule } from '@modules/user/user.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Friend, FriendRequest, User]),
+    TypeOrmModule.forFeature([Friend, FriendRequest]),
     ChatModule,
+    UserModule,
+    SocketModule,
   ],
-  providers: [
-    FriendService,
-    FriendRequestService,
-    JwtStrategy,
-    Utils,
-    RedisService,
-  ],
+  providers: [FriendService, FriendRequestService],
   controllers: [FriendController, FriendRequestController],
+  exports: [FriendService, FriendRequestService],
 })
 export class FriendsModule {}

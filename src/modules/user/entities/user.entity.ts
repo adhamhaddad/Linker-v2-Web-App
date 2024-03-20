@@ -19,7 +19,6 @@ import { Education } from 'src/modules/education/entities/education.entity';
 import { Job } from 'src/modules/job/entities/job.entity';
 import { ProfilePicture } from 'src/modules/profile-picture/entities/profile-picture.entity';
 import { FriendRequest } from 'src/modules/friends/entities/friend-request.entity';
-import { Friend } from 'src/modules/friends/entities/friend.entity';
 import { Relationship } from 'src/modules/relationships/entities/relationship.entity';
 import { RelationshipRequest } from 'src/modules/relationships/entities/relationship-request.entity';
 import { Visitor } from 'src/modules/visitor/entities/visitor.entity';
@@ -67,13 +66,11 @@ export class User implements IUser {
   @Column({ type: 'timestamp', nullable: true, default: null })
   email_verified_at: Date;
 
-  @Column({
-    type: 'enum',
-    enum: OnlineStatus,
-    nullable: false,
-    default: 'offline',
-  })
-  is_online: OnlineStatus;
+  @Column({ type: 'boolean', nullable: false, default: false })
+  two_step_verification: boolean;
+
+  @Column({ type: 'date', nullable: true })
+  last_active: Date;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   created_at: Date;
@@ -112,12 +109,6 @@ export class User implements IUser {
   @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.recipient)
   @JoinColumn({ name: 'recipient_id' })
   receivedFriendRequests: FriendRequest[];
-
-  @OneToMany(() => Friend, (friend) => friend.user1)
-  user1Friends: Friend[];
-
-  @OneToMany(() => Friend, (friend) => friend.user2)
-  user2Friends: Friend[];
 
   @OneToMany(
     () => RelationshipRequest,

@@ -20,11 +20,11 @@ export class Friend implements IFriend {
   @Generated('uuid')
   uuid: string;
 
-  @ManyToOne(() => User, (user) => user.user1Friends)
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'user1_id' })
   user1: User;
 
-  @ManyToOne(() => User, (user) => user.user2Friends)
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'user2_id' })
   user2: User;
 

@@ -43,8 +43,8 @@ export class FriendService {
     qb.leftJoinAndSelect('friend.user1', 'user1')
       .leftJoinAndSelect('friend.user2', 'user2')
       .where(
-        '((user1.uuid = :uuid AND user2.uuid != :uuid) OR (user2.uuid = :uuid AND user1.uuid != :uuid)) AND (user1.is_online = :online OR user2.is_online = :online)',
-        { uuid, online: 'online' },
+        '(user1.uuid = :uuid AND user2.uuid != :uuid) OR (user2.uuid = :uuid AND user1.uuid != :uuid)',
+        { uuid },
       );
 
     // Apply ordering, pagination
