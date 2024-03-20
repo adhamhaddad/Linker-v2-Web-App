@@ -10,7 +10,6 @@ import { UpdateChatDto } from '../dto/update-chat.dto';
 import { ChatSerialization } from '../serializers/chat.serialization';
 import { GetChatSerialization } from '../serializers/get-chat.serialization';
 import { ErrorMessages } from 'src/interfaces/error-messages.interface';
-import { ConversationService } from './conversation.service';
 import { DeleteChatDto, DeleteChatType } from '../dto/delete-chat.dto';
 import { IMessage } from '../interfaces/message.interface';
 import { v4 as uuidV4 } from 'uuid';
@@ -30,14 +29,29 @@ export class ChatService {
     private readonly messageModel: Model<IMessage>,
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-    private readonly conversationService: ConversationService,
     private readonly messageService: MessageService,
     private readonly i18nService: I18nService,
   ) {}
 
   async checkChatExist(user_id1: string, user_id2: string) {
     const chat = await this.chatModel.findOne({
-      participants: { $all: [{ _id: user_id1 }, { _id: user_id2 }] },
+      participants: {
+        $all: [
+          { $elemMatch: { _id: user_id1 } },
+          { $elemMatch: { _id: user_id2 } },
+        ],
+      },
+    });
+
+    return chat || false;
+  }
+
+  async findOne(uuid: string, userUuid: string) {
+    const chat = await this.chatModel.findOne({
+      _id: uuid,
+      participants: {
+        $all: [{ $elemMatch: { _id: userUuid } }],
+      },
     });
 
     return chat || false;
@@ -51,18 +65,19 @@ export class ChatService {
       },
     );
 
-    const isChatExist = await this.checkChatExist(user.uuid, body.userId);
-    if (isChatExist)
-      return {
-        message: errorMessage.chatAlreadyExist,
-        data: this.serializeChats(isChatExist),
-      };
+    const isChatExist = await this.checkChatExist(user.uuid, body.userUuid);
+    if (isChatExist) {
+      return;
+    }
 
     // Initial chat created with friendship creation
     const chatCreated = {
       _id: uuidV4(),
-      participants: [{ _id: user.uuid }, { _id: body.userId }],
       type: body.type,
+      participants: [{ _id: user.uuid }, { _id: body.userUuid }],
+      conversation: {
+        _id: uuidV4(),
+      },
     };
 
     const chat = new this.chatModel(chatCreated);
@@ -72,16 +87,6 @@ export class ChatService {
         errorMessage.failedToCreateChat,
         HttpStatus.BAD_REQUEST,
       );
-
-    await this.conversationService.createConversation(
-      { chatId: chat._id, participants: chat.participants },
-      lang,
-    );
-
-    return {
-      message: errorMessage.chatCreatedSuccessfully,
-      data: this.serializeChat(chat),
-    };
   }
 
   async getChats(query: FilterChatDTO, user: User) {
@@ -197,7 +202,7 @@ export class ChatService {
       const participant = {
         profilePicture: profile.profilePicture,
         user: profile.user,
-        status: profile.user.is_online,
+        status: profile.user.last_active,
       };
 
       // Count unseen messages for this chat
@@ -308,7 +313,7 @@ export class ChatService {
     const participant = {
       profilePicture: profile.profilePicture,
       user: profile.user,
-      status: profile.user.is_online,
+      status: profile.user.last_active,
     };
 
     chat[0].participants = participant;

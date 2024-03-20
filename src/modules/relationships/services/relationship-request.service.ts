@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RelationshipRequest } from '../entities/relationship-request.entity';
-import { Repository } from 'typeorm';
+import { OrderByCondition, Repository } from 'typeorm';
 import { Relationship } from '../entities/relationship.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { I18nService } from 'nestjs-i18n';
@@ -17,6 +17,10 @@ import {
 import { UpdateRelationshipRequestSerialization } from '../serializers/update-relationship-request.serialization';
 import { CreateRelationshipDto } from '../dto/create-relationship.dto';
 import { UpdateRelationshipDto } from '../dto/update-relationship.dto';
+import { FilterRelationRequestDTO } from '../dto/requests-filter.dto';
+import { IRelationshipRequest } from '../interfaces/relationship-request.interface';
+import { FriendService } from '@modules/friends/services/friend.service';
+import { UserService } from '@modules/user/services/user.service';
 
 @Injectable()
 export class RelationshipRequestService {
@@ -25,24 +29,10 @@ export class RelationshipRequestService {
     private readonly relationshipRequestRepository: Repository<RelationshipRequest>,
     @InjectRepository(Relationship)
     private readonly relationshipRepository: Repository<Relationship>,
-    @InjectRepository(Friend)
-    private readonly friendRepository: Repository<Friend>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly userService: UserService,
+    private readonly friendService: FriendService,
     private readonly i18nService: I18nService,
   ) {}
-
-  // Helper function to check if users are already friends
-  private async areUsersFriends(user1: User, user2: User): Promise<boolean> {
-    const friend = await this.friendRepository.findOne({
-      where: [
-        { user1: { id: user1.id }, user2: { id: user2.id } },
-        { user1: { id: user2.id }, user2: { id: user1.id } },
-      ],
-    });
-
-    return !!friend;
-  }
 
   // Helper function to check if users are already in a relation
   private async areUsersInRelation(user1: User, user2: User): Promise<boolean> {
@@ -92,7 +82,7 @@ export class RelationshipRequestService {
       },
     );
 
-    console.log(createRelationshipDto)
+    console.log(createRelationshipDto);
     // Check if the recipientUuid is the same as the user's UUID
     if (createRelationshipDto.recipient_id === user.uuid) {
       throw new HttpException(
@@ -102,14 +92,13 @@ export class RelationshipRequestService {
     }
 
     // Check User Exist
-    const recipient = await this.userRepository.findOne({
-      where: { uuid: createRelationshipDto.recipient_id },
-    });
-    if (!recipient)
-      throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
+    const recipient = await this.userService.findOne(
+      createRelationshipDto.recipient_id,
+      lang,
+    );
 
     // Check if it's not a friends
-    const isFriend = await this.areUsersFriends(user, recipient);
+    const isFriend = await this.friendService.areUsersFriends(user, recipient);
     if (!isFriend) {
       throw new HttpException(
         errorMessage.friendNotFound,
@@ -294,39 +283,61 @@ export class RelationshipRequestService {
     };
   }
 
-  async getRelationshipRequests(user: User, lang: string, sent = false) {
-    const errorMessage: ErrorMessages = this.i18nService.translate(
-      'error-messages',
-      {
-        lang,
-      },
+  async getRelationshipRequests(query: FilterRelationRequestDTO, user: User) {
+    const selector: Partial<IRelationshipRequest> = {
+      status: RequestStatus.PENDING,
+    };
+    let order: OrderByCondition = {
+      'request.created_at': 'DESC',
+      'profilePicture.created_at': 'DESC',
+    };
+    const requestType = query.filter?.type || null;
+    query.paginate = query.paginate || 15;
+    query.page = query.page || 1;
+    const skip = (query.page - 1) * query.paginate;
+
+    // Create Query Builder
+    const qb = this.relationshipRequestRepository.createQueryBuilder('request');
+
+    // Apply filters
+    if (Object.keys(selector).length > 0) {
+      qb.where(selector);
+    }
+
+    if (requestType) {
+      qb.leftJoinAndSelect('request.recipient', 'recipient')
+        .leftJoinAndSelect('request.relation', 'relation')
+        .leftJoinAndSelect('recipient.profilePicture', 'profilePicture')
+        .andWhere('request.requester.id = :requesterId', {
+          requesterId: user.id,
+        });
+    } else {
+      qb.leftJoinAndSelect('request.requester', 'requester')
+        .leftJoinAndSelect('request.relation', 'relation')
+        .leftJoinAndSelect('requester.profilePicture', 'profilePicture')
+        .andWhere('request.recipient.id = :recipientId', {
+          recipientId: user.id,
+        });
+    }
+
+    // Apply ordering, pagination
+    qb.orderBy(order).skip(skip).take(query.paginate);
+
+    const [requests, total] = await qb.getManyAndCount();
+
+    const data = requests.map((request) =>
+      this.serializeRelationshipRequest(request),
     );
 
-    const selectFields = sent ? ['recipient'] : ['requester'];
-    const whereClause = sent
-      ? {
-          requester: { id: user.id },
-          status: RequestStatus.PENDING,
-        }
-      : {
-          recipient: { id: user.id },
-          status: RequestStatus.PENDING,
-        };
-
-    const relationshipRequests = await this.relationshipRequestRepository.find({
-      where: whereClause,
-      relations: [...selectFields, 'relation'],
-    });
-    if (!relationshipRequests)
-      throw new HttpException(
-        errorMessage.noRelationshipRequestsFound,
-        HttpStatus.NOT_FOUND,
-      );
-
     return {
-      message: '',
-      data: this.serializeRelationshipRequest(relationshipRequests),
-      total: relationshipRequests.length,
+      data,
+      total,
+      meta: {
+        total,
+        currentPage: query.page,
+        eachPage: query.paginate,
+        lastPage: Math.ceil(total / query.paginate),
+      },
     };
   }
 

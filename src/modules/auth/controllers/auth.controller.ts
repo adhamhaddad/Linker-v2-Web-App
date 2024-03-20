@@ -48,8 +48,30 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() body: LoginDto, @Lang() lang: string) {
-    const { message, data } = await this.authService.login(body, lang);
+  async login(
+    @Body() body: LoginDto,
+    @Res({ passthrough: true }) response: Response,
+    @Headers() headers: any,
+    @Ip() ip: string,
+    @Lang() lang: string,
+  ) {
+    const { message, token, data } = await this.authService.login(
+      body,
+      lang,
+      headers,
+      ip,
+    );
+    const expiresIn = 3 * 60 * 60 * 1000;
+    const expirationDate = new Date(Date.now() + expiresIn);
+
+    if (token)
+      response.cookie('access_token', token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        expires: expirationDate,
+      });
+
     return { message, data };
   }
 

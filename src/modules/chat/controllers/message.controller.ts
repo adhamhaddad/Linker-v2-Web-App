@@ -17,7 +17,7 @@ import { CreateMessageDto } from '../dto/create-message.dto';
 import { UpdateMessageDto } from '../dto/update-message.dto';
 import { FilterMessageDTO } from '../dto/filter-messages.dto';
 import { DeleteMessageDto } from '../dto/delete-message.dto';
-import { SocketGateway } from 'src/modules/socket/socket.gateway';
+import { SocketGateway } from '@modules/socket/socket.gateway';
 
 @UseGuards(JwtAuthGuard)
 @Controller('chats/conversations')
@@ -73,7 +73,7 @@ export class MessageController {
       user,
       lang,
     );
-    await this.socketGateway.handleUpdatedMessage(data);
+    await this.socketGateway.handleUpdateMessage(data);
     return { message, data };
   }
 
@@ -92,7 +92,7 @@ export class MessageController {
       user,
       lang,
     );
-    await this.socketGateway.handleDeletedMessage(data);
+    await this.socketGateway.handleDeleteMessage(data);
     return { message, data };
   }
 }

@@ -11,7 +11,6 @@ import { ProfileSerialization } from '../serializers/profile.serialization';
 import { GetProfilesSerialization } from '../serializers/get-profiles.serialization';
 import { FilterProfileDTO } from '../dto/filter-profile.dto';
 import { IProfile } from '../interfaces/profile.interface';
-import { IProfileHeader } from '../interfaces/profile-header.interface';
 import { IProfileSettings } from '../interfaces/profile-settings.interface';
 import { FriendRequestService } from 'src/modules/friends/services/friend-request.service';
 import { FriendService } from 'src/modules/friends/services/friend.service';
@@ -21,8 +20,8 @@ export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-    // private readonly friendsService: FriendService,
-    // private readonly friendRequestService: FriendRequestService,
+    private readonly friendsService: FriendService,
+    private readonly friendRequestService: FriendRequestService,
     private readonly i18nService: I18nService,
   ) {}
 
@@ -44,6 +43,34 @@ export class ProfileService {
       );
 
     return profile;
+  }
+
+  async getProfileByUserId(uuid: string) {
+    let order: OrderByCondition = {
+      'profilePicture.created_at': 'DESC',
+    };
+
+    // Create Query Builder
+    const qb = this.profileRepository
+      .createQueryBuilder('profile')
+      .leftJoinAndSelect('profile.user', 'user')
+      .leftJoinAndSelect('profile.profilePicture', 'profilePicture')
+      .where('user.uuid = :uuid', { uuid });
+
+    // Apply ordering, pagination
+    qb.orderBy(order).take(1);
+
+    const profile = await qb.getOneOrFail();
+    if (!profile) {
+      return false;
+    }
+
+    const data = {
+      fullName: `${profile.user.first_name} ${profile.user.last_name}`,
+      profile: profile.profilePicture[0].image_url || null,
+    };
+
+    return data || false;
   }
 
   async createProfile(user: User, lang: string) {
@@ -180,29 +207,23 @@ export class ProfileService {
 
     const isMe = profile.user.uuid === user.uuid;
 
-    // const connection = {
-    //   isConnected: await this.friendRequestService.areUsersFriends(
-    //     profileUser,
-    //     user,
-    //   ),
-    //   isRequested: await this.friendRequestService.isFriendRequestSent(
-    //     profileUser,
-    //     user,
-    //   ),
-    // };
-
     const connection = {
       isConnected: false,
-      isRequested: false,
+      isRequested: null,
     };
 
     if (!isMe) {
-      // connection.isConnected = await this.friendsService.areUsersFriends(
-      //   user,
-      //   profile.user,
-      // );
-      // connection.isRequested =
-      //   await this.friendRequestService.isFriendRequestSent(user, profile.user);
+      const connected = await this.friendsService.areUsersFriends(
+        user,
+        profile.user,
+      );
+      const requested = await this.friendRequestService.isRequested(
+        user,
+        profile.user,
+      );
+
+      connection.isConnected = connected;
+      connection.isRequested = requested;
     }
 
     console.log(connection);

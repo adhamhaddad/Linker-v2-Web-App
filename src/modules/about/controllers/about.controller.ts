@@ -3,7 +3,7 @@ import { Lang } from 'src/decorators/lang.decorator';
 import { AboutService } from '../services/about.service';
 import { User } from 'src/decorators/user.decorator';
 import { UpdateAboutDto } from '../dto/update-about.dto';
-import { JwtAuthGuard } from 'src/modules/auth/guards/auth.guard';
+import { JwtAuthGuard } from '@modules/auth/guards/auth.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users/profiles')

@@ -10,11 +10,11 @@ import { User } from 'src/decorators/user.decorator';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get(':id/profiles')
-  async getUserProfile(@Param('id') id: string, @Lang() lang: string) {
-    const { data, message } = await this.userService.findOne(id, lang);
-    return { data, message };
-  }
+  // @Get(':id/profiles')
+  // async getUserProfile(@Param('id') id: string, @Lang() lang: string) {
+  //   const { data, message } = await this.userService.findOne(id, lang);
+  //   return { data, message };
+  // }
 
   @Get()
   async getUsers(@Query() query: FilterUsersDTO, @User() user: any) {

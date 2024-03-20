@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { OrderByCondition, Repository, SelectQueryBuilder } from 'typeorm';
+import { OrderByCondition, Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { User } from 'src/modules/user/entities/user.entity';
 import { IUser } from 'src/modules/user/interfaces/user.interface';
@@ -9,8 +9,6 @@ import { plainToClass } from 'class-transformer';
 import { FilterUsersDTO } from '../dto/filter-users.dto';
 import { UserProfileSerialization } from '../serializers/get-user-profile.serialization';
 import { UserSerialization } from '../serializers/user.serialization';
-import { ProfilePicture } from 'src/modules/profile-picture/entities/profile-picture.entity';
-import { UpdateUserStatus } from '../dto/update-user-status.dto';
 
 @Injectable()
 export class UserService {
@@ -20,23 +18,21 @@ export class UserService {
     private readonly i18nService: I18nService,
   ) {}
 
-  async updateOnlineStatus(uuid: string, status: UpdateUserStatus) {
+  async updateActiveStatus(uuid: string, date: Date) {
     const { affected } = await this.userRepository.update(
-      {
-        uuid,
-      },
-      { is_online: status.is_online },
+      { uuid },
+      { last_active: date },
     );
     if (!affected)
       throw new HttpException(
-        'Failed to update online status',
+        'Failed to update last active status',
         HttpStatus.BAD_REQUEST,
       );
 
-    return { message: 'Status updated successfully', status: status.is_online };
+    return { message: 'Status updated successfully', status: date };
   }
 
-  async findOne(id: string, lang: string) {
+  async findOne(uuid: string, lang: string) {
     const errorMessage: ErrorMessages = this.i18nService.translate(
       'error-messages',
       {
@@ -44,11 +40,11 @@ export class UserService {
       },
     );
 
-    const user = await this.userRepository.findOne({ where: { uuid: id } });
+    const user = await this.userRepository.findOne({ where: { uuid } });
     if (!user)
       throw new HttpException(errorMessage.userNotFound, HttpStatus.NOT_FOUND);
 
-    return { data: this.serializeUserProfile(user), message: '' };
+    return user;
   }
 
   async getUsers(query: FilterUsersDTO, user: User) {

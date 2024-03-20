@@ -19,8 +19,6 @@ export class RelationshipService {
     private readonly relationshipRepository: Repository<Relationship>,
     @InjectRepository(RelationshipRequest)
     private readonly relationshipRequestRepository: Repository<RelationshipRequest>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     private readonly relationshipRequestService: RelationshipRequestService,
     private readonly i18nService: I18nService,
   ) {}

@@ -10,7 +10,7 @@ export class Message extends Document {
   _id: string;
 
   @Prop({ type: String, ref: 'Conversation', required: true, index: 1 })
-  conversationId: String;
+  conversation: String;
 
   @Prop({ type: String, required: true })
   senderId: string;

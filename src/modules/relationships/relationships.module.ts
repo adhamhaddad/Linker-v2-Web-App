@@ -6,23 +6,16 @@ import { Relationship } from './entities/relationship.entity';
 import { RelationshipRequestService } from './services/relationship-request.service';
 import { RelationshipRequest } from './entities/relationship-request.entity';
 import { RelationshipRequestController } from './controllers/relationship-requests.controller';
-import { JwtStrategy } from '../auth/strategies/jwt.strategy';
-import { Utils } from 'src/utils/utils';
-import { RedisService } from '../redis/redis.service';
-import { User } from '../user/entities/user.entity';
-import { Friend } from '../friends/entities/friend.entity';
+import { UserModule } from '@modules/user/user.module';
+import { FriendsModule } from '@modules/friends/friends.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Relationship, RelationshipRequest, User, Friend]),
+    TypeOrmModule.forFeature([Relationship, RelationshipRequest]),
+    UserModule,
+    FriendsModule,
   ],
-  providers: [
-    RelationshipService,
-    RelationshipRequestService,
-    JwtStrategy,
-    Utils,
-    RedisService,
-  ],
+  providers: [RelationshipService, RelationshipRequestService],
   controllers: [RelationshipController, RelationshipRequestController],
 })
 export class RelationshipsModule {}

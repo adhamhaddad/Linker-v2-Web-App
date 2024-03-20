@@ -32,8 +32,10 @@ export interface ErrorMessages {
   addressExist: string;
   addressCreatedSuccessfully: string;
   addressUpdatedSuccessfully: string;
+  addressDeletedSuccessfully: string;
   failedToCreateAddress: string;
   failedToUpdateAddress: string;
+  failedToDeleteAddress: string;
   /* -- About -- */
   aboutNotFound: string;
   aboutExist: string;
@@ -92,6 +94,7 @@ export interface ErrorMessages {
   friendRequestUpdatedSuccessfully: string;
   friendRequestAlreadyUpdated: string;
   failedToSendFriendRequest: string;
+  failedToUpdateRequest: string;
   cannotSendRequestToYourself: string;
   /* -- Friend -- */
   noFriendsFound: string;
